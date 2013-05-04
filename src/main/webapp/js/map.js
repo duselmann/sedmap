@@ -1,11 +1,21 @@
 var map;
-var untiled;
-var tiled;
+var imageLayer;
+var topoLayer;
+var baseLayer;
 var pureCoverage = false;
 // pink tile avoidance
 OpenLayers.IMAGE_RELOAD_ATTEMPTS = 5;
 // make OL compute scale according to WMS spec
 OpenLayers.DOTS_PER_INCH = 25.4 / 0.28;
+
+var toggleBaseLayer = function() {
+	if (baseLayer === imageLayer) {
+		baseLayer = topoLayer
+	} else {
+		baseLayer = imageLayer
+	}
+	map.setBaseLayer(baseLayer)
+}
 
 function init(){
     // if this is just a coverage or a group of them, disable a few items,
@@ -34,7 +44,18 @@ function init(){
     };
     map = new OpenLayers.Map('map', options);
 
-    map.addLayer(new OpenLayers.Layer.XYZ("World Imagery",
+	topoLayer = new OpenLayers.Layer.XYZ("Topo",
+            "http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/${z}/${y}/${x}",
+            {
+                sphericalMercator: true,
+                isBaseLayer: true,
+                numZoomLevels: 20,
+                wrapDateLine: true
+            }
+    )
+	map.addLayer(topoLayer);
+	
+	imageLayer = new OpenLayers.Layer.XYZ("World Imagery",
             "http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}",
             {
                 sphericalMercator: true,
@@ -42,7 +63,9 @@ function init(){
                 numZoomLevels: 20,
                 wrapDateLine: true
             }
-    ));
+    )
+	map.addLayer(imageLayer);
+	
     // setup tiled layer
     map.addLayer( new OpenLayers.Layer.WMS(
         "upload:SM_SITE_REF - Tiled", "http://cida-wiwsc-sedmapdev.er.usgs.gov:8080/geoserver/upload/wms",
@@ -95,8 +118,8 @@ function init(){
     map.addControl(new OpenLayers.Control.MousePosition({element: $('location')}));
     
     // wire up the option button
-    var options = document.getElementById("options");
-    options.onclick = toggleControlPanel;
+    //var options = document.getElementById("options");
+    //options.onclick = toggleControlPanel;
     
     // support GetFeatureInfo
     map.events.register('click', map, function (e) {
