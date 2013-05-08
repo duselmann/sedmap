@@ -39,7 +39,7 @@ function init(){
         controls: [],
         maxExtent: bounds,
         maxResolution: 0.4482803329789445,
-        projection: "EPSG:4269", // or 4326
+        projection: "EPSG:4326", // or 4269
         units: 'degrees'
     };
     map = new OpenLayers.Map('map', options);
@@ -65,44 +65,45 @@ function init(){
             }
     )
 	map.addLayer(imageLayer);
-	
-    // setup tiled layer
-    map.addLayer( new OpenLayers.Layer.WMS(
-        "upload:SM_SITE_REF - Tiled", "http://cida-wiwsc-sedmapdev.er.usgs.gov:8080/geoserver/upload/wms",
-        {
-            LAYERS: 'upload:SM_SITE_REF',
-            STYLES: '',
-            format: format,
-            tiled: true,
-            transparent: true,
-            tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
-        },
-        {
-            buffer: 0,
-            displayOutsideMaxExtent: true,
-            isBaseLayer: false,
-            yx : {'EPSG:4269' : true}
-        } 
-    ));
 
-    // setup single tiled layer
-    map.addLayer( new OpenLayers.Layer.WMS(
-        "upload:SM_SITE_REF - Untiled", "http://cida-wiwsc-sedmapdev.er.usgs.gov:8080/geoserver/upload/wms",
-        {
-            LAYERS: 'upload:SM_SITE_REF',
-            STYLES: '',
-            transparent: true,
-            format: format
-        },
-        {
-           singleTile: true, 
-           ratio: 1, 
-           isBaseLayer: false,
-           yx : {'EPSG:4269' : true}
-        } 
-    ));
-
-
+	 var dailies = new OpenLayers.Layer.WMS(
+		        "Daily Sites", "http://cida-wiwsc-sedmapdev.er.usgs.gov:8080/geoserver/sedmap/wms",
+		        {
+		            LAYERS: 'sedmap:Daily Sites',
+		            STYLES: '',
+		            format: format,
+		            tiled: true,
+		            transparent: true,
+		            tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
+		        },
+		        {
+		            buffer: 0,
+		            displayOutsideMaxExtent: true,
+		            isBaseLayer: false,
+		            yx : {'EPSG:4269' : true}
+		        } 
+		    );
+		    map.addLayer( dailies);
+		    
+		    var instant = new OpenLayers.Layer.WMS(
+			        "Instant Sites", "http://cida-wiwsc-sedmapdev.er.usgs.gov:8080/geoserver/sedmap/wms",
+			        {
+			            LAYERS: 'sedmap:Instant Sites',
+			            STYLES: '',
+			            format: format,
+			            tiled: true,
+			            transparent: true,
+			            tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
+			        },
+			        {
+			            buffer: 0,
+			            displayOutsideMaxExtent: true,
+			            isBaseLayer: false,
+			            yx : {'EPSG:4269' : true}
+			        } 
+			    );
+			    map.addLayer( instant);
+			    
 	map.zoomToMaxExtent();
 	var center = new OpenLayers.LonLat(-100,40)
 	var proj = new OpenLayers.Projection("EPSG:4326");
@@ -116,6 +117,7 @@ function init(){
     map.addControl(new OpenLayers.Control.Navigation());
     map.addControl(new OpenLayers.Control.Scale($('scale')));
     map.addControl(new OpenLayers.Control.MousePosition({element: $('location')}));
+    map.addControl(new OpenLayers.Control.LayerSwitcher());
     
     // wire up the option button
     //var options = document.getElementById("options");
