@@ -39,34 +39,111 @@ function init(){
         controls: [],
         maxExtent: bounds,
         maxResolution: 0.4482803329789445,
-        projection: "EPSG:4326", // or 4269
+        projection: "EPSG:900913", // or 4269
         units: 'degrees'
     };
     map = new OpenLayers.Map('map', options);
 
 	topoLayer = new OpenLayers.Layer.XYZ("Topo",
-            "http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/${z}/${y}/${x}",
-            {
-                sphericalMercator: true,
-                isBaseLayer: true,
-                numZoomLevels: 20,
-                wrapDateLine: true
-            }
+        "http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/${z}/${y}/${x}",
+        {
+            sphericalMercator: true,
+            isBaseLayer: true,
+            numZoomLevels: 20,
+            wrapDateLine: true
+        }
     )
 	map.addLayer(topoLayer);
 	
 	imageLayer = new OpenLayers.Layer.XYZ("World Imagery",
-            "http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}",
-            {
-                sphericalMercator: true,
-                isBaseLayer: true,
-                numZoomLevels: 20,
-                wrapDateLine: true
-            }
+        "http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}",
+        {
+            sphericalMercator: true,
+            isBaseLayer: true,
+            numZoomLevels: 20,
+            wrapDateLine: true
+        }
     )
 	map.addLayer(imageLayer);
 
-	 var dailies = new OpenLayers.Layer.WMS(
+	
+    var states = new OpenLayers.Layer.WMS(
+            "States", "http://cida-wiwsc-sedmapdev:8080/geoserver/sedmap/wms",
+            {
+                LAYERS: 'sedmap:CONUS_states_multipart',
+                STYLES: '',
+                format: format,
+                tiled: true,
+	            transparent: true,
+                tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
+            },
+            {
+                buffer: 0,
+                displayOutsideMaxExtent: true,
+                isBaseLayer: false,
+                yx : {'EPSG:900913' : false}
+            } 
+        );
+    map.addLayer(states);
+    var counties = new OpenLayers.Layer.WMS(
+            "Counties", "http://cida-wiwsc-sedmapdev:8080/geoserver/sedmap/wms",
+            {
+                LAYERS: 'sedmap:countyp020',
+                STYLES: '',
+                format: format,
+                tiled: true,
+                transparent: true,
+                tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
+            },
+            {
+                buffer: 0,
+                displayOutsideMaxExtent: true,
+                isBaseLayer: false,
+                yx : {'EPSG:900913' : false}
+            } 
+        );
+        map.addLayer(counties);
+        
+        var huc8 = new OpenLayers.Layer.WMS(
+                "HUC8", "http://cida-wiwsc-sedmapdev:8080/geoserver/sedmap/wms",
+                {
+                    LAYERS: 'sedmap:huc_8_multipart_wgs',
+                    STYLES: '',
+                    format: format,
+                    tiled: true,
+    	            transparent: true,
+                    tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
+                },
+                {
+                    buffer: 0,
+                    displayOutsideMaxExtent: true,
+                    isBaseLayer: false,
+                    yx : {'EPSG:900913' : false}
+                } 
+            );
+        map.addLayer(huc8);
+	
+		    
+    var instant = new OpenLayers.Layer.WMS(
+	        "Instant Sites", "http://cida-wiwsc-sedmapdev.er.usgs.gov:8080/geoserver/sedmap/wms",
+	        {
+	            LAYERS: 'sedmap:Instant Sites',
+	            STYLES: '',
+	            format: format,
+	            tiled: true,
+	            transparent: true,
+	            tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
+	        },
+	        {
+	            buffer: 0,
+	            displayOutsideMaxExtent: true,
+	            isBaseLayer: false,
+	            yx : {'EPSG:4269' : true}
+	        } 
+	    );
+	    map.addLayer( instant);
+	    
+		var dailies = new OpenLayers.Layer.WMS(
 		        "Daily Sites", "http://cida-wiwsc-sedmapdev.er.usgs.gov:8080/geoserver/sedmap/wms",
 		        {
 		            LAYERS: 'sedmap:Daily Sites',
@@ -84,25 +161,27 @@ function init(){
 		        } 
 		    );
 		    map.addLayer( dailies);
-		    
-		    var instant = new OpenLayers.Layer.WMS(
-			        "Instant Sites", "http://cida-wiwsc-sedmapdev.er.usgs.gov:8080/geoserver/sedmap/wms",
-			        {
-			            LAYERS: 'sedmap:Instant Sites',
-			            STYLES: '',
-			            format: format,
-			            tiled: true,
-			            transparent: true,
-			            tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
-			        },
-			        {
-			            buffer: 0,
-			            displayOutsideMaxExtent: true,
-			            isBaseLayer: false,
-			            yx : {'EPSG:4269' : true}
-			        } 
-			    );
-			    map.addLayer( instant);
+	    
+    var nid = new OpenLayers.Layer.WMS(
+            "NID", "http://cida-wiwsc-sedmapdev:8080/geoserver/sedmap/wms",
+            {
+                LAYERS: 'sedmap:NID',
+                STYLES: '',
+                format: format,
+                tiled: true,
+	            transparent: true,
+                tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
+            },
+            {
+                buffer: 0,
+                displayOutsideMaxExtent: true,
+                isBaseLayer: false,
+                yx : {'EPSG:900913' : false}
+            } 
+        );
+    map.addLayer(nid);
+    
+    
 			    
 	map.zoomToMaxExtent();
 	var center = new OpenLayers.LonLat(-100,40)
@@ -134,7 +213,7 @@ function init(){
             INFO_FORMAT: 'text/html',
             QUERY_LAYERS: map.layers[0].params.LAYERS,
             FEATURE_COUNT: 50,
-            Layers: 'upload:SM_SITE_REF',
+            Layers: 'sedmap:SM_SITE_REF',
             WIDTH: map.size.w,
             HEIGHT: map.size.h,
             format: format,
@@ -162,7 +241,7 @@ function init(){
         if(map.layers[0].params.FEATUREID) {
             params.featureid = map.layers[0].params.FEATUREID;
         }
-        OpenLayers.loadURL("http://cida-wiwsc-sedmapdev.er.usgs.gov:8080/geoserver/upload/wms", params, this, setHTML, setHTML);
+        OpenLayers.loadURL("http://cida-wiwsc-sedmapdev.er.usgs.gov:8080/geoserver/sedmap/wms", params, this, setHTML, setHTML);
         OpenLayers.Event.stop(e);
     });
 }
