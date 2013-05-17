@@ -99,6 +99,7 @@ function init(){
                 buffer: 0,
                 displayOutsideMaxExtent: true,
                 isBaseLayer: false,
+                visibility:false,
                 yx : {'EPSG:900913' : false}
             } 
         );
@@ -118,6 +119,7 @@ function init(){
                     buffer: 0,
                     displayOutsideMaxExtent: true,
                     isBaseLayer: false,
+                    visibility:false,
                     yx : {'EPSG:900913' : false}
                 } 
             );
@@ -143,7 +145,7 @@ function init(){
 	    );
 	    map.addLayer( instant);
 	    
-		var dailies = new OpenLayers.Layer.WMS(
+		var daily = new OpenLayers.Layer.WMS(
 		        "Daily Sites", "http://cida-wiwsc-sedmapdev.er.usgs.gov:8080/geoserver/sedmap/wms",
 		        {
 		            LAYERS: 'sedmap:Daily Sites',
@@ -160,7 +162,7 @@ function init(){
 		            yx : {'EPSG:4269' : true}
 		        } 
 		    );
-		    map.addLayer( dailies);
+		    map.addLayer( daily);
 	    
     var nid = new OpenLayers.Layer.WMS(
             "NID", "http://cida-wiwsc-sedmapdev:8080/geoserver/sedmap/wms",
@@ -176,6 +178,7 @@ function init(){
                 buffer: 0,
                 displayOutsideMaxExtent: true,
                 isBaseLayer: false,
+                visibility:false,
                 yx : {'EPSG:900913' : false}
             } 
         );
