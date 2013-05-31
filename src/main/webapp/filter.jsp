@@ -3,8 +3,16 @@
 
 <html lang="en">
     
+    <style>
+    	div.warn {
+    		color:red;
+    	}
+    </style>
+    
     <body ><div id="filter">
-        Filter By:    	 <input type="button" id="clearFilter" value="Clear">
+        Filter By:    	 
+        <input type="button" id="clearFilter" value="Clear">
+        <input type="button" id="applyFilter" value="Apply">
         <br>
         States: <div id="states">
         <div id="baseState" style="margin-left:50px">
@@ -41,13 +49,14 @@
     	<BR>
     	HUC: <input id="HUC_12" type="text">
     	<BR> -->
-    	Basin: <input id="BASIN" type="text">
+    	Basin: <input id="BASIN" class="basin" type="text">
     	<br>
     	<br>
     	Drainage Area (mi<super>2</super>): between <br>
-    		<input id="DRAINAGE_AREA_MI_SQ-low" type="text" size="8">
+    		<input id="DRAINAGE_AREA_MI_SQ-low" class="drainage" type="text" size="8">
     		and 
-    		<input id="DRAINAGE_AREA_MI_SQ-high" type="text" size="8">
+    		<input id="DRAINAGE_AREA_MI_SQ-high" class="drainage" type="text" size="8">
+    		<div id="drainage-warn" class="warn"></div>
     </div></body>
     
     <script type="text/javascript" src="js/filter.js"></script>

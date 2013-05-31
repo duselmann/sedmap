@@ -15,6 +15,7 @@
         <cida.maven.url>http://internal.cida.usgs.gov/maven</cida.maven.url>
         <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
         <timestamp>${maven.build.timestamp}</timestamp> 
+        <slf4j.version>1.7.5</slf4j.version>
     </properties>
     
 
@@ -99,7 +100,27 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+        <dependency>
+            <groupId>gov.usgs.cida</groupId>
+            <artifactId>dynamicProperties</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <artifactId>slf4j-api</artifactId>
+            <groupId>org.slf4j</groupId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>        
 		<dependency>
 		    <groupId>commons-httpclient</groupId>
 		    <artifactId>commons-httpclient</artifactId>
