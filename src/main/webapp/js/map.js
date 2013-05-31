@@ -5,20 +5,11 @@ OpenLayers.DOTS_PER_INCH = 25.4 / 0.28;
 
 var map // this will be your main openlayers handle
 var format     = 'image/png'; // your default wms return type. 
-var projectUrl = 'http://cida-wiwsc-sedmapdev:8080/geoserver/sedmap/wms'; // your project server. 
+var projectUrl = 'http://cida-wiwsc-sedmapdev:8080/geoserver/sedmap/'; // your project server. 
 var arcgisUrl  = 'http://services.arcgisonline.com/ArcGIS/rest/services/'; // ArcGIS server. 
 
-//var imageLayer;
-//var topoLayer;
-//var baseLayer;
-//var toggleBaseLayer = function() {
-//	if (baseLayer === imageLayer) {
-//		baseLayer = topoLayer
-//	} else {
-//		baseLayer = imageLayer
-//	}
-//	map.setBaseLayer(baseLayer)
-//}
+var layers = {}
+
 
 function init(){
 
@@ -71,7 +62,8 @@ function init(){
 it is best to make a method for repetitive tasks.  you will likely have more than one layer and the order they are added determines the order they are overlaid 
 */
 function addLayer(map, title, layerId, initiallyVisible) {
-   var layer = new OpenLayers.Layer.WMS(title, projectUrl,
+	
+   var layer = new OpenLayers.Layer.WMS(title, projectUrl+"wms",
        {
            LAYERS: layerId,
            STYLES: '',
@@ -88,6 +80,7 @@ function addLayer(map, title, layerId, initiallyVisible) {
            yx : {'EPSG:900913' : false}
        }
    );
+   layers[title] = layer;
    map.addLayer(layer); // add the new layer to the map viewport 
 }
 
@@ -102,6 +95,7 @@ function addArcGisLayer(map, title, layerId) {
            wrapDateLine: true
        }
    );
+   layers[title] = layer;
    map.addLayer(layer); // add the new layer to the map viewport 
 }
 
