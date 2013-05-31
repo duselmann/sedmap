@@ -1,0 +1,10 @@
+.nav {
+    margin:0;
+}
+div.olMap {
+	float:left;
+}
+div.filter {
+	float:right;
+	margin:3px;
+}
