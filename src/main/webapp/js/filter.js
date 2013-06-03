@@ -32,6 +32,12 @@ var Tag = new function() {
 	this.CLOSE = true
 
 	this.make = function(tag,close) {
+		if (close) {
+			var index = tag.indexOf(" ")
+			index = index>=0 ?index :tag.length 
+			tag = tag.substring(0,index)
+		}
+	
 		var clause = "<"+(close?'/':'')+tag+">"
 		return clause
 	}
@@ -61,6 +67,7 @@ var Ogc = new function() {
 		'!':'Not',
 		'<':'LessThan',
 		'>':'GreaterThan',
+		'L':'Like wildCard="*" singleChar="." escape="!"',
 	}
 	this.opcodes = Object.keys(this.operators)
 
@@ -135,6 +142,7 @@ var mp = function(op, name, value) {
 
 var stateFilter    = {Or:[]}
 var basinFilter    = undefined
+var hucFilter      = undefined
 var drainageFilter = undefined
 
 var getStateValues = function(el) {
@@ -215,6 +223,7 @@ $().ready(function(){
 
 	$('#applyFilter').click(applyFilter)
 	$('input.basin').blur(onBasinBlur)
+	$('input.huc').blur(onHucBlur)
 	$('input.drainage').blur(onDrainageBlur)
 
 	$('#STATE').change(function(e){
@@ -226,9 +235,11 @@ $().ready(function(){
 		$('#states').find('input.destroy').parent().remove()
 		$('input.drainage').val('')
 		$('input.basin').val('')
+		$('input.huc').val('')
 		
 		stateFilter    = {Or:[]}
 		basinFilter    = undefined
+		hucFilter      = undefined
 		drainageFilter = undefined
 		applyFilterToLayers('','all')
 	})
@@ -251,9 +262,12 @@ var applyFilter = function() {
 
 		applyFilterToLayers(ogcXml, ['States','Counties','NID'])
 	}
-	if (basinFilter || drainageFilter) {
+	if (basinFilter || drainageFilter || hucFilter) {
 		if (basinFilter) {
 			filter.And.push(basinFilter)
+		}
+		if (hucFilter) {
+			filter.And.push(hucFilter)
 		}
 		if (drainageFilter) {
 			filter.And.push(drainageFilter[0])
@@ -298,12 +312,17 @@ var onDrainageBlur = function() {
 	$('#drainage-warn').text(errorText)
 }
 
+var onHucBlur = function(e) {
+	var el  = e.srcElement
+	var val = $(el).val()
+	hucFilter = mp('L','HUC_12',val)
+}
 
 
 var onBasinBlur = function(e) {
 	var el  = e.srcElement
 	var val = $(el).val()
-	basinFilter = mp('=','BASIN',val)
+	basinFilter = mp('L','BASIN',val)
 }
 
 
@@ -318,6 +337,22 @@ var Test = new function() {
 		return true
 	}
 }
+
+var tag    = "foo"
+var expect = "<foo>"
+var actual = Tag.open(tag)
+Test.equal(actual,expect)
+var expect = "</foo>"
+var actual = Tag.close(tag)
+Test.equal(actual,expect)
+var tag    = 'foo attr="val"'
+var expect = '<foo attr="val">'
+var actual = Tag.open(tag)
+Test.equal(actual,expect)
+var expect = "</foo>"
+var actual = Tag.close(tag)
+Test.equal(actual,expect)
+
 
 // test building property comparisons
 var tag    = "foo"

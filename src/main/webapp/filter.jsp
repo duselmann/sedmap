@@ -46,9 +46,9 @@
     	</div>
     	<BR>
 <!--    	FIPS County: <input id="FIPS_CNTY" type="text">
-    	<BR>
-    	HUC: <input id="HUC_12" type="text">
     	<BR> -->
+    	HUC: <input id="HUC_12" class="huc" type="text">
+    	<BR>
     	Basin: <input id="BASIN" class="basin" type="text">
     	<br>
     	<br>
