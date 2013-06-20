@@ -18,11 +18,12 @@
         <div id="baseState" style="margin-left:50px">
     	<select id="STATE">
 			<option value="">Select a State</option>
-			<option value="AL">Alabama</option><option value="AZ">Arizona</option><option value="AR">Arkansas</option>
+			<option value="AK">Alaska</option><option value="AL">Alabama</option><option value="AZ">Arizona</option><option value="AR">Arkansas</option>
 			<option value="CA">California</option><option value="CO">Colorado</option><option value="CT">Connecticut</option>
 			<option value="DE">Delaware</option>
 			<option value="FL">Florida</option>
 			<option value="GA">Georgia</option>
+			<option value="HI">Hawaii</option>
 			<option value="ID">Idaho</option><option value="IL">Illinois</option><option value="IN">Indiana</option><option value="IA">Iowa</option>
 			<option value="KS">Kansas</option><option value="KY">Kentucky</option>
 			<option value="LA">Louisiana</option>
@@ -49,8 +50,6 @@
     	<BR> -->
     	HUC: <input id="HUC_12" class="huc" type="text">
     	<BR>
-    	Basin: <input id="BASIN" class="basin" type="text">
-    	<br>
     	<br>
     	Drainage Area (mi<super>2</super>): between <br>
     		<input id="DRAINAGE_AREA_MI_SQ-low" class="drainage" type="text" size="8">
