@@ -143,6 +143,7 @@ var mp = function(op, name, value) {
 var stateFilter    = {Or:[]}
 var basinFilter    = undefined
 var hucFilter      = undefined
+var minYrsFilter   = undefined
 var drainageFilter = undefined
 
 var getStateValues = function(el) {
@@ -225,6 +226,7 @@ $().ready(function(){
 	$('input.basin').blur(onBasinBlur)
 	$('input.huc').blur(onHucBlur)
 	$('input.drainage').blur(onDrainageBlur)
+	$('input.minyrs').blur(onMinYrsBlur)
 
 	$('#STATE').change(function(e){
 		addStateFilter(e)
@@ -236,11 +238,13 @@ $().ready(function(){
 		$('input.drainage').val('')
 		$('input.basin').val('')
 		$('input.huc').val('')
+		$('input.minyrs').val('')
 		
 		stateFilter    = {Or:[]}
 		basinFilter    = undefined
 		hucFilter      = undefined
 		drainageFilter = undefined
+		minYrsFilter   = undefined
 		applyFilterToLayers('','all')
 	})
 })
@@ -262,22 +266,29 @@ var applyFilter = function() {
 
 		applyFilterToLayers(ogcXml, ['States','Counties','NID'])
 	}
-	if (basinFilter || drainageFilter || hucFilter) {
-		if (basinFilter) {
-			filter.And.push(basinFilter)
-		}
-		if (hucFilter) {
-			filter.And.push(hucFilter)
-		}
-		if (drainageFilter) {
-			filter.And.push(drainageFilter[0])
-			filter.And.push(drainageFilter[1])
-		}
+	if (basinFilter) {
+		filter.And.push(basinFilter)
 	}
-	if (filter.And.length) {
+	if (hucFilter) {
+		filter.And.push(hucFilter)
+	}
+	if (drainageFilter) {
+		filter.And.push(drainageFilter[0])
+		filter.And.push(drainageFilter[1])
+	}
+	if (filter.And.length) { // TODO need a layers based approach
 		var ogcXml = Ogc.filter(filter)
-		applyFilterToLayers(ogcXml, ['Instant Sites','Daily Sites'])
-	}	
+		var layers = ['Instant Sites']
+		if (!minYrsFilter) layers.push('Daily Sites')
+		applyFilterToLayers(ogcXml, layers)
+	}
+	
+	if (minYrsFilter) {
+		filter.And.push(minYrsFilter)
+		var ogcXml = Ogc.filter(filter)
+		var layers = ['Daily Sites']
+		applyFilterToLayers(ogcXml, layers)
+	}
 	//layers['HUC8'].mergeNewParams({FILTER:ogcXml})
 }
 
@@ -310,6 +321,22 @@ var onDrainageBlur = function() {
 		}
 	} 
 	$('#drainage-warn').text(errorText)
+}
+
+
+var onMinYrsBlur = function() {
+	var errorText = ""
+	var val = $('input.minyrs').val()
+	console.log(val)
+	if (val === "") return
+	if (! $.isNumeric(val) || val<0 ) {
+		errorText = 'Min year must be a number between 1 and 60.'
+		$('#drainage-warn').text(errorText)
+		$('input.minyrs').focus()
+		return
+	}
+	
+	minYrsFilter = mp('>','SAMPLE_YEARS',val)
 }
 
 var onHucBlur = function(e) {

@@ -65,7 +65,7 @@ function init(){
     addLayer(map, "Counties", "sedmap:countyp020", false)   // add a new invisible layer
     addLayer(map, "HUC8", "sedmap:huc_8_multipart_wgs", false)
     addLayer(map, "Instant Sites", "sedmap:Instant Sites", true)
-    addLayer(map, "Daily Sites", "sedmap:Daily Sites", true)
+    addLayer(map, "Daily Sites", "sedmap:SM_DAILY_STATION_YEARS", true)
     addLayer(map, "NID", "sedmap:NID", false)
 	
     // zoom and move viewport to desired location
@@ -122,7 +122,7 @@ function addNlcdLayer(map, title, layerId) {
 	       buffer: 0,
 	       opacity: .5,        // alpha for overlay
 	       isBaseLayer: false, // overlay layer
-	       wrapDateLine: false,// repeat the world map
+	       wrapDateLine: true,// repeat the world map
 	       visibility: false,  // default hidden
 	       displayOutsideMaxExtent: true, // display full map returned
 //	       sphericalMercator: true,
@@ -143,7 +143,7 @@ function addArcGisLayer(map, title, layerId) {
      {
 	 	   buffer: 0,
 	       isBaseLayer: true, // base layer
-	       wrapDateLine: false,// repeat the world map
+	       wrapDateLine: true,// repeat the world map
 	       visibility: true,   // default visible
 	       displayOutsideMaxExtent: true, // display full map returned
            sphericalMercator: true,
