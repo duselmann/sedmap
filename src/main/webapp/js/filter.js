@@ -144,6 +144,7 @@ var stateFilter    = {Or:[]}
 var basinFilter    = undefined
 var hucFilter      = undefined
 var minYrsFilter   = undefined
+var refOnlyFilter  = undefined
 var drainageFilter = undefined
 
 var getStateValues = function(el) {
@@ -222,6 +223,7 @@ var onStateChange = function(e) {
 
 $().ready(function(){
 
+	$('input.refonly').click(onRefOnlyClick)
 	$('#applyFilter').click(applyFilter)
 	$('input.basin').blur(onBasinBlur)
 	$('input.huc').blur(onHucBlur)
@@ -239,12 +241,14 @@ $().ready(function(){
 		$('input.basin').val('')
 		$('input.huc').val('')
 		$('input.minyrs').val('')
+		$('input.refonly').attr("checked",false);
 		
 		stateFilter    = {Or:[]}
 		basinFilter    = undefined
 		hucFilter      = undefined
 		drainageFilter = undefined
 		minYrsFilter   = undefined
+		refOnlyFilter  = undefined
 		applyFilterToLayers('','all')
 	})
 })
@@ -275,6 +279,9 @@ var applyFilter = function() {
 	if (drainageFilter) {
 		filter.And.push(drainageFilter[0])
 		filter.And.push(drainageFilter[1])
+	}
+	if (refOnlyFilter) {
+		filter.And.push(refOnlyFilter)
 	}
 	if (filter.And.length) { // TODO need a layers based approach
 		var ogcXml = Ogc.filter(filter)
@@ -323,6 +330,12 @@ var onDrainageBlur = function() {
 	$('#drainage-warn').text(errorText)
 }
 
+var onRefOnlyClick = function() {
+	refOnlyFilter  = undefined
+	if ( $('input.refonly').attr("checked") ) {
+		refOnlyFilter = mp('=','REFERENCE_SITE',"1")
+	}
+}
 
 var onMinYrsBlur = function() {
 	var errorText = ""

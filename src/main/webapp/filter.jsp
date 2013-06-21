@@ -50,7 +50,9 @@
     	<BR> -->
     	HUC: <input id="HUC_12" class="huc" type="text">
     	<BR>
-    	Min Years of Daily Data: <input id="minyrs" class="minyrs" type="text" size="4" maxlength="2">
+        Min Years of Daily Data: <input id="minyrs" class="minyrs" type="text" size="4" maxlength="2">
+    	<BR>
+        Referece Sites Only: <input id="refonly" class="refonly" type="checkbox">
     	<BR>
     	Drainage Area (mi<super>2</super>): between <br>
     		<input id="DRAINAGE_AREA_MI_SQ-low" class="drainage" type="text" size="8">
