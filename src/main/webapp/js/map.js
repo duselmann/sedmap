@@ -5,7 +5,7 @@ OpenLayers.Layer.WMS.prototype.getFullRequestString = function(newParams,altUrl)
     }catch(err){
         var projectionCode=this.map.getProjection();
     }
-    projectionCode = 'EPSG:4326'
+    projectionCode = 'EPSG:3857'
 
     this.params.SRS = projectionCode=="none" ?null :projectionCode;
  
@@ -36,24 +36,20 @@ function init(){
         new OpenLayers.Control.Scale($('scale')),
         new OpenLayers.Control.MousePosition({element: $('location')}),
         new OpenLayers.Control.LayerSwitcher(),
+        new OpenLayers.Control.ScaleLine(),
     ]
-    var bounds = new OpenLayers.Bounds(-173, 18, -60, 70);
+    var bounds = new OpenLayers.Bounds(-173*111000, 18*111000, -60*111000, 70*111000);
 	
     var options = {
     	controls: controls,
-    	numZoomLevels: NUM_ZOOM_LEVELS,
-//        maxExtent: bounds,
-    	maxExtent: new OpenLayers.Bounds(-180,-90,180,90),
-        // Got this number from Hollister, and he's not sure where it came from.
-        // Without this line, the esri road and relief layers will not display
-        // outside of the upper western hemisphere.
-        maxResolution: 1.40625,
-//      maxResolution: 1.40625/2,
+//    	numZoomLevels: NUM_ZOOM_LEVELS,
+//      maxExtent: bounds,
+        maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34),
+//    	maxExtent: new OpenLayers.Bounds(-20037508,-20037508,20037508,20037508),
+        maxResolution: 1.40625/2,
 //        maxResolution: 0.45,
-//        maxResolution: auto,
-        projection: "EPSG:4326", // or 4269
-        //projection: "EPSG:900913", // or 4269
-        units: 'degrees'
+        projection: "EPSG:3857",
+        units: 'm'
     };
     
     map = new OpenLayers.Map('map', options);
@@ -61,26 +57,26 @@ function init(){
     // the arcgis base maps
     addArcGisLayer(map, "Topographic", "World_Topo_Map")
     addArcGisLayer(map, "World Image", "World_Imagery")
-    // etc...
+//    // etc...
     addNlcdLayer(map, "NLCD 2006", "24")
 
     // sedmap project maps
     addLayer(map, "States", "sedmap:CONUS_states_multipart", false) // add a new visible layer
     addLayer(map, "Counties", "sedmap:countyp020", false)   // add a new invisible layer
     addLayer(map, "HUC8", "sedmap:huc_8_multipart_wgs", false)
-    addLayer(map, "Instant Sites", "sedmap:Instant Sites", false)
-    addLayer(map, "Daily Sites", "sedmap:Daily Sites", false)
+    addLayer(map, "Instant Sites", "sedmap:Instant Sites", true)
+    addLayer(map, "Daily Sites", "sedmap:Daily Sites", true)
     addLayer(map, "NID", "sedmap:NID", false)
 	
     // zoom and move viewport to desired location
     //map.zoomToMaxExtent();
-	var center = new OpenLayers.LonLat(-96,37)
-	var proj   = new OpenLayers.Projection("EPSG:4326");
+	var center = new OpenLayers.LonLat(-96*111000,37*111000)
+	var proj   = new OpenLayers.Projection("EPSG:3857");
 	center.transform(proj, map.getProjectionObject());
-	map.setCenter(center,3);
-				
-   
+	map.setCenter(center,4);
 }
+
+
 
 function _addLayer(map, title,layer) {
    layers[title] = layer;
@@ -89,51 +85,49 @@ function _addLayer(map, title,layer) {
 /* 
 it is best to make a method for repetitive tasks.  you will likely have more than one layer and the order they are added determines the order they are overlaid 
 */
-function addLayer(map, title, layerId, initiallyVisible) {
+function addLayer(map, title, layerId, show) {
 	
    var layer = new OpenLayers.Layer.WMS(title, projectUrl+"wms",
        {
-           LAYERS: layerId,
-           STYLES: '',
-           format: format,
-           tiled: true, // it is best to tile
-           transparent: true, // do not forget this is your want layers to overlap
+	       LAYERS: layerId,    // the layer id
+	       transparent: true,  // overlay layer
+	       isBaseLayer: false, // overlay layer
+	       STYLES: '',         // default style
+	       format: format,     // png file
+           tiled: true,        // it is best to tile
            tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
        },{
-	       opacity: .6,
-           buffer: 0,
-           displayOutsideMaxExtent: true,
-           isBaseLayer: false,
-           visibility: initiallyVisible,
-//           yx : {'EPSG:4326' : false}
+	       buffer: 0,
+	       opacity: .5,        // alpha for overlay
+	       isBaseLayer: false, // overlay layer
+	       wrapDateLine: false,// repeat the world map
+           visibility: show,   // initial visibility
+	       displayOutsideMaxExtent: true, // display full map returned
+//           yx : {'EPSG:3857' : false}
        }
    );
    _addLayer(map, title, layer)
 }
 
-// http://raster.nationalmap.gov/ArcGIS/services/TNM_LandCover/MapServer/WMSServer?LAYERS=24&STYLES=&FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&SRS=EPSG%3A4326&BBOX=-7514238.6275,7514083.6275,-5009550.085,10018772.17&WIDTH=256&HEIGHT=256
 //the NLCD topographical world map
 function addNlcdLayer(map, title, layerId) {
    var layer = new OpenLayers.Layer.WMS(title, nlcdUrl,
        {
-	       LAYERS: layerId,
-	       transparent: true, // do not forget this is your want layers to overlap
-	       isBaseLayer: false,
-	       STYLES: '',
-	//       SRS:'EPSG:4326',
-	       format: format,
-	//       tiled: true, // it is best to tile
-	//       tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
+	       LAYERS: layerId,    // the layer id
+	       transparent: true,  // overlay layer
+	       isBaseLayer: false, // overlay layer
+	       STYLES: '',         // default style
+	       format: format,     // png file
 	   },{
-//	         sphericalMercator: true,
-	       opacity: .5,
-	       isBaseLayer: false,
-//	         numZoomLevels: NUM_ZOOM_LEVELS,
 	       buffer: 0,
-	       displayOutsideMaxExtent: true,
-	         wrapDateLine: false,
-	       visibility: true,
-//	       yx : {'EPSG:4326' : false}
+	       opacity: .5,        // alpha for overlay
+	       isBaseLayer: false, // overlay layer
+	       wrapDateLine: false,// repeat the world map
+	       visibility: false,  // default hidden
+	       displayOutsideMaxExtent: true, // display full map returned
+//	       sphericalMercator: true,
+//	       numZoomLevels: NUM_ZOOM_LEVELS,
+//	       yx : {'EPSG:3857' : false}
 	   }
    );
    _addLayer(map, title, layer)
@@ -142,19 +136,19 @@ function addNlcdLayer(map, title, layerId) {
 
 
 
-//the arcgis topographical world map
+//the arcgis topographical world map - these are returned as EPSG:3857 or unofficially 900913
 function addArcGisLayer(map, title, layerId) {
  var layerUrl = arcgisUrl+layerId +"/MapServer/tile/${z}/${y}/${x}"
  var layer = new OpenLayers.Layer.XYZ(title, layerUrl, 
      {
-//         sphericalMercator: true,
-//         isBaseLayer: true, // openlayers will render this layer first
+	 	   buffer: 0,
+	       isBaseLayer: true, // base layer
+	       wrapDateLine: false,// repeat the world map
+	       visibility: true,   // default visible
+	       displayOutsideMaxExtent: true, // display full map returned
+           sphericalMercator: true,
 //         numZoomLevels: NUM_ZOOM_LEVELS,
-	       buffer: 0,
-	       displayOutsideMaxExtent: true,
-         wrapDateLine: false,
-	       visibility: true,
-//	       yx : {'EPSG:4326' : false}
+//	       yx : {'EPSG:3857' : false}
      }
  );
  _addLayer(map, title, layer)
