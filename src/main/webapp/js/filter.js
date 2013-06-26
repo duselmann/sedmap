@@ -321,39 +321,33 @@ var applyRange = function(field, values) {
 	return rangeFilter
 }
 
-var onDrainageBlur = function() {
-	var errorText = ""
-	var vals = []
-	$('input.drainage').each(function(i,input) {
-		var val = $(input).val()
-		console.log(val)
-		if (val === "") return
-		if (! $.isNumeric(val) || val<0 ) {
-			errorText = 'Drainages must be positive numbers.'
-			$(input).focus()
-		}
-		vals.push(val)
-	})
-	
-	if (vals.length === 2) {
-		if (vals[0]>vals[1]) {
-			errorText = 'Initail drainages must be less than the second.'
-		} else {
-			drainageFilter = applyRange('DRAINAGE_AREA_MI_SQ',vals)
-		}
-	} 
-	$('#drainage-warn').text(errorText)
+var onDrainageBlur  = function() {
+	if ( rangeValidate('Drainage', 'input.drainage', '#drainage-warn', 0) ) {
+		drainageFilter = applyRange('DRAINAGE_AREA_MI_SQ',vals)
+	}	
+}
+var onYearRangeBlur = function() {
+	if ( rangeValidate('Year', 'input.yearRange', '#yearRange-warn', 1900, 'present') ) {
+		var yr1 = $('#yr1').val()
+		var yr2 = $('#yr2').val()
+		yearRange = 'yr1:'+yr1+';yr2:'+yr2
+	}
 }
 
-var onYearRangeBlur = function() {
+var rangeValidate = function(title,fields,warn,min,max) {
 	var errorText = ""
 	var vals = []
-	$('input.yearRange').each(function(i,input) {
+	$(fields).each(function(i,input) {
 		var val = $(input).val()
 		console.log(val)
 		if (val === "") return
-		if (! $.isNumeric(val) || val<1900 ) {
-			errorText = 'Year must be from 1900 to present.'
+		if (! $.isNumeric(val) || val<min || ($.isNumeric(max) && val>max) ) {
+			errorText = title+' must be at least '+min
+			if (max !== undefined) {
+				errorText += ', to '+max
+			}
+			errorText += '.'
+			
 			$(input).focus()
 		}
 		vals.push(val)
@@ -361,14 +355,13 @@ var onYearRangeBlur = function() {
 	
 	if (vals.length === 2) {
 		if (vals[0]>vals[1]) {
-			errorText = 'Initial year must be less than the second.'
+			errorText = 'Initial value must be less than the second.'
 		} else {
-			var yr1 = $('#yr1').val()
-			var yr2 = $('#yr2').val()
-			yearRange = 'yr1:'+yr1+';yr2:'+yr2
+			return true
 		}
 	} 
-	$('#yearRange-warn').text(errorText)
+	$(warn).text(errorText)
+	return false
 }
 
 var onRefOnlyClick = function() {

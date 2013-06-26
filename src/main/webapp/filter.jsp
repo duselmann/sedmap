@@ -60,7 +60,7 @@
     	<BR>
         Referece Sites Only: <input id="refonly" class="refonly" type="checkbox">
     	<BR>
-    	Drainage Area (mi<super>2</super>): between <br>
+    	Drainage Area (mi<sup>2</sup>): between <br>
     		<input id="DRAINAGE_AREA_MI_SQ-low" class="drainage" type="text" size="8">
     		and 
     		<input id="DRAINAGE_AREA_MI_SQ-high" class="drainage" type="text" size="8">
