@@ -5,8 +5,9 @@ div.olMap {
 	float:left;
 }
 div.filter {
-	float:right;
-	margin:3px;
+	position: absolute;
+    top: 106px;
+    left: 1006px;
 }
 #nlcdlegend {
 	width: 244px;
