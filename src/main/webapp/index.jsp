@@ -98,6 +98,10 @@
                 <div class="span7" id="map-span">
                     <div id="map-well" class="well well-small tab-content">
                         <div class="olMap" id="map"></div>
+                        <div id="nlcdlegend">
+                            <span id="nlcdthumb">NLCD Legend</span>
+                            <a href="http://www.mrlc.gov/nlcd06_leg.php" target="_tab"><img id="nlcdimg" src="images/nlcdlegend.png"></a>
+                        </div>
                         <div class="filter" id="filter" >
                             <jsp:include page="filter.jsp"/>
                         </div>

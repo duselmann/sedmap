@@ -12,6 +12,8 @@ OpenLayers.Layer.WMS.prototype.getFullRequestString = function(newParams,altUrl)
     return OpenLayers.Layer.Grid.prototype.getFullRequestString.apply(this,arguments);
 }
 
+OpenLayers.ImgPath = "images/openlayers/"
+
 // pink tile avoidance
 OpenLayers.IMAGE_RELOAD_ATTEMPTS = 3;
 // make OL compute scale according to WMS spec
@@ -29,6 +31,9 @@ var layers = {}
 
 
 function init(){
+	
+	$('#nlcdthumb').click(nlcdLegendToggle)
+	
     // build up all controls
 	var controls = [
         new OpenLayers.Control.PanZoomBar({ position: new OpenLayers.Pixel(2, 15) }),
@@ -58,7 +63,8 @@ function init(){
     addArcGisLayer(map, "Topographic", "World_Topo_Map")
     addArcGisLayer(map, "World Image", "World_Imagery")
 //    // etc...
-    addNlcdLayer(map, "NLCD 2006", "24")
+    var nlcd = addNlcdLayer(map, "NLCD 2006", "24")
+    nlcd.events.register('visibilitychanged', nlcd, nlcdThumbToggle)
 
     // sedmap project maps
     addLayer(map, "States", "sedmap:CONUS_states_multipart", false) // add a new visible layer
@@ -78,11 +84,25 @@ function init(){
 	map.setCenter(center,4);
 }
 
-
+function nlcdLegendToggle() {
+	if ($('#nlcdimg').css('display') == 'none') {
+		$('#nlcdimg').fadeIn("slow")
+	} else {
+		$('#nlcdimg').fadeOut("slow")
+	}
+}
+function nlcdThumbToggle() {
+	if ($('#nlcdthumb').css('display') == 'none') {
+		$('#nlcdthumb').fadeIn("slow")
+	} else {
+		$('#nlcdthumb').fadeOut("slow")
+	}
+}
 
 function _addLayer(map, title,layer) {
    layers[title] = layer;
    map.addLayer(layer); // add the new layer to the map viewport 
+   return layer
 }
 /* 
 it is best to make a method for repetitive tasks.  you will likely have more than one layer and the order they are added determines the order they are overlaid 
@@ -108,7 +128,7 @@ function addLayer(map, title, layerId, show) {
 //           yx : {'EPSG:3857' : false}
        }
    );
-   _addLayer(map, title, layer)
+   return _addLayer(map, title, layer)
 }
 
 //the NLCD topographical world map
@@ -132,7 +152,7 @@ function addNlcdLayer(map, title, layerId) {
 //	       yx : {'EPSG:3857' : false}
 	   }
    );
-   _addLayer(map, title, layer)
+   return _addLayer(map, title, layer)
 }
 
 
@@ -153,5 +173,5 @@ function addArcGisLayer(map, title, layerId) {
 //	       yx : {'EPSG:3857' : false}
      }
  );
- _addLayer(map, title, layer)
+ return _addLayer(map, title, layer)
 }
