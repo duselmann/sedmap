@@ -64,8 +64,10 @@ function init(){
     addLayer(map, "States", "sedmap:CONUS_states_multipart", false) // add a new visible layer
     addLayer(map, "Counties", "sedmap:countyp020", false)   // add a new invisible layer
     addLayer(map, "HUC8", "sedmap:huc_8_multipart_wgs", false)
-    addLayer(map, "Instant Sites", "sedmap:SM_INST_STATION", true)
-    addLayer(map, "Daily Sites", "sedmap:SM_DAILY_STATION", true)
+    addLayer(map, "Instant Sites", "sedmap:instant", true)
+    addLayer(map, "Daily Sites", "sedmap:daily", true)
+//    addLayer(map, "Instant Sites", "sedmap:SM_INST_STATION", true)
+//    addLayer(map, "Daily Sites", "sedmap:SM_DAILY_STATION", true)
     addLayer(map, "NID", "sedmap:NID", false)
 	
     // zoom and move viewport to desired location
