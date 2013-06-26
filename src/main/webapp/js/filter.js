@@ -104,16 +104,18 @@ var Ogc = new function() {
 		var clause = ""
 		var _this = this
 			
-		if (params.name && params.value) {
-			clause += this.property(params.name, params.value)
-		} else {
+		if (params.name === undefined && params.value === undefined) {
+			// handle non-property entries
 			$.each(params, function(p,child) {
-				if ( isNaN(Number(p)) ) {
-					clause += _this.clause(p, child)
-				} else {
+				if ( $.isNumeric(p) ) {
 					clause += _this.inner(child)
+				} else {
+					clause += _this.clause(p, child)
 				}
 			})
+		} else {
+			// handle property entries
+			clause += this.property(params.name, params.value)
 		}
 		return clause
 	}
@@ -146,6 +148,7 @@ var hucFilter      = undefined
 var minYrsFilter   = undefined
 var refOnlyFilter  = undefined
 var drainageFilter = undefined
+var yearFilter     = ''
 
 var getStateValues = function(el) {
     var st     = $(el).val()
@@ -249,7 +252,7 @@ $().ready(function(){
 		basinFilter    = undefined
 		hucFilter      = undefined
 		drainageFilter = undefined
-		yearRange      = '' // this is a non-ogc param that will need OGC for the webservice call
+		yearFilter     = '' // this is a non-ogc param that will need OGC for the webservice call
 		minYrsFilter   = undefined
 		refOnlyFilter  = undefined
 		applyFilterToLayers({filter:'',viewparams:''},'all')
@@ -293,46 +296,50 @@ var applyFilter = function() {
 		if (!minYrsFilter) { // min yrs only applies to daily
 			layers.push('Daily Sites')
 		}
-		applyFilterToLayers({filter:ogcXml,viewparams:yearRange}, layers)
+		applyFilterToLayers({filter:ogcXml,viewparams:yearFilter}, layers)
 	}
 	
 	if (minYrsFilter) {
 		filter.And.push(minYrsFilter)
 		var ogcXml = Ogc.filter(filter)
 		var layers = ['Daily Sites']
-		applyFilterToLayers({filter:ogcXml,viewparams:yearRange}, layers)
+		applyFilterToLayers({filter:ogcXml,viewparams:yearFilter}, layers)
 	}
 }
 
 
 var applyRange = function(field, values) {
 	var rangeFilter = []
-	rangeFilter.push( mp('>=',filed,values[0]) )
-	rangeFilter.push( mp('<=',filed,values[1]) )
+	rangeFilter.push( mp('>=',field,values[0]) )
+	rangeFilter.push( mp('<=',field,values[1]) )
 	return rangeFilter
 }
 
 var onDrainageBlur  = function() {
-	if ( rangeValidate('Drainage', 'input.drainage', '#drainage-warn', 0) ) {
+	var vals = false
+	if ( vals = rangeValidate('Drainage', 'input.drainage', '#drainage-warn', 0) ) {
 		drainageFilter = applyRange('DRAINAGE_AREA_MI_SQ',vals)
 	}	
 }
 var onYearRangeBlur = function() {
-	if ( rangeValidate('Year', 'input.yearRange', '#yearRange-warn', 1900, 'present') ) {
-		var yr1 = $('#yr1').val()
-		var yr2 = $('#yr2').val()
-		yearRange = 'yr1:'+yr1+';yr2:'+yr2
+	var vals = false
+	if ( vals = rangeValidate('Year', 'input.yearRange', '#yearRange-warn', 1900, 'present') ) {
+		var yr1 = vals[0] //$('#yr1').val()
+		var yr2 = vals[1] //$('#yr2').val()
+		yearFilter = 'yr1:'+yr1+';yr2:'+yr2
 	}
 }
 
 var rangeValidate = function(title,fields,warn,min,max) {
 	var errorText = ""
+	$(warn).text(errorText) // reset warning msg
 	var vals = []
 	$(fields).each(function(i,input) {
 		var val = $(input).val()
 		console.log(val)
 		if (val === "") return
-		if (! $.isNumeric(val) || val<min || ($.isNumeric(max) && val>max) ) {
+		var num = parseInt(val)
+		if (! $.isNumeric(val) || num<min || ($.isNumeric(max) && num>max) ) {
 			errorText = title+' must be at least '+min
 			if (max !== undefined) {
 				errorText += ', to '+max
@@ -341,14 +348,14 @@ var rangeValidate = function(title,fields,warn,min,max) {
 			
 			$(input).focus()
 		}
-		vals.push(val)
+		vals.push(num)
 	})
 	
 	if (vals.length === 2) {
 		if (vals[0]>vals[1]) {
 			errorText = 'Initial value must be less than the second.'
 		} else {
-			return true
+			return vals
 		}
 	} 
 	$(warn).text(errorText)
