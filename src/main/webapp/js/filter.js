@@ -249,25 +249,20 @@ $().ready(function(){
 		basinFilter    = undefined
 		hucFilter      = undefined
 		drainageFilter = undefined
-		yearRange      = undefined
+		yearRange      = '' // this is a non-ogc param that will need OGC for the webservice call
 		minYrsFilter   = undefined
 		refOnlyFilter  = undefined
-		applyFilterToLayers('','all')
-		applyFilterToLayers('','all', 'viewparams')
+		applyFilterToLayers({filter:'',viewparams:''},'all')
 	})
 })
 
-var applyFilterToLayers = function(value, applyTo, param) {
-	if (param === undefined) { // default is the OGC XML filter
-		param = 'FILTER'
-	}
-	if (applyTo === 'all') {
+var applyFilterToLayers = function(filter, applyTo) {
+	// default all layers and use all layers for 'all' keyword
+	if (applyTo === undefined || applyTo === 'all') {
 		applyTo = Object.keys(layers)
 	}
 	$.each(applyTo, function(i,layerId) {
-		var newParam = {}
-		newParam[param]= value
-		layers[layerId].mergeNewParams(newParam)
+		layers[layerId].mergeNewParams(filter)
 	})
 }
 
@@ -277,7 +272,7 @@ var applyFilter = function() {
 		filter.And.push( stateFilter )
 		var ogcXml = Ogc.filter(filter)
 
-		applyFilterToLayers(ogcXml, ['States','Counties','NID'])
+		applyFilterToLayers({filter:ogcXml}, ['States','Counties','NID'])
 	}
 	if (basinFilter) {
 		filter.And.push(basinFilter)
@@ -295,22 +290,18 @@ var applyFilter = function() {
 	if (filter.And.length) { // TODO need a layers based approach
 		var ogcXml = Ogc.filter(filter)
 		var layers = ['Instant Sites']
-		if (!minYrsFilter) layers.push('Daily Sites')
-		applyFilterToLayers(ogcXml, layers)
+		if (!minYrsFilter) { // min yrs only applies to daily
+			layers.push('Daily Sites')
+		}
+		applyFilterToLayers({filter:ogcXml,viewparams:yearRange}, layers)
 	}
 	
 	if (minYrsFilter) {
 		filter.And.push(minYrsFilter)
 		var ogcXml = Ogc.filter(filter)
 		var layers = ['Daily Sites']
-		applyFilterToLayers(ogcXml, layers)
+		applyFilterToLayers({filter:ogcXml,viewparams:yearRange}, layers)
 	}
-	
-	// TODO this will apply filters twice - refactor required to apply both at once
-	if (yearRange) {
-		applyFilterToLayers(yearRange, ['Daily Sites', 'Instant Sites'], 'viewparams')
-	}
-	//layers['HUC8'].mergeNewParams({FILTER:ogcXml})
 }
 
 
