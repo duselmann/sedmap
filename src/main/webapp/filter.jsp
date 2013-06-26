@@ -51,6 +51,12 @@
     	HUC: <input id="HUC_12" class="huc" type="text">
     	<BR>
         Min Years of Daily Data: <input id="minyrs" class="minyrs" type="text" size="4" maxlength="2">
+        <BR>
+        Year Range : between <br>
+            <input id="yr1" class="yearRange" type="text" size="8">
+            and 
+            <input id="yr2" class="yearRange" type="text" size="8">
+            <div id="yearRange-warn" class="warn"></div>
     	<BR>
         Referece Sites Only: <input id="refonly" class="refonly" type="checkbox">
     	<BR>

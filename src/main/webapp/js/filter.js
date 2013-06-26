@@ -228,6 +228,7 @@ $().ready(function(){
 	$('input.basin').blur(onBasinBlur)
 	$('input.huc').blur(onHucBlur)
 	$('input.drainage').blur(onDrainageBlur)
+	$('input.yearRange').blur(onYearRangeBlur)
 	$('input.minyrs').blur(onMinYrsBlur)
 
 	$('#STATE').change(function(e){
@@ -238,6 +239,7 @@ $().ready(function(){
 	$('#clearFilter').click( function(e) {
 		$('#states').find('input.destroy').parent().remove()
 		$('input.drainage').val('')
+		$('input.yearRange').val('')
 		$('input.basin').val('')
 		$('input.huc').val('')
 		$('input.minyrs').val('')
@@ -247,18 +249,25 @@ $().ready(function(){
 		basinFilter    = undefined
 		hucFilter      = undefined
 		drainageFilter = undefined
+		yearRange      = undefined
 		minYrsFilter   = undefined
 		refOnlyFilter  = undefined
 		applyFilterToLayers('','all')
+		applyFilterToLayers('','all', 'viewparams')
 	})
 })
 
-var applyFilterToLayers = function(ogcXml, applyTo) {
+var applyFilterToLayers = function(value, applyTo, param) {
+	if (param === undefined) { // default is the OGC XML filter
+		param = 'FILTER'
+	}
 	if (applyTo === 'all') {
 		applyTo = Object.keys(layers)
 	}
-	$.each(applyTo, function(i,layerName) {
-		layers[layerName].mergeNewParams({FILTER:ogcXml})
+	$.each(applyTo, function(i,layerId) {
+		var newParam = {}
+		newParam[param]= value
+		layers[layerId].mergeNewParams(newParam)
 	})
 }
 
@@ -296,14 +305,20 @@ var applyFilter = function() {
 		var layers = ['Daily Sites']
 		applyFilterToLayers(ogcXml, layers)
 	}
+	
+	// TODO this will apply filters twice - refactor required to apply both at once
+	if (yearRange) {
+		applyFilterToLayers(yearRange, ['Daily Sites', 'Instant Sites'], 'viewparams')
+	}
 	//layers['HUC8'].mergeNewParams({FILTER:ogcXml})
 }
 
 
-var applyDrainage = function(values) {
-	drainageFilter = []
-	drainageFilter.push( mp('>=','DRAINAGE_AREA_MI_SQ',values[0]) )
-	drainageFilter.push( mp('<=','DRAINAGE_AREA_MI_SQ',values[1]) )
+var applyRange = function(field, values) {
+	var rangeFilter = []
+	rangeFilter.push( mp('>=',filed,values[0]) )
+	rangeFilter.push( mp('<=',filed,values[1]) )
+	return rangeFilter
 }
 
 var onDrainageBlur = function() {
@@ -324,10 +339,36 @@ var onDrainageBlur = function() {
 		if (vals[0]>vals[1]) {
 			errorText = 'Initail drainages must be less than the second.'
 		} else {
-			applyDrainage(vals)
+			drainageFilter = applyRange('DRAINAGE_AREA_MI_SQ',vals)
 		}
 	} 
 	$('#drainage-warn').text(errorText)
+}
+
+var onYearRangeBlur = function() {
+	var errorText = ""
+	var vals = []
+	$('input.yearRange').each(function(i,input) {
+		var val = $(input).val()
+		console.log(val)
+		if (val === "") return
+		if (! $.isNumeric(val) || val<1900 ) {
+			errorText = 'Year must be from 1900 to present.'
+			$(input).focus()
+		}
+		vals.push(val)
+	})
+	
+	if (vals.length === 2) {
+		if (vals[0]>vals[1]) {
+			errorText = 'Initial year must be less than the second.'
+		} else {
+			var yr1 = $('#yr1').val()
+			var yr2 = $('#yr2').val()
+			yearRange = 'yr1:'+yr1+';yr2:'+yr2
+		}
+	} 
+	$('#yearRange-warn').text(errorText)
 }
 
 var onRefOnlyClick = function() {
