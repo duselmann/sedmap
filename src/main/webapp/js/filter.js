@@ -277,11 +277,16 @@ var applyFilter = function() {
 
 		applyFilterToLayers({filter:ogcXml}, ['States','Counties','NID'])
 	}
-	if (basinFilter) {
-		filter.And.push(basinFilter)
-	}
 	if (hucFilter) {
 		filter.And.push(hucFilter)
+
+		var layerFilter = {L:{name:'HUC_8',value:hucFilter.L.value}}
+		var ogcXml = Ogc.filter(layerFilter)
+		
+		applyFilterToLayers({filter:ogcXml}, ['HUC8'])
+	}
+	if (basinFilter) {
+		filter.And.push(basinFilter)
 	}
 	if (drainageFilter) {
 		filter.And.push(drainageFilter[0])
@@ -290,21 +295,53 @@ var applyFilter = function() {
 	if (refOnlyFilter) {
 		filter.And.push(refOnlyFilter)
 	}
+	
+	// now we get complex because of the way geoserver takes params outside of OGC
+	// first, if there are OGC filters we need to apply them to at least the inst layer
+	// if the daily special filter, minyrs, is not present then include daily layer
+	// then keep track of layers that have been applied because if there is no OGC
+	//   but there is a year range then the year range must be applied on its own
+	var daily = false
+	var inst  = false
 	if (filter.And.length) { // TODO need a layers based approach
+		inst = true
 		var ogcXml = Ogc.filter(filter)
 		var layers = ['Instant Sites']
-		if (!minYrsFilter) { // min yrs only applies to daily
+		
+		// min yrs only applies to daily so skip daily if this filters is present
+		if ( ! minYrsFilter ) { 
+			daily = true
 			layers.push('Daily Sites')
 		}
+		
 		applyFilterToLayers({filter:ogcXml,viewparams:yearFilter}, layers)
 	}
 	
+	// minYrsFilter only applies to the daily sites
 	if (minYrsFilter) {
+		daily = true
 		filter.And.push(minYrsFilter)
 		var ogcXml = Ogc.filter(filter)
 		var layers = ['Daily Sites']
 		applyFilterToLayers({filter:ogcXml,viewparams:yearFilter}, layers)
 	}
+	
+	// yearFilter will not have been applied if the only filter
+	if (yearFilter) {
+		// find the layers need to be applied
+		var layers = []
+		if ( ! inst ) {
+			layers.push('Instant Sites')
+		}
+		if ( ! daily ) { 
+			layers.push('Daily Sites')
+		}
+		// apply to layers if there are layers to apply to
+		if (layers.length>0) {
+			applyFilterToLayers({viewparams:yearFilter}, layers)
+		}
+	}
+
 }
 
 

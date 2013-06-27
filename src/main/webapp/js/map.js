@@ -72,8 +72,6 @@ function init(){
     addLayer(map, "HUC8", "sedmap:huc_8_multipart_wgs", false)
     addLayer(map, "Instant Sites", "sedmap:instant", true)
     addLayer(map, "Daily Sites", "sedmap:daily", true)
-//    addLayer(map, "Instant Sites", "sedmap:SM_INST_STATION", true)
-//    addLayer(map, "Daily Sites", "sedmap:SM_DAILY_STATION", true)
     addLayer(map, "NID", "sedmap:NID", false)
 	
     // zoom and move viewport to desired location
@@ -82,6 +80,8 @@ function init(){
 	var proj   = new OpenLayers.Projection("EPSG:3857");
 	center.transform(proj, map.getProjectionObject());
 	map.setCenter(center,4);
+	
+	$('#nlcdimg').appendTo('#map:first-child')
 }
 
 function nlcdLegendToggle() {
@@ -95,6 +95,7 @@ function nlcdThumbToggle() {
 	if ($('#nlcdthumb').css('display') == 'none') {
 		$('#nlcdthumb').fadeIn("slow")
 	} else {
+		$('#nlcdimg').fadeOut("slow")
 		$('#nlcdthumb').fadeOut("slow")
 	}
 }
