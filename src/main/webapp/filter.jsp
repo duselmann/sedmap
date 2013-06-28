@@ -3,12 +3,6 @@
 
 <html lang="en">
     
-    <style>
-    	div.warn {
-    		color:red;
-    	}
-    </style>
-    
     <body ><div id="filter">
         Filter By:    	 
         <input type="button" id="clearFilter" value="Clear">

@@ -55,3 +55,49 @@ div.filter {
     background-color: #345280;
 }
 
+div.warn {
+    color:red;
+}
+
+
+
+#siteInfo {
+    position: absolute;
+    left: 50px;
+    top: 110px;
+    border: 2px solid #345280;
+    color: #345280;
+    background-color: #D4DEED;
+    display:none;
+}
+.singleSiteInfo {
+	width:900px;
+	clear:both;
+	border-top: 1px solid;
+	display:none;
+}
+.siteDatum {
+    width:150px;
+    float: left;
+}
+.siteInfoLabel {
+    font-weight:bold;
+    clear:both;
+}
+.siteInfoSubLabel {
+	margin-left: 10px;
+    width: 75px;
+}
+.siteInfoSubLabel:after {
+    content:':';
+}
+.siteInfoData {
+    margin-left: 20px;
+	float: left;
+}
+
+
+
+
+
+

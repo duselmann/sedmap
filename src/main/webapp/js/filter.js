@@ -280,6 +280,7 @@ var applyFilter = function() {
 	if (hucFilter) {
 		filter.And.push(hucFilter)
 
+		// FYI this layer has HUC_2, HUC_4, HUC_6, HUC_8, and HU_8_STATE fields
 		var layerFilter = {L:{name:'HUC_8',value:hucFilter.L.value}}
 		var ogcXml = Ogc.filter(layerFilter)
 		

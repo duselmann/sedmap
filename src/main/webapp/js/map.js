@@ -32,8 +32,6 @@ var layers = {}
 
 function init(){
 	
-	$('#nlcdthumb').click(nlcdLegendToggle)
-	
     // build up all controls
 	var controls = [
         new OpenLayers.Control.PanZoomBar({ position: new OpenLayers.Pixel(2, 15) }),
@@ -81,8 +79,143 @@ function init(){
 	center.transform(proj, map.getProjectionObject());
 	map.setCenter(center,4);
 	
+	map.events.register('click', map, getSiteInfo);
+
+	
+	$('#nlcdthumb').click(nlcdLegendToggle)
 	$('#nlcdimg').appendTo('#map:first-child')
+	$('#siteInfo').click(clearSiteInfo)
 }
+
+function getSiteInfo(e) {
+	var layer = layers['Daily Sites']
+	var params = {
+			REQUEST: "GetFeatureInfo",
+			EXCEPTIONS: "application/vnd.ogc.se_xml",
+			BBOX: map.getExtent().toBBOX(),
+			SERVICE: "WMS",
+			INFO_FORMAT: 'text/html',
+			QUERY_LAYERS: layer.params.LAYERS,
+			FEATURE_COUNT: 50,
+			Layers: 'sedmap:daily',
+			WIDTH: map.size.w,
+			HEIGHT: map.size.h,
+			format: format,
+			styles: layer.params.STYLES,
+			srs: "EPSG:3857"
+	};
+	
+	// handle the wms 1.3 vs wms 1.1 madness
+	if(layer.params.VERSION == "1.3.0") {
+		params.version = "1.3.0";
+		params.j = parseInt(e.xy.x);
+		params.i = parseInt(e.xy.y);
+	} else {
+		params.version = "1.1.1";
+		params.x = parseInt(e.xy.x);
+		params.y = parseInt(e.xy.y);
+	}
+	
+	// merge filters
+	if (layer.params.CQL_FILTER != null) {
+		params.cql_filter = layer.params.CQL_FILTER;
+	} 
+	if (layer.params.FILTER != null) {
+		params.filter = layer.params.FILTER;
+	}
+	if (layer.params.FEATUREID) {
+		params.featureid = layer.params.FEATUREID;
+	}
+	OpenLayers.Request.GET({url:projectUrl+"wms", params:params, scope:this, success:onSiteInfoResponse, failure:onSiteInfoResponseFail});
+	OpenLayers.Event.stop(e);
+}
+
+function onSiteInfoResponseFail(response) {
+	clearSiteInfo()
+	alert('Failed to request site information.')
+}
+
+function onSiteInfoResponse(response) {
+	// this makes the fade out and in work out right
+	// because we are deleting and adding new rows
+	// it must be sequenced
+	clearSiteInfo({newinfo:response})
+}
+
+function clearSiteInfo(e) {
+	$('#siteInfo').fadeOut(300, function(){
+		$('.singleSiteInfo:not(:first)').remove()
+
+		// this makes the fade out and in work out right
+		// because we are deleting and adding new rows
+		// it must be sequenced
+		if (e.newinfo !== undefined) {
+			renderSiteInfo(e.newinfo)
+		}
+	})
+}
+
+//sets the HTML provided into the nodelist element
+function renderSiteInfo(response) {
+	var html  = response.responseText
+	var start = html.indexOf('<table')
+	var end   = html.indexOf('</table') +8
+	var table = html.substring(start, end)
+	
+	var fields = {STATION_NAME:-1,
+		USGS_STATION_ID:-1,
+		DRAINAGE_AREA_MI_SQ:-1,
+		SAMPLE_YEARS:-1}
+	$.each(fields, function(key,val) {
+		var col = findCol(table, key)
+		// TODO log error/not found
+		fields[key] = col;
+	})
+	
+	// TODO this is daily only - need inst also
+	// TODO need close action as well
+	// TODO need to move subsequent rows dow
+	// TODO need to make sure source row is always hidden
+	
+	var rows = $(table).find('tr').length
+	if (rows>7) { // first row is an ignored header row
+		// when max rows reached then fix height and scroll
+		$('#siteInfo').css('height',6*81);
+		$('#siteInfo').css('overflow-y','scroll');
+	} else { // allow to get larger automatically
+		$('#siteInfo').css('height','auto');
+		$('#siteInfo').css('overflow-y','hidden');
+	}
+	
+	$(table).find('tr').each(function(r,row){
+		if (r===0) return // skip header row because :not(:first) did not work here
+		var info = $('#singleSiteInfo').clone()
+		info.attr('id','siteInfo-'+r)
+		$.each(fields, function(key,c) {
+			var value = $(row).find('td').eq(c).text()
+			$(info).find('#'+key).text(value)
+			$(info).find('#'+key).attr('id',key+'-'+r) // give the field a unique id
+		})
+		$('#siteInfo').append(info)
+		$('#siteInfo-'+r).show()
+		$('#siteInfo').fadeIn(300)
+	})
+}
+
+function findCol(table, el) {
+	var col = -1
+	$(table).find('th').each(function(i,th){
+		var val = $(th).text()
+		if (val===el) {
+			col = i
+		}
+	})
+	return col
+}
+
+//function assignValues(fields, infoEl, row) {
+//}
+
 
 function nlcdLegendToggle() {
 	if ($('#nlcdimg').css('display') == 'none') {

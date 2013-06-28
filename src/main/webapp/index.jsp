@@ -105,6 +105,9 @@
                         <div class="filter" id="filter" >
                             <jsp:include page="filter.jsp"/>
                         </div>
+                        <div id="siteInfo">
+                            <jsp:include page="siteInfo.jsp"/>
+                        </div>
                     </div>
                 </div>
 
@@ -121,6 +124,7 @@
                     <jsp:param name="contact-info" value="<a href='mailto:cjlee@usgs.gov?Subject=Coastal%20Hazards%20Feedback'>Casey Lee</a>" />
                 </jsp:include>
             </div>
+        
         </div>
 		
 		<%-- Stuff that isn't shown in the application but is used by JS --%>
@@ -134,7 +138,7 @@
             </div>
             <div class="modal-footer"></div>
         </div>
-		
+        
     </body>
     
     <jsp:include page="js/dygraphs/dygraphs.jsp">
