@@ -16,17 +16,17 @@
       </div>
       <div class="siteDatum">
         <div class="siteInfoLabel">Period of Record</div>
-            <div class="siteInfoLabel siteInfoSubLabel siteInfoDiscrete">discrete</div>  <div class="siteInfoData siteInfoDiscrete" id="sitePeriodDaily">1984-2001</div>
+            <div class="siteInfoLabel siteInfoSubLabel siteInfoDiscrete">daily</div>  <div class="siteInfoData siteInfoDiscrete" id="sitePeriodDaily">1984-2001</div>
             <div class="siteInfoLabel siteInfoSubLabel siteInfoInstant">instant</div>    <div class="siteInfoData siteInfoInstant"  id="sitePeriodInst">1990-2001</div>
       </div>
       <div class="siteDatum">
         <div class="siteInfoLabel">Number of Values</div>
-            <div class="siteInfoLabel siteInfoSubLabel siteInfoDiscrete">discrete</div>  <div class="siteInfoData siteInfoDiscrete" id="siteSamplesDaily">101</div>
+            <div class="siteInfoLabel siteInfoSubLabel siteInfoDiscrete">daily</div>  <div class="siteInfoData siteInfoDiscrete" id="siteSamplesDaily">101</div>
             <div class="siteInfoLabel siteInfoSubLabel siteInfoInstant">instant</div>    <div class="siteInfoData siteInfoInstant"  id="siteSamplesInst">3650</div>
       </div>
       <div class="siteDatum">
         <div class="siteInfoLabel discrete">Years Data Sampled</div>
-            <div class="siteInfoLabel siteInfoSubLabel siteInfoDiscrete">discrete</div>  <div class="siteInfoData siteInfoDiscrete" id="SAMPLE_YEARS">15</div>
+            <div class="siteInfoLabel siteInfoSubLabel siteInfoDiscrete">daily</div>  <div class="siteInfoData siteInfoDiscrete" id="SAMPLE_YEARS">15</div>
       </div>
     
     </div>
