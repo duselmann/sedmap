@@ -9,6 +9,16 @@ select distinct
 from SM_SRC_ALLSSCDATACOMBINED7 a;
 --rollback truncate sm_inst_sites;
 
+--changeset ajmccart:CreateDataSeq
+CREATE SEQUENCE SEDMAP.SM_DATA_SEQ
+  START WITH 1
+  MAXVALUE 9999999999999999999999999999
+  MINVALUE 1
+  NOCYCLE
+  NOCACHE
+  NOORDER;
+--rollback drop sequence sedmap.sm_data_seq;
+
 --changeset ajmccart:PopulateInstSample
 insert into sm_inst_sample_fact
 SELECT 

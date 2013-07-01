@@ -11,6 +11,14 @@
     </preConditions>
 
 
-	<include file="changelog.sql" relativeToChangelogFile="true"/>
+	<include file="changelog1SiteRefTables.sql" relativeToChangelogFile="true"/>
+	<include file="changelog1SiteRefPopulate.sql" relativeToChangelogFile="true"/>
+	<include file="changelog1DaUpdate.sql" relativeToChangelogFile="true"/>
+	<include file="changelog1DailyTables.sql" relativeToChangelogFile="true"/>
+	<include file="changelog1DailyPopulate.sql" relativeToChangelogFile="true"/>
+	<include file="changelog1InstTables.sql" relativeToChangelogFile="true"/>
+	<include file="changelog1InstPopulate.sql" relativeToChangelogFile="true"/>
+	<include file="changelog1StreamStatsTables.sql" relativeToChangelogFile="true"/>
+	<include file="changelog1StreamStatsPopulate.sql" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
