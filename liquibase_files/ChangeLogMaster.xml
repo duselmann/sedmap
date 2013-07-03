@@ -21,4 +21,7 @@
 	<include file="changelog1StreamStatsTables.sql" relativeToChangelogFile="true"/>
 	<include file="changelog1StreamStatsPopulate.sql" relativeToChangelogFile="true"/>
 
+	<include file="changelog1DailyYear.sql" relativeToChangelogFile="true"/>
+	<include file="changelog1Views.sql" relativeToChangelogFile="true"/>
+	
 </databaseChangeLog>
