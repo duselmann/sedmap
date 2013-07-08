@@ -9,7 +9,7 @@
 
     {
         try {
-            props = props.addJNDIContexts(new String[0]);
+            props.addJNDIContexts(new String[0]);
         } catch (Exception e) {
             LoggerFactory.getLogger("index.jsp").error("Could not find JNDI - Application will probably not function correctly");
         }

@@ -307,7 +307,7 @@ var applyFilter = function() {
 	if (filter.And.length) { // TODO need a layers based approach
 		inst = true
 		var ogcXml = Ogc.filter(filter)
-		var layers = ['Instant Sites']
+		var layers = ['Discrete Sites']
 		
 		// min yrs only applies to daily so skip daily if this filters is present
 		if ( ! minYrsFilter ) { 
@@ -332,7 +332,7 @@ var applyFilter = function() {
 		// find the layers need to be applied
 		var layers = []
 		if ( ! inst ) {
-			layers.push('Instant Sites')
+			layers.push('Discrete Sites')
 		}
 		if ( ! daily ) { 
 			layers.push('Daily Sites')
@@ -356,7 +356,7 @@ var applyRange = function(field, values) {
 var onDrainageBlur  = function() {
 	var vals = false
 	if ( vals = rangeValidate('Drainage', 'input.drainage', '#drainage-warn', 0) ) {
-		drainageFilter = applyRange('DRAINAGE_AREA_MI_SQ',vals)
+		drainageFilter = applyRange('DA',vals)
 	}	
 }
 var onYearRangeBlur = function() {

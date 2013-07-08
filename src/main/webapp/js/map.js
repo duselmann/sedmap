@@ -23,7 +23,7 @@ var NUM_ZOOM_LEVELS = 18
 
 var map // this will be your main openlayers handle
 var format     = 'image/png'; // your default wms return type. 
-var projectUrl = 'http://cida-wiwsc-sedmapdev:8080/geoserver/sedmap/'; // your project server. 
+var projectUrl = '/sediment/map/'; // your project server. 
 var arcgisUrl  = 'http://services.arcgisonline.com/ArcGIS/rest/services/'; // ArcGIS server. 
 var nlcdUrl    = 'http://raster.nationalmap.gov/ArcGIS/services/TNM_LandCover/MapServer/WMSServer'; // NLCD server ?request=GetCapabilities&service=WMS&version=1.3.0
 	
@@ -68,7 +68,7 @@ function init(){
     addLayer(map, "States", "sedmap:CONUS_states_multipart", false) // add a new visible layer
     addLayer(map, "Counties", "sedmap:countyp020", false)   // add a new invisible layer
     addLayer(map, "HUC8", "sedmap:huc_8_multipart_wgs", false)
-    addLayer(map, "Instant Sites", "sedmap:instant", true)
+    addLayer(map, "Discrete Sites", "sedmap:instant", true)
     addLayer(map, "Daily Sites", "sedmap:daily", true)
     addLayer(map, "NID", "sedmap:NID", false)
 	

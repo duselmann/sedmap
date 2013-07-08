@@ -2,9 +2,9 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>gov.usgs.cida</groupId>
-    <artifactId>sedmap-web</artifactId>
+    <artifactId>sediment</artifactId>
     <packaging>war</packaging>
-    <name>sedmap-web</name>
+    <name>sediment</name>
     <version>0.0.1-SNAPSHOT</version>
     <description>Sediment web mapping application</description>
 
@@ -101,11 +101,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>gov.usgs.cida</groupId>
-            <artifactId>dynamicProperties</artifactId>
-            <version>0.0.1</version>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>log4j-over-slf4j</artifactId>
             <version>${slf4j.version}</version>
@@ -195,7 +190,7 @@
     </dependencies>
 
     <build>
-        <finalName>sedmap</finalName>
+        <finalName>sediment</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

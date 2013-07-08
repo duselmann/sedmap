@@ -18,20 +18,15 @@ public class GeoserverProxy extends ProxyServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final String HTML_MIME_TYPE = "text/html";
-	private static final String UTF_8          = "UTF-8";
-
-	// TODO need this in dev env -- cida-wiwsc-sedmapdev.er.usgs.gov
-	private static final String PROXIED_URL    = "http://localhost:8080/geoserver/upload/wms?service=WMS&version=1.1.0&request=GetMap&layers=upload:SM_SITE_REF&styles=&bbox=-172.953934831794,18.032464,-58.1941695891842,70.4953759999999&width=1000&height=550&srs=EPSG:4269&format=application/openlayers";
-
-
 	@Override
 	public URL buildRequestURL(HttpServletRequest request, URL baseURL)
 			throws MalformedURLException {
-
-		return new URL(PROXIED_URL);
+		String uri = request.getRequestURI();
+		uri = uri.replace("sediment", "geoserver");
+		uri = uri.replace("map", "sedmap");
+		String params = request.getQueryString();
+		return new URL("http://localhost:8080" + uri +"?" +params);
 	}
-
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -43,7 +38,7 @@ public class GeoserverProxy extends ProxyServlet {
 		OutputStream       responseOutputStream = null;
 
 		URL targetURL     = buildRequestURL(request, null);
-		String requestURI = request.getRequestURI();
+		String requestURI = request.getRequestURI() + "";
 
 
 		try {
