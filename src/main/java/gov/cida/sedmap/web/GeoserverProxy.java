@@ -42,11 +42,7 @@ public class GeoserverProxy extends ProxyServlet {
 
 
 		try {
-			int connTimeout = strategy.getConnectTimeout(requestURI);
-			int requTimeout = strategy.getReadTimeout(requestURI);
-
-
-			targetConn = getConnection(targetURL, "GET", connTimeout, requTimeout);
+			targetConn = getConnection(targetURL, "GET", 15000, 60000);
 			// Copy headers from the incoming request to the forwarded request
 			copyHeaders(request, targetConn);
 
