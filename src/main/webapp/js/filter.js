@@ -247,6 +247,7 @@ $().ready(function(){
 		$('input.huc').val('')
 		$('input.minyrs').val('')
 		$('input.refonly').attr("checked",false);
+		$('.warn').html('')
 		
 		stateFilter    = {Or:[]}
 		basinFilter    = undefined
@@ -270,6 +271,9 @@ var applyFilterToLayers = function(filter, applyTo) {
 }
 
 var applyFilter = function() {
+	var hasErrors = $('.warn:not(:empty)').length>0
+	if (hasErrors) alert('Please address warnings.')
+
 	var filter = {And:[]}
 	if (stateFilter.Or.length) {
 		filter.And.push( stateFilter )
