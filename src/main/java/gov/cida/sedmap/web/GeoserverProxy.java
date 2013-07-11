@@ -22,10 +22,17 @@ public class GeoserverProxy extends ProxyServlet {
 	public URL buildRequestURL(HttpServletRequest request, URL baseURL)
 			throws MalformedURLException {
 		String uri = request.getRequestURI();
-		uri = uri.replace("sediment", "geoserver");
-		uri = uri.replace("map", "sedmap");
+
 		String params = request.getQueryString();
-		return new URL("http://localhost:8080" + uri +"?" +params);
+		if (uri.contains("flow")) {
+			uri = "http://cida-wiwsc-wsdev.er.usgs.gov:8080/geoserver/NHDPlusFlowlines/wms";
+			log.error(uri+"?"+params);
+		} else {
+			uri = uri.replace("sediment", "geoserver");
+			uri = uri.replace("map", "sedmap");
+			uri = "http://cida-wiwsc-sedmapdev.er.usgs.gov:8080" + uri;
+		}
+		return new URL(uri +"?" +params);
 	}
 
 	@Override

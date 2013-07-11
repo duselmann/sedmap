@@ -26,7 +26,9 @@ var format     = 'image/png'; // your default wms return type.
 var projectUrl = '/sediment/map/'; // your project server. 
 var arcgisUrl  = 'http://services.arcgisonline.com/ArcGIS/rest/services/'; // ArcGIS server. 
 var nlcdUrl    = 'http://raster.nationalmap.gov/ArcGIS/services/TNM_LandCover/MapServer/WMSServer'; // NLCD server ?request=GetCapabilities&service=WMS&version=1.3.0
-	
+var flowUrl    = '/sediment/flow/'; // url to the flow proxy point
+
+
 var layers = {}
 
 
@@ -71,7 +73,9 @@ function init(){
     addLayer(map, "Discrete Sites", "sedmap:instant", true)
     addLayer(map, "Daily Sites", "sedmap:daily", true)
     addLayer(map, "NID", "sedmap:NID", false)
-	
+
+    addFlowLinesLayer(map);
+    
     // zoom and move viewport to desired location
     //map.zoomToMaxExtent();
 	var center = new OpenLayers.LonLat(-96*111000,37*111000)
@@ -278,7 +282,7 @@ function addNlcdLayer(map, title, layerId) {
 	       isBaseLayer: false, // overlay layer
 	       wrapDateLine: true,// repeat the world map
 	       visibility: false,  // default hidden
-	       displayOutsideMaxExtent: true, // display full map returned
+	       displayOutsideMaxExtent: true // display full map returned
 //	       sphericalMercator: true,
 //	       numZoomLevels: NUM_ZOOM_LEVELS,
 //	       yx : {'EPSG:3857' : false}
@@ -300,10 +304,64 @@ function addArcGisLayer(map, title, layerId) {
 	       wrapDateLine: true,// repeat the world map
 	       visibility: true,   // default visible
 	       displayOutsideMaxExtent: true, // display full map returned
-           sphericalMercator: true,
+           sphericalMercator: true
 //         numZoomLevels: NUM_ZOOM_LEVELS,
 //	       yx : {'EPSG:3857' : false}
      }
  );
  return _addLayer(map, title, layer)
 }
+
+
+
+
+
+
+var addFlowLinesLayer = function(map) {
+	var flowlineStyle = "FlowlineStreamOrder";
+	var flowlineLayer = "NHDPlusFlowlines:PlusFlowlineVAA_NHDPlus-StreamOrder";
+	// function to create pixel to render
+	var pixelR = pixelG = pixelB  = pixelA = 255;
+	var flowlineAboveClipPixel;
+	var createFlowlineAboveClipPixel = function() {
+		flowlineAboveClipPixel = (pixelA & 0xff) << 24 | (pixelB & 0xff) << 16 | (pixelG & 0xff) << 8  | (pixelR & 0xff);
+	};
+	createFlowlineAboveClipPixel();
+ 
+	// define per-pixel operation
+	var flowlineClipOperation = OpenLayers.Raster.Operation.create(function(pixel) {
+	    if (pixel >> 24 === 0) {  return 0; }
+	    var value = pixel & 0x00ffffff;
+	    if (value >= streamOrderClipValue && value < 0x00ffffff) {
+	        return flowlineAboveClipPixel;
+	    } else {
+	        return 0;
+	    }
+	});
+	
+	var flowlinesWMSData = new OpenLayers.Layer.WMS(
+	    "Flowline WMS (Data)", 
+	    flowUrl + "wms",
+	    { layers: flowlineLayer, styles: flowlineStyle, format: "image/png", tiled: "true" },
+	    { isBaseLayer: false, opacity: 0, displayInLayerSwitcher: false, tileOptions: { crossOriginKeyword: 'anonymous' } } );
+	
+
+	// source canvas (writes WMS tiles to canvas for reading)
+	var flowlineComposite = OpenLayers.Raster.Composite.fromLayer(flowlinesWMSData, {int32: true});
+	
+	// filter source data through per-pixel operation 
+	var flowlineClipOperationData = flowlineClipOperation(flowlineComposite);
+	
+	var flowlineRaster = new OpenLayers.Layer.Raster({ 
+		name: "NHD Flowlines", data: flowlineClipOperationData, isBaseLayer: false
+ 
+	});
+	
+	
+	// define layer that writes data to a new canvas
+	flowlineRaster.setData(flowlineClipOperationData);
+	
+	
+	 _addLayer(map, "Flowline WMS (Data)", flowlinesWMSData)
+	 _addLayer(map, "NHD Flowlines", flowlineRaster)
+}	
