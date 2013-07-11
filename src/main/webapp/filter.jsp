@@ -52,7 +52,7 @@
             <input id="yr2" class="yearRange" type="text" size="8">
             <div id="yearRange-warn" class="warn"></div>
     	<BR>
-        Reference Sites Only: <input id="refonly" class="refonly" type="checkbox">
+        Benchmark Sites Only: <input id="refonly" class="refonly" type="checkbox">
     	<BR>
     	Drainage Area (mi<sup>2</sup>): between <br>
     		<input id="DRAINAGE_AREA_MI_SQ-low" class="drainage" type="text" size="8">
