@@ -173,9 +173,6 @@ function renderSiteInfo(response) {
 	})
 	
 	// TODO this is daily only - need inst also
-	// TODO need close action as well
-	// TODO need to move subsequent rows dow
-	// TODO need to make sure source row is always hidden
 	
 	var rows = $(table).find('tr').length
 	if (rows>7) { // first row is an ignored header row
@@ -258,7 +255,8 @@ function addLayer(map, title, layerId, show) {
 	       isBaseLayer: false, // overlay layer
 	       wrapDateLine: false,// repeat the world map
            visibility: show,   // initial visibility
-	       displayOutsideMaxExtent: true, // display full map returned
+           gutter:35,
+           displayOutsideMaxExtent: true, // display full map returned
 //           yx : {'EPSG:3857' : false}
        }
    );
