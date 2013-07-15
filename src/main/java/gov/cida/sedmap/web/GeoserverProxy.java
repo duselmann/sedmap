@@ -44,6 +44,7 @@ public class GeoserverProxy extends ProxyServlet {
 			log.warn("Falling back to default geoservers. NHD:" + NHD_SERVER+NHD_PATH
 					+" and sedmap: " + SED_SERVER, e);
 		}
+		NHD_SERVER  += NHD_PATH;
 	}
 
 
