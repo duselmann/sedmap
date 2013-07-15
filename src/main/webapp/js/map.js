@@ -70,11 +70,11 @@ function init(){
     addLayer(map, "States", "sedmap:CONUS_states_multipart", false) // add a new visible layer
     addLayer(map, "Counties", "sedmap:countyp020", false)   // add a new invisible layer
     addLayer(map, "HUC8", "sedmap:huc_8_multipart_wgs", false)
+    addFlowLinesLayer(map);
     addLayer(map, "Discrete Sites", "sedmap:instant", true)
     addLayer(map, "Daily Sites", "sedmap:daily", true)
     addLayer(map, "NID", "sedmap:NID", false)
 
-    addFlowLinesLayer(map);
     
     // zoom and move viewport to desired location
     //map.zoomToMaxExtent();
@@ -316,12 +316,42 @@ function addArcGisLayer(map, title, layerId) {
 
 
 
+var streamOrderClipValues = [
+     7, // 0
+     7,
+     7,
+     6,
+     6,
+     6, // 5
+     5,
+     5,
+     5,
+     4,
+     4, // 10
+     4,
+     3,
+     3,
+     3,
+     2, // 15
+     2,
+     2,
+     1,
+     1,
+     1  // 20
+ ];
+
+var streamOrderClipValue = 0;
 
 var addFlowLinesLayer = function(map) {
+	streamOrderClipValue = streamOrderClipValues[map.zoom]
+    map.events.register('zoomend', map, 
+	    function() { streamOrderClipValue = streamOrderClipValues[map.zoom] }, true);	
+	
 	var flowlineStyle = "FlowlineStreamOrder";
 	var flowlineLayer = "NHDPlusFlowlines:PlusFlowlineVAA_NHDPlus-StreamOrder";
 	// function to create pixel to render
-	var pixelR = pixelG = pixelB  = pixelA = 255;
+	var pixelR = pixelG  = 0;
+	var pixelB  = pixelA = 255;
 	var flowlineAboveClipPixel;
 	var createFlowlineAboveClipPixel = function() {
 		flowlineAboveClipPixel = (pixelA & 0xff) << 24 | (pixelB & 0xff) << 16 | (pixelG & 0xff) << 8  | (pixelR & 0xff);
