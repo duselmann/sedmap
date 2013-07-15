@@ -7,6 +7,8 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import javax.naming.InitialContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +20,33 @@ public class GeoserverProxy extends ProxyServlet {
 
 	private static final long serialVersionUID = 1L;
 
+	public static final String NHD_ENV_SERVER = "sedmap/nhdServer";
+	public static final String NHD_ENV_PATH   = "sedmap/nhdPath";
+	public static final String SED_ENV_SERVER = "sedmap/sedServer";
+
+	private String NHD_SERVER = "http://cida-wiwsc-wsdev.er.usgs.gov:8080";
+	private String NHD_PATH   = "/geoserver/NHDPlusFlowlines/wms";
+	private String SED_SERVER = "http://localhost:8080";
+
+	public GeoserverProxy() {
+		try {
+			InitialContext ctx = new InitialContext();
+			log.error("TEST");
+			String nhdS = (String) ctx.lookup("java:comp/env/"+NHD_ENV_SERVER);
+			String nhdP = (String) ctx.lookup("java:comp/env/"+NHD_ENV_PATH);
+			String sedS = (String) ctx.lookup("java:comp/env/"+SED_ENV_SERVER);
+
+			// now set the vars so if there is a problem all defaults are used
+			NHD_PATH    = nhdP;
+			NHD_SERVER  = nhdS + NHD_PATH;
+			SED_SERVER  = sedS;
+		} catch (Exception e) {
+			log.warn("Falling back to default geoservers. NHD:" + NHD_SERVER+NHD_PATH
+					+" and sedmap: " + SED_SERVER, e);
+		}
+	}
+
+
 	@Override
 	public URL buildRequestURL(HttpServletRequest request, URL baseURL)
 			throws MalformedURLException {
@@ -25,12 +54,12 @@ public class GeoserverProxy extends ProxyServlet {
 
 		String params = request.getQueryString();
 		if (uri.contains("flow")) {
-			uri = "http://cida-wiwsc-wsdev.er.usgs.gov:8080/geoserver/NHDPlusFlowlines/wms";
+			uri = NHD_SERVER; //"http://cida-wiwsc-wsdev.er.usgs.gov:8080/geoserver/NHDPlusFlowlines/wms";
 			log.error(uri+"?"+params);
 		} else {
 			uri = uri.replace("sediment", "geoserver");
 			uri = uri.replace("map", "sedmap");
-			uri = "http://cida-wiwsc-sedmapdev.er.usgs.gov:8080" + uri;
+			uri = SED_SERVER + uri; //"http://cida-wiwsc-sedmapdev.er.usgs.gov:8080" + uri;
 		}
 		return new URL(uri +"?" +params);
 	}

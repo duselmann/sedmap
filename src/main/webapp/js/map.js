@@ -341,23 +341,28 @@ var streamOrderClipValues = [
  ];
 
 var streamOrderClipValue = 0;
+var flowlineAboveClipPixel;
+var createFlowlineColor = function(r,g,b,a) {
+	flowlineAboveClipPixel = (a & 0xff) << 24 | (b & 0xff) << 16 | (g & 0xff) << 8  | (r & 0xff);
+};
+createFlowlineColor(100,100,255,255);
 
 var addFlowLinesLayer = function(map) {
 	streamOrderClipValue = streamOrderClipValues[map.zoom]
     map.events.register('zoomend', map, 
-	    function() { streamOrderClipValue = streamOrderClipValues[map.zoom] }, true);	
+    	    function() { streamOrderClipValue = streamOrderClipValues[map.zoom] }, true);	
+/*    map.events.register('removelayer', map, 
+    	    function() { 
+    			if (layers['Topographic'].visiblity) createFlowlineColor(0,0,255,255) 
+    			else createFlowlineColor(200,200,255,255) }
+    	, true);	
+*/	
 	
 	var flowlineStyle = "FlowlineStreamOrder";
 	var flowlineLayer = "NHDPlusFlowlines:PlusFlowlineVAA_NHDPlus-StreamOrder";
 	// function to create pixel to render
-	var pixelR = pixelG  = 0;
-	var pixelB  = pixelA = 255;
-	var flowlineAboveClipPixel;
-	var createFlowlineAboveClipPixel = function() {
-		flowlineAboveClipPixel = (pixelA & 0xff) << 24 | (pixelB & 0xff) << 16 | (pixelG & 0xff) << 8  | (pixelR & 0xff);
-	};
-	createFlowlineAboveClipPixel();
  
+	
 	// define per-pixel operation
 	var flowlineClipOperation = OpenLayers.Raster.Operation.create(function(pixel) {
 	    if (pixel >> 24 === 0) {  return 0; }
