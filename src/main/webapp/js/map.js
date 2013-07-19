@@ -370,6 +370,8 @@ var createFlowlineColor = function(r,g,b,a) {
 };
 createFlowlineColor(100,100,255,255);
 
+
+
 var addFlowLinesLayer = function(map) {
     streamOrderClipValue = streamOrderClipValues[map.zoom]
     
@@ -389,7 +391,7 @@ var addFlowLinesLayer = function(map) {
     });
     
     var flowlineLayer = "NHDPlusFlowlines:PlusFlowlineVAA_NHDPlus-StreamOrder";
-    var options = { visibility: true,opacity: 0, displayInLayerSwitcher: false, tileOptions: { crossOriginKeyword: 'anonymous' } }
+    var options = { opacity: 0, displayInLayerSwitcher: false, tileOptions: { crossOriginKeyword: 'anonymous' } }
     var flowlinesWMSData = _addLayer(map, "Flowline WMS (Data)", flowlineLayer, "wms",
             flowUrl + "wms", options, {styles: "FlowlineStreamOrder"})
 
@@ -399,14 +401,27 @@ var addFlowLinesLayer = function(map) {
     // filter source data through per-pixel operation 
     var flowlineClipOperationData = flowlineClipOperation(flowlineComposite);
     
+    var flowLayerName = "NHD Flowlines"
     var flowlineRaster = new OpenLayers.Layer.Raster({ 
-        name: "NHD Flowlines", data: flowlineClipOperationData, isBaseLayer: false
+        name: flowLayerName, data: flowlineClipOperationData, isBaseLayer: false
     });
+    flowlineRaster.visibility = false;
     
     // define layer that writes data to a new canvas
     flowlineRaster.setData(flowlineClipOperationData);
     
     // add the special raster layer to the map viewport 
-    layers["NHD Flowlines"] = flowlineRaster;
+    layers[flowLayerName] = flowlineRaster;
     map.addLayer(flowlineRaster);
+    
+    map.events.register('changelayer', null, function(evt){
+        if (evt.property === "visibility"
+        	&& evt.layer.name === flowLayerName) {
+        	flowlinesWMSData.visibility = evt.layer.visibility
+        	if (flowlinesWMSData.visibility) {
+	        	flowlinesWMSData.redraw()
+	        }
+        }
+    }
+ );
 }    
