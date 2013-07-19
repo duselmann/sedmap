@@ -12,7 +12,7 @@
         <div class="siteInfoLabel">USGS Stream Gage ID</div>                   <div class="siteInfoData" id="USGS_STATION_ID">08343234</div>
       </div>
       <div class="siteDatum">
-        <div class="siteInfoLabel">Drainage Area (mi<sup>2</sup>)</div>        <div class="siteInfoData" id="DRAINAGE_AREA_MI_SQ">2342</div>
+        <div class="siteInfoLabel">Drainage Area (mi<sup>2</sup>)</div>        <div class="siteInfoData" id="DA">2342</div>
       </div>
       <div class="siteDatum">
         <div class="siteInfoLabel">Period of Record</div>

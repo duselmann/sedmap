@@ -31,19 +31,19 @@ public class GeoserverProxy extends ProxyServlet {
 	public GeoserverProxy() {
 		try {
 			InitialContext ctx = new InitialContext();
-			log.error("TEST");
 			String nhdS = (String) ctx.lookup("java:comp/env/"+NHD_ENV_SERVER);
 			String nhdP = (String) ctx.lookup("java:comp/env/"+NHD_ENV_PATH);
 			String sedS = (String) ctx.lookup("java:comp/env/"+SED_ENV_SERVER);
 
 			// now set the vars so if there is a problem all defaults are used
+			NHD_SERVER  = nhdS;
 			NHD_PATH    = nhdP;
-			NHD_SERVER  = nhdS + NHD_PATH;
 			SED_SERVER  = sedS;
 		} catch (Exception e) {
 			log.warn("Falling back to default geoservers. NHD:" + NHD_SERVER+NHD_PATH
 					+" and sedmap: " + SED_SERVER, e);
 		}
+		// lets concat this once
 		NHD_SERVER  += NHD_PATH;
 	}
 
@@ -58,8 +58,7 @@ public class GeoserverProxy extends ProxyServlet {
 			uri = NHD_SERVER; //"http://cida-wiwsc-wsdev.er.usgs.gov:8080/geoserver/NHDPlusFlowlines/wms";
 			log.error(uri+"?"+params);
 		} else {
-			uri = uri.replace("sediment", "geoserver");
-			uri = uri.replace("map", "sedmap");
+			uri = uri.replace("sediment/map", "geoserver/sedmap");
 			uri = SED_SERVER + uri; //"http://cida-wiwsc-sedmapdev.er.usgs.gov:8080" + uri;
 		}
 		return new URL(uri +"?" +params);
@@ -75,7 +74,6 @@ public class GeoserverProxy extends ProxyServlet {
 		OutputStream       responseOutputStream = null;
 
 		URL targetURL     = buildRequestURL(request, null);
-		String requestURI = request.getRequestURI() + "";
 
 
 		try {

@@ -144,6 +144,7 @@
     <jsp:include page="js/dygraphs/dygraphs.jsp">
         <jsp:param name="debug-qualifier" value="true" />
     </jsp:include>
+    
     <script type="text/javascript" src="js/jquery-ui/jquery-ui-1.10.0.custom.min.js"></script>
     <script type="text/javascript" src="js/ui/ui.js"></script>
     <script type="text/javascript" src="js/util/util.js"></script>
