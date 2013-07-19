@@ -101,7 +101,7 @@ function getSiteInfo(e) {
             EXCEPTIONS: "application/vnd.ogc.se_xml",
             BBOX: map.getExtent().toBBOX(),
             SERVICE: "WMS",
-            INFO_FORMAT: 'text/html',
+            INFO_FORMAT: 'application/json',
             QUERY_LAYERS: layer.params.LAYERS,
             FEATURE_COUNT: 50,
             Layers: 'sedmap:daily',
@@ -132,6 +132,9 @@ function getSiteInfo(e) {
     }
     if (layer.params.FEATUREID) {
         params.featureid = layer.params.FEATUREID;
+    }
+    if (layer.params.viewparams) {
+        params.viewparams = layer.params.viewparams;
     }
     OpenLayers.Request.GET({url:projectUrl+"wms", params:params, scope:this, success:onSiteInfoResponse, failure:onSiteInfoResponseFail});
     OpenLayers.Event.stop(e);
@@ -164,25 +167,13 @@ function clearSiteInfo(e) {
 
 //sets the HTML provided into the nodelist element
 function renderSiteInfo(response) {
-    var html  = response.responseText
-    var start = html.indexOf('<table')
-    var end   = html.indexOf('</table') +8
-    var table = html.substring(start, end)
+    var json  = $.parseJSON( response.responseText )
     
-    var fields = {STATION_NAME:-1,
-        USGS_STATION_ID:-1,
-        DRAINAGE_AREA_MI_SQ:-1,
-        SAMPLE_YEARS:-1}
-    $.each(fields, function(key,val) {
-        var col = findCol(table, key)
-        // TODO log error/not found
-        fields[key] = col;
-    })
+    var fields = ['STATION_NAME', 'USGS_STATION_ID', 'DA', 'SAMPLE_YEARS']
     
     // TODO this is daily only - need inst also
     
-    var rows = $(table).find('tr').length
-    if (rows>7) { // first row is an ignored header row
+    if (json.features.length > 7) { // first row is an ignored header row
         // when max rows reached then fix height and scroll
         $('#siteInfo').css('height',6*81);
         $('#siteInfo').css('overflow-y','scroll');
@@ -191,34 +182,21 @@ function renderSiteInfo(response) {
         $('#siteInfo').css('overflow-y','hidden');
     }
     
-    $(table).find('tr').each(function(r,row){
-        if (r===0) return // skip header row because :not(:first) did not work here
+    $.each(json.features, function(row,feature){
         var info = $('#singleSiteInfo').clone()
-        info.attr('id','siteInfo-'+r)
-        $.each(fields, function(key,c) {
-            var value = $(row).find('td').eq(c).text()
-            $(info).find('#'+key).text(value)
-            $(info).find('#'+key).attr('id',key+'-'+r) // give the field a unique id
+        info.attr('id','siteInfo-'+row)
+        
+        $.each(fields, function(i,field) {
+            var value = feature.properties[field]
+            $(info).find('#'+field).text(value)
+            $(info).find('#'+field).attr('id',field+'-'+row) // give the field a unique id
         })
         $('#siteInfo').append(info)
-        $('#siteInfo-'+r).show()
+        $('#siteInfo-'+row).show()
         $('#siteInfo').fadeIn(300)
     })
 }
 
-function findCol(table, el) {
-    var col = -1
-    $(table).find('th').each(function(i,th){
-        var val = $(th).text()
-        if (val===el) {
-            col = i
-        }
-    })
-    return col
-}
-
-//function assignValues(fields, infoEl, row) {
-//}
 
 
 function nlcdLegendToggle() {
