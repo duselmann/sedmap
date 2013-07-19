@@ -6,27 +6,26 @@
 <body>
     <div id="singleSiteInfo" class="singleSiteInfo">
       <div class="siteDatum">
-        <div class="siteInfoLabel">Station</div>              <div class="siteInfoData" id="STATION_NAME">Abracadabra</div>
+        <div class="siteInfoLabel">Station</div>              <div class="siteInfoData" id="STATION_NAME"></div>
       </div>
       <div class="siteDatum">
-        <div class="siteInfoLabel">USGS Stream Gage ID</div>                   <div class="siteInfoData" id="USGS_STATION_ID">08343234</div>
+        <div class="siteInfoLabel">USGS Stream Gage ID</div>                   <div class="siteInfoData" id="USGS_STATION_ID"></div>
       </div>
       <div class="siteDatum">
-        <div class="siteInfoLabel">Drainage Area (mi<sup>2</sup>)</div>        <div class="siteInfoData" id="DA">2342</div>
+        <div class="siteInfoLabel">Drainage Area (mi<sup>2</sup>)</div>        <div class="siteInfoData" id="DA"></div>
       </div>
       <div class="siteDatum">
         <div class="siteInfoLabel">Period of Record</div>
-            <div class="siteInfoLabel siteInfoSubLabel siteInfoDiscrete">daily</div>  <div class="siteInfoData siteInfoDiscrete" id="sitePeriodDaily">1984-2001</div>
-            <div class="siteInfoLabel siteInfoSubLabel siteInfoInstant">discrete</div>    <div class="siteInfoData siteInfoInstant"  id="sitePeriodInst">1990-2001</div>
+            <div class="siteInfoLabel siteInfoSubLabel siteInfoDAILY">daily</div>    <div class="siteInfoData siteInfoDAILY"  id="DAILY_PERIOD"></div>
+            <div class="siteInfoLabel siteInfoSubLabel siteInfoDISCRETE">discrete</div>    <div class="siteInfoData siteInfoDISCRETE"  id="DISCRETE_PERIOD"></div>
       </div>
       <div class="siteDatum">
-        <div class="siteInfoLabel">Number of Values</div>
-            <div class="siteInfoLabel siteInfoSubLabel siteInfoDiscrete">daily</div>  <div class="siteInfoData siteInfoDiscrete" id="siteSamplesDaily">101</div>
-            <div class="siteInfoLabel siteInfoSubLabel siteInfoInstant">discrete</div>    <div class="siteInfoData siteInfoInstant"  id="siteSamplesInst">3650</div>
+        <div class="siteInfoLabel siteInfoDISCRETE">Number of Samples</div>
+            <div class="siteInfoLabel siteInfoSubLabel siteInfoDISCRETE">discrete</div>    <div class="siteInfoData siteInfoDISCRETE"  id="DISCRETE_SAMPLES"></div>
       </div>
       <div class="siteDatum">
-        <div class="siteInfoLabel discrete">Years Data Sampled</div>
-            <div class="siteInfoLabel siteInfoSubLabel siteInfoDiscrete">daily</div>  <div class="siteInfoData siteInfoDiscrete" id="SAMPLE_YEARS">15</div>
+        <div class="siteInfoLabel siteInfoDAILY">Years Data Sampled</div>
+            <div class="siteInfoLabel siteInfoSubLabel siteInfoDAILY">daily</div>  <div class="siteInfoData siteInfoDAILY" id="DAILY_YEARS"></div>
       </div>
     
     </div>

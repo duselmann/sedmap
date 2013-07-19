@@ -1,3 +1,10 @@
+if (typeof String.prototype.startsWith != 'function') {
+  // see below for better implementation!
+  String.prototype.startsWith = function (str){
+    return this.indexOf(str) == 0;
+  };
+}
+
 OpenLayers.Layer.WMS.prototype.getFullRequestString = function(newParams,altUrl)
 {
     try{
@@ -107,9 +114,9 @@ function getSiteInfo(e) {
             BBOX: map.getExtent().toBBOX(),
             SERVICE: "WMS",
             INFO_FORMAT: 'application/json',
-            QUERY_LAYERS: layer.params.LAYERS,
+            QUERY_LAYERS: 'sedmap:SiteInfo',//layer.params.LAYERS,
             FEATURE_COUNT: 50,
-            Layers: 'sedmap:daily',
+            Layers: 'sedmap:SiteInfo',
             WIDTH: map.size.w,
             HEIGHT: map.size.h,
             format: format,
@@ -175,7 +182,7 @@ function clearSiteInfo(e) {
 function renderSiteInfo(response) {
     var json  = $.parseJSON( response.responseText )
     
-    var fields = ['STATION_NAME', 'USGS_STATION_ID', 'DA', 'SAMPLE_YEARS']
+    var fields = ['STATION_NAME', 'USGS_STATION_ID', 'DA', 'DAILY_YEARS', 'DAILY_PERIOD', 'DISCRETE_PERIOD', 'DISCRETE_SAMPLES']
     
     // TODO this is daily only - need inst also
     
@@ -192,10 +199,24 @@ function renderSiteInfo(response) {
         var info = $('#singleSiteInfo').clone()
         info.attr('id','siteInfo-'+row)
         
+    	var siteTypes = {}
+        $.each(['DAILY','DISCRETE'], function(i,siteType) {
+        	var thisType = siteTypes[siteType] = feature.properties[siteType+'_SITE']===1
+        	if ( ! thisType ) {
+        		$(info).find('.siteInfo'+siteType).hide()
+        	}
+        })
+        
         $.each(fields, function(i,field) {
-            var value = feature.properties[field]
-            $(info).find('#'+field).text(value)
-            $(info).find('#'+field).attr('id',field+'-'+row) // give the field a unique id
+        	var isDailyField    = field.startsWith('DAILY') 
+        	var isDiscreteField = field.startsWith('DISCRETE') 
+        	
+        	if ( ( !isDailyField    || siteTypes['DAILY'] )  
+        	 &&  ( !isDiscreteField || siteTypes['DISCRETE'] ) ) {
+	            var value = feature.properties[field]
+	            $(info).find('#'+field).text(value)
+	            $(info).find('#'+field).attr('id',field+'-'+row) // give the field a unique id
+        	}
         })
         $('#siteInfo').append(info)
         $('#siteInfo-'+row).show()
