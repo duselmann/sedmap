@@ -96,6 +96,11 @@ function init(){
 
 function getSiteInfo(e) {
     var layer = layers['Daily Sites']
+    
+    var buffer= Math.round(map.zoom * Math.pow(3, map.zoom/20))
+    if (map.zoom >= 10) buffer*=2
+    console.log(buffer)
+     
     var params = {
             REQUEST: "GetFeatureInfo",
             EXCEPTIONS: "application/vnd.ogc.se_xml",
@@ -109,7 +114,8 @@ function getSiteInfo(e) {
             HEIGHT: map.size.h,
             format: format,
             styles: layer.params.STYLES,
-            srs: "EPSG:3857"
+            srs: "EPSG:3857",
+            buffer: buffer
     };
     
     // handle the wms 1.3 vs wms 1.1 madness
