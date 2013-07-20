@@ -53,7 +53,8 @@
             <jsp:param name="expires" value="never" />
             <jsp:param name="development" value="<%= development %>" />
         </jsp:include>
-        <script type="text/javascript" src="js/jquery/jquery-1.8.1.min.js"></script>
+        <script type="text/javascript" src="js/jquery/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript" src="js/utils.js"></script>
     </head>
     
     <body onload="init()">

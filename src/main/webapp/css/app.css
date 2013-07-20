@@ -55,10 +55,18 @@ div.filter {
     background-color: #345280;
 }
 
-div.warn {
-    color:red;
+div.warn, div.filterWarn {
+    color:#990000;
+    background:#FFCCCC;
+}
+div.inputfilterWarnOn {
+    padding: 3px;
+    border: 1px solid #990000;
 }
 
+div.inputFilterWarn input {
+	border: 1px solid #990000;
+}
 
 
 #siteInfo {

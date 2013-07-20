@@ -1,154 +1,464 @@
-// this version of each does not conflict with the jquery version
-// TODO well actually jquery needs a push method on this for some reason - will look into it or use underscore later
-// jquery is in the way on this cool extension
-// Object.prototype.each = function(callback) {
-/*
-var each = function(obj, callback) {
-    for (var key in this) {
-    	if (this.hasOwnProperty(key)) {
-	        callback(this[key],key)
-	    }
-    }
-}
-Array.prototype.each = function(callback) {
-    for (var i=0; i<this.length; i++) {
-        callback(this[i],i) 
-    }
-}
-*/
-Array.prototype.eachReverse = function(callback) {
-    for (var i=this.length-1; i>=0; i--) {
-        callback(this[i],i) 
-    }
-}
-Array.prototype.remove = function(from, to) {
-  var rest = this.slice((to || from) + 1 || this.length)
-  this.length = from < 0 ? this.length + from : from
-  return this.push.apply(this, rest)
+// slightly less to type
+var Ogc = {}
+Ogc.Logic=OpenLayers.Filter.Logical
+Ogc.Comp =OpenLayers.Filter.Comparison
+Ogc.Geo  =OpenLayers.Filter.Spatial
+
+Ogc.encode = function(filter) {
+	var xml = new OpenLayers.Format.XML();
+    var filter_1_1 = new OpenLayers.Format.Filter({version: "1.1.0"});
+
+	return xml.write( filter_1_1.write(filter) );
 }
 
-var Tag = new function() {
-	this.OPEN  = false
-	this.CLOSE = true
+// TODO apply for each layer and each filter
+var applyFilter = function() {
+	var hasErrors = $('.warn:not(:empty)').length>0
+	if (hasErrors) alert('Please address warnings.')
 
-	this.make = function(tag,close) {
-		if (close) {
-			var index = tag.indexOf(" ")
-			index = index>=0 ?index :tag.length 
-			tag = tag.substring(0,index)
+	var filter = {And:[]}
+	if (stateFilter.Or.length) {
+		filter.And.push( stateFilter )
+		var ogcXml = Ogc.filter(filter)
+
+		applyFilterToLayers({filter:ogcXml}, ['States','Counties','NID'])
+	}
+	if (hucFilter) {
+		filter.And.push(hucFilter)
+
+		// FYI this layer has HUC_2, HUC_4, HUC_6, HUC_8, and HU_8_STATE fields
+		var layerFilter = {L:{name:'HUC_8',value:hucFilter.L.value}}
+		var ogcXml = Ogc.filter(layerFilter)
+		
+		applyFilterToLayers({filter:ogcXml}, ['HUC8'])
+	}
+	if (basinFilter) {
+		filter.And.push(basinFilter)
+	}
+	if (drainageFilter) {
+		filter.And.push(drainageFilter[0])
+		filter.And.push(drainageFilter[1])
+	}
+	if (refOnlyFilter) {
+		filter.And.push(refOnlyFilter)
+	}
+	
+	// now we get complex because of the way geoserver takes params outside of OGC
+	// first, if there are OGC filters we need to apply them to at least the inst layer
+	// if the daily special filter, minyrs, is not present then include daily layer
+	// then keep track of layers that have been applied because if there is no OGC
+	//   but there is a year range then the year range must be applied on its own
+	var daily = false
+	var inst  = false
+	if (filter.And.length) { // TODO need a layers based approach
+		inst = true
+		var ogcXml = Ogc.filter(filter)
+		var layers = ['Discrete Sites']
+		
+		// min yrs only applies to daily so skip daily if this filters is present
+		if ( ! minYrsFilter ) { 
+			daily = true
+			layers.push('Daily Sites')
 		}
+		
+		applyFilterToLayers({filter:ogcXml,viewparams:yearFilter}, layers)
+	}
 	
-		var clause = "<"+(close?'/':'')+tag+">"
-		return clause
+	// minYrsFilter only applies to the daily sites
+	if (minYrsFilter) {
+		daily = true
+		filter.And.push(minYrsFilter)
+		var ogcXml = Ogc.filter(filter)
+		var layers = ['Daily Sites']
+		applyFilterToLayers({filter:ogcXml,viewparams:yearFilter}, layers)
 	}
-	this.open = function(tag) {
-		return this.make(tag, this.OPEN)
+	
+	// yearFilter will not have been applied if the only filter
+	if (yearFilter) {
+		// find the layers need to be applied
+		var layers = []
+		if ( ! inst ) {
+			layers.push('Discrete Sites')
+		}
+		if ( ! daily ) { 
+			layers.push('Daily Sites')
+		}
+		// apply to layers if there are layers to apply to
+		if (layers.length>0) {
+			applyFilterToLayers({viewparams:yearFilter}, layers)
+		}
 	}
-	this.close = function(tag) {
-		return this.make(tag, this.CLOSE)
-	}
+
 }
 
-/*
-<PropertyIsEqualTo>
-<PropertyIsNotEqualTo>
-<PropertyIsLessThan>
-<PropertyIsLessThanOrEqualTo>
-<PropertyIsGreaterThan>
-<PropertyIsGreaterThanOrEqualTo>
-*/
-// And Or Not should be literal param clause keys
 
 
 
-var Ogc = new function() {
-	this.operators = {
-		'=':'EqualTo',
-		'!':'Not',
-		'<':'LessThan',
-		'>':'GreaterThan',
-		'L':'Like wildCard="*" singleChar="." escape="!"',
-	}
-	this.opcodes = Object.keys(this.operators)
 
-	this.filter = function(params) {
-		var filter = this.clause("Filter", params)
-		return filter
-	}
 
-	
-	this.clause = function(tag, params) {
-		tag = this.propertyTag(tag)
-		var clause = Tag.make(tag)
-		clause += this.inner(params)
-		clause += Tag.make(tag, Tag.CLOSE)
-		return clause
-	}
-	
-	this.propertyTag = function(tag) {
-		if (tag.length > 2) return tag
-		var newTag = "PropertyIs"
-		var or = ""
-		for (var oc=0; oc<tag.length; oc++) {
-			var opcode = tag[oc]
-			if (this.opcodes.indexOf(opcode) < 0) {
-				return tag
-			}
-			newTag += or + this.operators[opcode]
-			or = opcode==="!" ?"" :"Or" // when joining 'not' does not use 'Or'
+
+
+
+
+
+
+
+
+var Filters = Class.extend({
+	init : function(params) {
+		this.el      = params.el
+		this.$el     = '#'+params.el
+		this.$warn   = this.$el+'-warn'
+		this.parent  = params.parent
+		this.field   = params.field
+		this.class   = params.class ? params.class : ''
+		this.label   = params.label
+		this.trueVal = params.trueVal
+		this.errClass= params.errorClass ? params.errorClass : 'inputFilterWarn'
+		this.layers  = params.layers
+		this.filter  = undefined
+		
+		// if there is no give clear action then used the default undefined action
+		if (params.clearAction) {
+			this.clear = params.clearAction
 		}
-		return newTag
-	}
+		
+		var dom = this.createDom() + '</div>' 
+		// this is so composite filters get one error div
+		if ( isUndefined(params.subfilter) || ! params.subfilter) {
+			dom += this.errorDom()
+			Filters.Instances.push(this)
+		}
+		$(this.parent).append(dom)
+		
+		if ( isUndefined(params.subfilter) || ! params.subfilter) {
+			this.linkChange()
+		}
+	},
+
+	// function that is called when the user wants to clear this filter
+	clearFilter : function() {
+		// default clearing is the undefined
+		this.filter = undefined
+	},
+
+	// create common dom
+	createDom : function() {
+		var dom = '<div id="'+this.el+'" '
+		if (this.class) dom += 'class="'+this.class+'"'
+		return dom + '>'
+	},
 	
-	this.inner = function(params) {
-		var clause = ""
-		var _this = this
+	errorDom : function() {
+		return '<div id="'+this.el+'-warn" class="filterWarn"></div>'
+	},
+	
+	onchange : function() {
+		this.clearFilter()
+		this.validate()
+		// no text is a clean bill of health
+		return $(this.$warn).text().length > 0
+	},
+	
+	makeFilter : function() {
+		return this.filter
+	},
+	
+	validate : function(noReset) {
+		if ( isUndefined(noReset) || noReset) {
+			this.validateReset()
+		}
+		var msg = this.subvalidate()
+		if (msg.length>0) {
+			$(this.$el).addClass(this.errClass)
+			$(this.$warn).addClass(this.errClass+"On")
+			$(this.$warn).html(msg)
+		}
+		return msg
+	},
+	
+	validateReset : function() {
+		$(this.$el).removeClass(this.errClass)
+		$(this.$warn).removeClass(this.errClass+"On")
+		$(this.$warn).html('')
+	},
+	
+	subvalidate : function() {
+		return '' // default validation
+	},
+	// pass through to jquery val()
+	val : function(val) {
+		if ( isDefined(val) ) {
+			return $(this.$el+' input').val(val)
+		}
+		return $(this.$el+' input').val()
+	}
+})
+
+// storage of the filter obj instances
+Filters.Instances = []
+// storage of the unique filter names
+Filters.Layers = {}
+// the openlayers map these filters apply
+Filters.Map = undefined
+
+// general validation
+Filters.Validate = {
+	max : function(value, max) {
+		if ( isUndefined(max) || max.length===0) return ''
+		var val = matchType(max, value)
+		if (val > max) {
+			return ' ' + value + ' exceeds the max: ' + max
+		}
+		return ''
+	},
+
+	min : function(value, min) {
+		if ( isUndefined(min) || min.length===0) return ''
+		var val = matchType(min, value)
+		if (val < min) return ' ' + value + ' is less than the min: ' + min
+		return ''
+	},
+	
+	pattern : function(value, pattern, msg) {
+		if ( isUndefined(pattern) || pattern.length===0) return ''
+		if ( ! new RegExp(pattern).test(value) ) {
+			return ' ' + msg
+		}
+		return ''
+	},
+	
+	rangefull : function(a, b, min, max) {
+		var errorText = ""
+		var vals = []
 			
-		if (params.name === undefined && params.value === undefined) {
-			// handle non-property entries
-			$.each(params, function(p,child) {
-				if ( $.isNumeric(p) ) {
-					clause += _this.inner(child)
-				} else {
-					clause += _this.clause(p, child)
-				}
-			})
-		} else {
-			// handle property entries
-			clause += this.property(params.name, params.value)
+		$.each([a,b], function(i,val){
+			if (val === "") return
+			if ( $.isNumeric(val) ) {
+				var num = parseInt(val)
+				errorText += Filters.Validate.min(num,min)
+				errorText += Filters.Validate.max(num,max)
+				vals.push(num)
+			}
+		})
+		
+		if (vals.length == 2) {
+			if (vals[0]>vals[1]) {
+				errorText = 'Initial value must be less than the second.'
+			}
 		}
-		return clause
-	}
-
-
-	this.property = function(name, value) {
-		var property  = this.wrap("PropertyName",name)
-			property += this.wrap("Literal",value)
-		return property
-	}
+		return errorText
+	},
 	
-	
-	this.wrap = function(tag, value) {
-		var wrap = Tag.open(tag)+value+Tag.close(tag)
-		return wrap
-	}
+	// need the min or max value for type checking to ensure lexical or numeric compare consistency
+	// this does not check the min and max that is done in min and max functions
+	// this checks that a <= b if both values exist
+	range : function(a, b, minOrMax) {
 
+		// first get proper type and only given values. the empty string means the user has not entered anything
+		var vals = []
+		$().each([a,b], function(i,val) {
+			if (val !== "") {
+				vals.push( matchType(minOrMax, val) )
+			}
+		})
+		
+		// now that the values are in the proper type
+		// if the user has not entered both values then things are fine
+		var errorText = ''
+		if (vals.length == 2) {
+			if ( vals[0] >= vals[1] ) {
+				errorText = 'Initial value must be less than the second.'
+			}
+		}
+		return errorText
+	}	
 }
 
-var mp = function(op, name, value) {
-	param = {}
-	param[op] = {name:name,value:value}
-	return param
-}
+//simple boolean checkbox filter
+Filters.Bool   = Filters.extend({
+	onchange : function() {
+		if (this._super()) return
+		
+		var val = $(this.$el +' input').attr("checked")
+		if (val) {
+			this.makeFilter()
+		}
+	},
+	
+	makeFilter : function() {
+		this.filter = new Ogc.Comp({
+			type:Ogc.Comp.EQUAL_TO,
+			property:this.field,
+			value:this.trueVal
+		})
+		return this.filter
+	},
+	
+	linkChange : function() {
+		$(this.$el +' input').click(this.onchange)
+	},
+	
+	createDom : function() {
+		return this._super() + this.label+': <input type="checkbox" >'
+	}
+})
+
+// simple single value filter
+Filters.Value  = Filters.extend({
+	init : function(params) {
+		// use size if given, use class if exists, default to 8 chars
+		this.size     = params.size ? params.size : params.class ? '' : 8
+		this.maxlength= params.maxlength ? params.maxlength : 256
+		this.minValue = params.min
+		this.maxValue = params.max
+		this.compare  = params.compare ? params.compare : Ogc.Comp.EQUAL_TO
+		this.pattern  = params.pattern
+		this.patternMsg = params.patternMsg
+		
+		this._super(params)
+	},
+	
+	onchange : function() {
+		if (this._super()) return
+		var val = $(this.$el +' input').val()
+		
+		if ( isDefined(val) && val.length ) {
+			this.makeFilter(val)
+		}
+	},
+	
+	linkChange : function() {
+		var _this = this
+		$(this.$el +' input').blur(function(){_this.onchange()})
+	},
+	
+	makeFilter : function(val) {
+		var params = {
+				property:this.field,
+				value:val
+			}
+		if ( val.endsWith('*') ) {
+			params.type=Ogc.Comp.LIKE
+		} else {
+			params.type=this.compare
+		}
+		this.filter = new Ogc.Comp(params)
+		return this.filter
+	},
+	
+	createDom : function() {
+		var dom = this._super() + this.label+' <input type="text" '
+		dom += 'size="'+this.size+'" '
+		dom += 'maxlength="'+this.maxlength+'" '
+		dom += '>'
+		return dom
+	},
+	
+	subvalidate : function() {
+		var val = $(this.$el +' input').val()
+		if (isUndefined(val) || val.length==0) return ''
+		var msg = Filters.Validate.pattern(val, this.pattern, this.patternMsg)
+				+ Filters.Validate.max(val, this.maxValue)
+				+ Filters.Validate.min(val, this.minValue)
+		return msg
+	}
+})
 
 
-var stateFilter    = {Or:[]}
+Filters.Range  = Filters.extend({
+	init : function(params) {
+		this._super(params)
+		
+		var minParams      = $.extend({}, params)
+		minParams.el      += "-Low"
+		minParams.label   += " between"
+		minParams.compare  = Ogc.Comp.GREATER_THAN_OR_EQUAL_TO
+		minParams.subfilter= true
+		minParams.parent   = this.$el
+		this.low  = new Filters.Value(minParams)
+		this.low.$warn     = this.$warn
+		
+		var maxParams      = $.extend({}, params)
+		maxParams.el      += "-Hi"
+		maxParams.label    = " and"
+		maxParams.compare  = Ogc.Comp.LESS_THAN_OR_EQUAL_TO
+		maxParams.subfilter= true
+		maxParams.parent   = this.$el
+		this.high = new Filters.Value(maxParams)
+		this.high.$warn    = this.$warn
+		
+		this.linkChange() // this already reand in super so have to do it again to catch the children
+	},
+	
+	onchange : function(e) {
+		if (this._super()) return
+		this.low.onchange()
+		this.high.onchange()
+
+		if ( this.low.filter && this.high.filter ) {
+			this.makeFilter()
+		}
+	},
+	
+	linkChange : function() {
+		var _this = this
+		$(this.$el +' input').blur(function(){_this.onchange()})
+	},
+	
+	makeFilter : function() {
+		if (this.low.filter && this.high.filter) 
+		
+		this.filter = new Ogc.Logic({
+			type   : Ogc.Logic.AND,
+			filters: [ this.low.filter, this.high.filter ]
+		})
+		return this.filter
+	},
+
+	createDom : function() {
+		return this._super()
+	},
+	
+	subvalidate : function() {
+		var val  = $(this.$el +' input').val()
+		var msg  = this.low.validate(false) 
+		    msg += this.high.validate(false)
+		if (msg.length===0) {
+			msg += Filters.Validate.range(this.low.val(), this.high.val(), this.low.minValue)
+		}
+		return msg
+	}
+})
+
+Filters.Option = Filters.extend({})
+
+
+
+// TODO OptionFilter
+	// TODO createOptionDom    as per cloneStateFilter
+	// TODO getOptionValue     as per getStateValue
+	// TODO removeOptionFilter as per removeStateFilter
+	// TODO restOptionFilter   as per resetStateFilter
+	// TODO addOptionFilter    as per addStateFilter
+	// TODO onOptionFocus      as per onStateFocus
+	// TODO onOptionChange     as per onStateChange
+
+// TODO RangeFilter
+	// TODO createRangeDom     as per existing dom in filter.jsp
+	// TODO onRangeBlur        as per onDrainageBlur note that the years filter is an exception because it does not fit into OGC
+
+
+var stateFilter    = new Ogc.Logic({
+	type:Ogc.Logic.OR
+})
 var basinFilter    = undefined
 var hucFilter      = undefined
 var minYrsFilter   = undefined
 var refOnlyFilter  = undefined
 var drainageFilter = undefined
-var yearFilter     = ''
+var yearFilter     = ''        // THIS IS NOT OGC SO THE EMPTY STRING SETS IT ASSIDE
+
 
 var getStateValues = function(el) {
     var st     = $(el).val()
@@ -178,7 +488,6 @@ var destroyStateFilter = function(self) {
 }
 
 var addStateFilter = function(e) {
-	var filter = {And:[]}
 	var el     = e.srcElement
     var state  = getStateValues(el)
 
@@ -226,6 +535,8 @@ var onStateChange = function(e) {
 
 $().ready(function(){
 
+	// TODO for each filer set click and blur
+	
 	$('input.refonly').click(onRefOnlyClick)
 	$('#applyFilter').click(applyFilter)
 	$('input.basin').blur(onBasinBlur)
@@ -234,12 +545,16 @@ $().ready(function(){
 	$('input.yearRange').blur(onYearRangeBlur)
 	$('input.minyrs').blur(onMinYrsBlur)
 
+	// TODO for option filter set change event to addOptionFilter/createOptionFilter
 	$('#STATE').change(function(e){
 		addStateFilter(e)
 		cloneStateFilter()
 	})
 
+	
 	$('#clearFilter').click( function(e) {
+		
+		// TODO for each filter clear values
 		$('#states').find('input.destroy').parent().remove()
 		$('input.drainage').val('')
 		$('input.yearRange').val('')
@@ -249,6 +564,7 @@ $().ready(function(){
 		$('input.refonly').attr("checked",false);
 		$('.warn').html('')
 		
+		// TODO for each filter reset
 		stateFilter    = {Or:[]}
 		basinFilter    = undefined
 		hucFilter      = undefined
@@ -256,13 +572,15 @@ $().ready(function(){
 		yearFilter     = '' // this is a non-ogc param that will need OGC for the webservice call
 		minYrsFilter   = undefined
 		refOnlyFilter  = undefined
+		
+		// reset all layers to have no filter
 		applyFilterToLayers({filter:'',viewparams:''},'all')
 	})
 })
 
 var applyFilterToLayers = function(filter, applyTo) {
 	// default all layers and use all layers for 'all' keyword
-	if (applyTo === undefined || applyTo === 'all') {
+	if ( isUndefined(applyTo) || applyTo === 'all') {
 		applyTo = Object.keys(layers)
 	}
 	$.each(applyTo, function(i,layerId) {
@@ -270,6 +588,8 @@ var applyFilterToLayers = function(filter, applyTo) {
 	})
 }
 
+
+// TODO this will be OpenLayers api soon --- see above
 var applyFilter = function() {
 	var hasErrors = $('.warn:not(:empty)').length>0
 	if (hasErrors) alert('Please address warnings.')
@@ -383,7 +703,7 @@ var rangeValidate = function(title,fields,warn,min,max) {
 		var num = parseInt(val)
 		if (! $.isNumeric(val) || num<min || ($.isNumeric(max) && num>max) ) {
 			errorText = title+' must be at least '+min
-			if (max !== undefined) {
+			if ( isDefined(max) ) {
 				errorText += ', to '+max
 			}
 			errorText += '.'
@@ -438,103 +758,6 @@ var onBasinBlur = function(e) {
 	var val = $(el).val()
 	basinFilter = mp('L','BASIN',val)
 }
-
-
-
-var Test = new function() {
-	this.equal = function(actual, expect, msg) {
-		if (actual !== expect) {
-			msg = msg ?msg : "actual value was not equal to expected: '" + expect
-			alert(msg + "' but was '" + actual + "'")
-			return false
-		}
-		return true
-	}
-}
-
-var tag    = "foo"
-var expect = "<foo>"
-var actual = Tag.open(tag)
-Test.equal(actual,expect)
-var expect = "</foo>"
-var actual = Tag.close(tag)
-Test.equal(actual,expect)
-var tag    = 'foo attr="val"'
-var expect = '<foo attr="val">'
-var actual = Tag.open(tag)
-Test.equal(actual,expect)
-var expect = "</foo>"
-var actual = Tag.close(tag)
-Test.equal(actual,expect)
-
-
-// test building property comparisons
-var tag    = "foo"
-var expect = "foo"
-var actual = Ogc.propertyTag(tag)
-Test.equal(actual,expect)
-var tag    = "="
-var expect = "PropertyIsEqualTo"
-var actual = Ogc.propertyTag(tag)
-Test.equal(actual,expect)
-var tag    = "!="
-var expect = "PropertyIsNotEqualTo"
-var actual = Ogc.propertyTag(tag)
-Test.equal(actual,expect)
-var tag    = ">="
-var expect = "PropertyIsGreaterThanOrEqualTo"
-var actual = Ogc.propertyTag(tag)
-Test.equal(actual,expect)
-
-// simple clause test
-var params = {name:'foo',value:'bar'}
-var expect = "<clause><PropertyName>foo</PropertyName><Literal>bar</Literal></clause>"
-var actual = Ogc.clause('clause',params)
-Test.equal(actual,expect)
-
-// logical multiple operator clause test
-var param1 = {name:'foo1',value:'bar1'}
-var param2 = {name:'foo2',value:'bar2'}
-var params = {Or:[{'=':param1},{'!=':param2}]}
-var expect = "<clause><Or><PropertyIsEqualTo><PropertyName>foo1</PropertyName><Literal>bar1</Literal></PropertyIsEqualTo><PropertyIsNotEqualTo><PropertyName>foo2</PropertyName><Literal>bar2</Literal></PropertyIsNotEqualTo></Or></clause>"
-var actual = Ogc.clause('clause',params)
-Test.equal(actual,expect)
-
-// complex logical operator filter test - note the test params do not have to make logical sense to test xml rendering
-var param1 = {name:'foo1',value:'bar1'}
-var param2 = {name:'foo2',value:'bar2'}
-var params = [{Or:[{'>=':param1},{'!=':param2}]},{And:[{'=':param1},{'=':param2}]},{And:[{'=':param1},{'=':param2}]}]
-var expect = "<Filter><Or><PropertyIsGreaterThanOrEqualTo><PropertyName>foo1</PropertyName><Literal>bar1</Literal></PropertyIsGreaterThanOrEqualTo><PropertyIsNotEqualTo><PropertyName>foo2</PropertyName><Literal>bar2</Literal></PropertyIsNotEqualTo></Or><And><PropertyIsEqualTo><PropertyName>foo1</PropertyName><Literal>bar1</Literal></PropertyIsEqualTo><PropertyIsEqualTo><PropertyName>foo2</PropertyName><Literal>bar2</Literal></PropertyIsEqualTo></And><And><PropertyIsEqualTo><PropertyName>foo1</PropertyName><Literal>bar1</Literal></PropertyIsEqualTo><PropertyIsEqualTo><PropertyName>foo2</PropertyName><Literal>bar2</Literal></PropertyIsEqualTo></And></Filter>"
-var actual = Ogc.filter(params)
-Test.equal(actual,expect)
-
-// actual logical filter test
-var param1 = {name:'STATE',value:'WI'}
-var param2 = {name:'STATE',value:'Wisconsin'}
-var params = {Or:[{'=':param1},{'=':param2}]}
-var expect = "<Filter><Or><PropertyIsEqualTo><PropertyName>STATE</PropertyName><Literal>WI</Literal></PropertyIsEqualTo><PropertyIsEqualTo><PropertyName>STATE</PropertyName><Literal>Wisconsin</Literal></PropertyIsEqualTo></Or></Filter>"
-var actual = Ogc.filter(params)
-Test.equal(actual,expect)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

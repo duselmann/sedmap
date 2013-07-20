@@ -1,0 +1,99 @@
+<html>
+<head>
+    <script type="text/javascript" src="js/jquery/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="js/openlayers/OpenLayers.js"></script>
+    <script type="text/javascript" src="../../main/webapp/js/utils.js"></script>
+    <script type="text/javascript" src="../../main/webapp/js/filter.js"></script>
+    <link type="text/css" rel="stylesheet" href="../../main/webapp/css/app.css" />
+</head>
+<body>
+
+In the box below should be the filter elements<br>
+<div id="filterDiv" style="border:1px solid;padding:3px;"></div>
+
+console of sorts
+<div id="console" style="border:1px solid;padding:3px;"></div>
+<script>
+var benchmark
+var minYears
+var minYears
+var drainArea
+
+function write(text) {
+    $('#console').append( encodeHtml(text) )
+    $('#console').append( '<br>' )
+}
+
+function test(){
+	
+	// This is the test js to create filter DOM elements
+	benchmark = new Filters.Bool({
+	    field:'REFERENCE_SITE', 
+	    trueVal:'1', 
+	    el:'refonly', 
+	    parent:'#filterDiv', 
+	    label:'Benchmarks Only'
+	})
+	
+	// test simple filter creation
+	$(benchmark.$el + ' input').attr('checked',true)
+	benchmark.onchange()
+	write( Ogc.encode(benchmark.filter) )
+	
+	// test value filter fields
+	minYears = new Filters.Value({
+	    class:"minyrs",
+	    field:'SAMPLE_YEARS', 
+	    el:'minyrs', 
+	    size:4,
+	    maxlength:2,
+	    parent:'#filterDiv', 
+	    label:'Min Years of Daily Data:',
+	    min:19,
+	    pattern: /^\d+$/,
+	    patternMsg: "Expecting a positive number",
+	})
+	
+    $('#minyrs input').val('1950')
+    minYears.validate()
+    minYears.onchange()
+    write( Ogc.encode(minYears.filter) )
+    
+	// test pattern validate
+	$('#minyrs input').val('a')
+	minYears.validate()
+	window.setTimeout(
+	    function(){
+	        // test that min validate works	    	
+	        $('#minyrs input').val('1')
+	        minYears.validate()
+	        // lets see if rest works
+	        window.setTimeout(function(){minYears.validateReset()}, 1000)
+	    },
+	1000)
+
+	
+	drainArea = new Filters.Range({
+        class:"drainage",
+        field:'DA', 
+        el:'DRAINAGE_AREA_MI_SQ', 
+        size:8,
+        maxlength:11,
+        parent:'#filterDiv', 
+        label:'Drainage Area (mi<sup>2</sup>):',
+        min:0,
+        max:999999999,
+        pattern: /^\d+$/,
+        patternMsg: "Expecting a positive number",
+	})
+	
+	
+	
+	write( Filters.Instances.length )
+}
+
+$().ready(test)
+</script>
+
+</body>
+</html>
