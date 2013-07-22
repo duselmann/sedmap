@@ -1,3 +1,5 @@
+// this is my imple of OGC object mapping. I like it better than Openlayers but this is not a standard
+
 /*
 <PropertyIsEqualTo>
 <PropertyIsNotEqualTo>

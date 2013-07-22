@@ -37,6 +37,17 @@ if (typeof Array.prototype.each !== 'function') {
 	}
 }
 
+if (typeof Array.prototype.concat !== 'function') {
+	Array.prototype.concat = function(newElements) {
+		newElements = isArray(newElements) ? newElements : [newElements]
+		return this.push.apply(this, newElements)
+	}
+}
+
+function defaultValue(val, defaultval) {
+	return isDefined(val) ?val : defaultval
+}
+
 // returns true if the number is an integer
 function isInt(val) {
 	if ($.isNumeric(val)) {
@@ -60,6 +71,9 @@ function isString(val) {
 }
 function isObject(val) {
 	return typeof val === 'object'
+}
+function isArray(val) {
+	return typeof val === 'array'
 }
 function isNumber(val) {
 	return typeof val === 'number'

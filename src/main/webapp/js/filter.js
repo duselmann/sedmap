@@ -11,89 +11,77 @@ Ogc.encode = function(filter) {
 	return xml.write( filter_1_1.write(filter) );
 }
 
-// TODO apply for each layer and each filter
+
+
+// apply for each layer and each filter
 var applyFilter = function() {
-	var hasErrors = $('.warn:not(:empty)').length>0
+	var hasErrors = $('.filterWarn:not(:empty)').length>0
 	if (hasErrors) alert('Please address warnings.')
 
-	var filter = {And:[]}
-	if (stateFilter.Or.length) {
-		filter.And.push( stateFilter )
-		var ogcXml = Ogc.filter(filter)
+	var layerFilters = {}
+	$.each(map.layers, function(i,layer){
+		layerFilters[layer.title]=[]
+	})
 
-		applyFilterToLayers({filter:ogcXml}, ['States','Counties','NID'])
-	}
-	if (hucFilter) {
-		filter.And.push(hucFilter)
+	// build each layers' OGC filter
+	$.each(Filters.Instances, function(i,inst) {
+		if ( inst.isMapOgc && isDefined(inst.filter) ) {
+			// default to filter layers and use all layers for keyword 'all' 
+			var applyTo = inst.layers
+			if ( inst.layers.indexOf('all') !== -1 ) {
+				applyTo = []
+				$.each(map.layers, function(i,layer){
+					applyTo.push( layer.title )
+				})
+			}
+			
+			$.each(applyTo, function(i,layerTitle){
+				layerFilters[layerTitle].push(inst.filter)
+			})
+		}
+	})
 
-		// FYI this layer has HUC_2, HUC_4, HUC_6, HUC_8, and HU_8_STATE fields
-		var layerFilter = {L:{name:'HUC_8',value:hucFilter.L.value}}
-		var ogcXml = Ogc.filter(layerFilter)
-		
-		applyFilterToLayers({filter:ogcXml}, ['HUC8'])
-	}
-	if (basinFilter) {
-		filter.And.push(basinFilter)
-	}
-	if (drainageFilter) {
-		filter.And.push(drainageFilter[0])
-		filter.And.push(drainageFilter[1])
-	}
-	if (refOnlyFilter) {
-		filter.And.push(refOnlyFilter)
-	}
+	// encode each layers filters
+	$.each(layerFilters, function(layerTitle,filters) {
+		if (layerFilters[layerTitle].length>0) {
+			var filter = new Ogc.Logic({
+				type   : Ogc.Logic.AND,
+				filters: layerFilters[layerTitle]
+			})
+			layerFilters[layerTitle] = Ogc.encode(filter)
+		} else {
+			layerFilters[layerTitle] = ''
+		}
+	})
 	
-	// now we get complex because of the way geoserver takes params outside of OGC
-	// first, if there are OGC filters we need to apply them to at least the inst layer
-	// if the daily special filter, minyrs, is not present then include daily layer
-	// then keep track of layers that have been applied because if there is no OGC
-	//   but there is a year range then the year range must be applied on its own
-	var daily = false
-	var inst  = false
-	if (filter.And.length) { // TODO need a layers based approach
-		inst = true
-		var ogcXml = Ogc.filter(filter)
-		var layers = ['Discrete Sites']
-		
-		// min yrs only applies to daily so skip daily if this filters is present
-		if ( ! minYrsFilter ) { 
-			daily = true
-			layers.push('Daily Sites')
+	// because year filter hads to be a different filter
+	var yearFilter = makeYearFilter()
+
+	// apply filters to layers
+	$.each(map.layers, function(i,layer){
+		// only apply the year filter to its assigned layers
+		var localYearFilter = ''
+		if ( theYearFilter.layers.indexOf(layer.title) >= 0 ) {
+			localYearFilter = yearFilter
 		}
-		
-		applyFilterToLayers({filter:ogcXml,viewparams:yearFilter}, layers)
-	}
-	
-	// minYrsFilter only applies to the daily sites
-	if (minYrsFilter) {
-		daily = true
-		filter.And.push(minYrsFilter)
-		var ogcXml = Ogc.filter(filter)
-		var layers = ['Daily Sites']
-		applyFilterToLayers({filter:ogcXml,viewparams:yearFilter}, layers)
-	}
-	
-	// yearFilter will not have been applied if the only filter
-	if (yearFilter) {
-		// find the layers need to be applied
-		var layers = []
-		if ( ! inst ) {
-			layers.push('Discrete Sites')
-		}
-		if ( ! daily ) { 
-			layers.push('Daily Sites')
-		}
-		// apply to layers if there are layers to apply to
-		if (layers.length>0) {
-			applyFilterToLayers({viewparams:yearFilter}, layers)
-		}
-	}
+		var ogcXml = layerFilters[layer.title]
+		// apply filter
+		layer.mergeNewParams({filter:ogcXml,viewparams:localYearFilter})
+	})
 
 }
 
-
-
-
+// this is annoying but geoserver handles view params outside the OGC query 
+// we will render the OGC for data download as per apply but the isMapOgc will be ignored
+var makeYearFilter = function() {
+	var filter = theYearFilter.filter
+	if ( isUndefined(filter) ) {
+		return ''
+	}
+	var yr1 = filter.filters[0].value
+	var yr2 = filter.filters[1].value
+	return 'yr1:'+yr1+';yr2:'+yr2
+}
 
 
 
@@ -111,12 +99,14 @@ var Filters = Class.extend({
 		this.$warn   = this.$el+'-warn'
 		this.parent  = params.parent
 		this.field   = params.field
-		this.class   = params.class ? params.class : ''
+		this.class   = defaultValue(params.class,'')
 		this.label   = params.label
 		this.trueVal = params.trueVal
-		this.errClass= params.errorClass ? params.errorClass : 'inputFilterWarn'
-		this.layers  = params.layers
+		this.errClass= defaultValue(params.errorClass,'inputFilterWarn')
+		this.layers  = defaultValue(params.layers,['all'])
+		this.isMapOgc= defaultValue(params.isMapOgc,true)
 		this.filter  = undefined
+		this.isPrime = defaultValue(params.isPrime, true) // default not sub-filter
 		
 		// if there is no give clear action then used the default undefined action
 		if (params.clearAction) {
@@ -125,13 +115,13 @@ var Filters = Class.extend({
 		
 		var dom = this.createDom() + '</div>' 
 		// this is so composite filters get one error div
-		if ( isUndefined(params.subfilter) || ! params.subfilter) {
+		if (this.isPrime) {
 			dom += this.errorDom()
 			Filters.Instances.push(this)
 		}
 		$(this.parent).append(dom)
 		
-		if ( isUndefined(params.subfilter) || ! params.subfilter) {
+		if (this.isPrime) {
 			this.linkChange()
 		}
 	},
@@ -168,13 +158,15 @@ var Filters = Class.extend({
 		if ( isUndefined(noReset) || noReset) {
 			this.validateReset()
 		}
-		var msg = this.subvalidate()
-		if (msg.length>0) {
+		var msgs = this.subvalidate()
+		// if there is a message, and sub-filters do not manage the messages
+		if (this.isPrime && msgs.length>0) {
+			var msgsText = msgs.join(', ')
 			$(this.$el).addClass(this.errClass)
 			$(this.$warn).addClass(this.errClass+"On")
-			$(this.$warn).html(msg)
+			$(this.$warn).html(msgsText)
 		}
-		return msg
+		return msgs
 	},
 	
 	validateReset : function() {
@@ -184,7 +176,7 @@ var Filters = Class.extend({
 	},
 	
 	subvalidate : function() {
-		return '' // default validation
+		return [] // default validation
 	},
 	// pass through to jquery val()
 	val : function(val) {
@@ -205,49 +197,49 @@ Filters.Map = undefined
 // general validation
 Filters.Validate = {
 	max : function(value, max) {
-		if ( isUndefined(max) || max.length===0) return ''
+		if ( isUndefined(max) || max.length===0) return []
 		var val = matchType(max, value)
 		if (val > max) {
-			return ' ' + value + ' exceeds the max: ' + max
+			return [' ' + value + ' exceeds the max: ' + max]
 		}
-		return ''
+		return []
 	},
 
 	min : function(value, min) {
-		if ( isUndefined(min) || min.length===0) return ''
+		if ( isUndefined(min) || min.length===0) return []
 		var val = matchType(min, value)
-		if (val < min) return ' ' + value + ' is less than the min: ' + min
-		return ''
+		if (val < min) return [' ' + value + ' is less than the min: ' + min]
+		return []
 	},
 	
 	pattern : function(value, pattern, msg) {
-		if ( isUndefined(pattern) || pattern.length===0) return ''
+		if ( isUndefined(pattern) || pattern.length===0) return []
 		if ( ! new RegExp(pattern).test(value) ) {
-			return ' ' + msg
+			return [' ' + msg]
 		}
-		return ''
+		return []
 	},
 	
 	rangefull : function(a, b, min, max) {
-		var errorText = ""
+		var msgs  = []
 		var vals = []
 			
 		$.each([a,b], function(i,val){
 			if (val === "") return
 			if ( $.isNumeric(val) ) {
 				var num = parseInt(val)
-				errorText += Filters.Validate.min(num,min)
-				errorText += Filters.Validate.max(num,max)
+				msgs = msgs.concat( Filters.Validate.min(num,min) )
+				msgs = msgs.concat( Filters.Validate.max(num,max) )
 				vals.push(num)
 			}
 		})
 		
 		if (vals.length == 2) {
 			if (vals[0]>vals[1]) {
-				errorText = 'Initial value must be less than the second.'
+				msgs = msgs.concat('Initial value must be less than the second.')
 			}
 		}
-		return errorText
+		return msgs
 	},
 	
 	// need the min or max value for type checking to ensure lexical or numeric compare consistency
@@ -257,7 +249,7 @@ Filters.Validate = {
 
 		// first get proper type and only given values. the empty string means the user has not entered anything
 		var vals = []
-		$().each([a,b], function(i,val) {
+		$.each([a,b], function(i,val) {
 			if (val !== "") {
 				vals.push( matchType(minOrMax, val) )
 			}
@@ -265,13 +257,13 @@ Filters.Validate = {
 		
 		// now that the values are in the proper type
 		// if the user has not entered both values then things are fine
-		var errorText = ''
+		var msg = []
 		if (vals.length == 2) {
 			if ( vals[0] >= vals[1] ) {
-				errorText = 'Initial value must be less than the second.'
+				msg = ['Initial value must be less than the second.']
 			}
 		}
-		return errorText
+		return msg
 	}	
 }
 
@@ -308,12 +300,12 @@ Filters.Bool   = Filters.extend({
 Filters.Value  = Filters.extend({
 	init : function(params) {
 		// use size if given, use class if exists, default to 8 chars
-		this.size     = params.size ? params.size : params.class ? '' : 8
-		this.maxlength= params.maxlength ? params.maxlength : 256
-		this.minValue = params.min
-		this.maxValue = params.max
-		this.compare  = params.compare ? params.compare : Ogc.Comp.EQUAL_TO
-		this.pattern  = params.pattern
+		this.size       = defaultValue(params.size, params.class ? '' : 8)
+		this.maxlength  = defaultValue(params.maxlength,256)
+		this.minValue   = params.min
+		this.maxValue   = params.max
+		this.compare    = defaultValue(params.compare, Ogc.Comp.EQUAL_TO)
+		this.pattern    = params.pattern
 		this.patternMsg = params.patternMsg
 		
 		this._super(params)
@@ -357,11 +349,11 @@ Filters.Value  = Filters.extend({
 	
 	subvalidate : function() {
 		var val = $(this.$el +' input').val()
-		if (isUndefined(val) || val.length==0) return ''
-		var msg = Filters.Validate.pattern(val, this.pattern, this.patternMsg)
-				+ Filters.Validate.max(val, this.maxValue)
-				+ Filters.Validate.min(val, this.minValue)
-		return msg
+		if (isUndefined(val) || val.length==0) return []
+		var msgs = Filters.Validate.pattern(val, this.pattern, this.patternMsg)
+		msgs = msgs.concat( Filters.Validate.max(val, this.maxValue) )
+		msgs = msgs.concat( Filters.Validate.min(val, this.minValue) )
+		return msgs
 	}
 })
 
@@ -370,33 +362,37 @@ Filters.Range  = Filters.extend({
 	init : function(params) {
 		this._super(params)
 		
+		var baseclass      = defaultValue(params.class, '')
+		
 		var minParams      = $.extend({}, params)
-		minParams.el      += "-Low"
+		minParams.el      += "-lo"
 		minParams.label   += " between"
 		minParams.compare  = Ogc.Comp.GREATER_THAN_OR_EQUAL_TO
-		minParams.subfilter= true
+		minParams.isPrime  = false
 		minParams.parent   = this.$el
-		this.low  = new Filters.Value(minParams)
-		this.low.$warn     = this.$warn
+		minParams.class    = baseclass + " loRange"
+		this.lo            = new Filters.Value(minParams)
+		this.lo.$warn      = this.$warn
 		
 		var maxParams      = $.extend({}, params)
-		maxParams.el      += "-Hi"
+		maxParams.el      += "-hi"
 		maxParams.label    = " and"
 		maxParams.compare  = Ogc.Comp.LESS_THAN_OR_EQUAL_TO
-		maxParams.subfilter= true
+		maxParams.isPrime  = false
 		maxParams.parent   = this.$el
-		this.high = new Filters.Value(maxParams)
-		this.high.$warn    = this.$warn
+		maxParams.class    = baseclass + " hiRange"
+		this.hi            = new Filters.Value(maxParams)
+		this.hi.$warn      = this.$warn
 		
 		this.linkChange() // this already reand in super so have to do it again to catch the children
 	},
 	
 	onchange : function(e) {
 		if (this._super()) return
-		this.low.onchange()
-		this.high.onchange()
+		this.lo.onchange()
+		this.hi.onchange()
 
-		if ( this.low.filter && this.high.filter ) {
+		if ( this.lo.filter && this.hi.filter ) {
 			this.makeFilter()
 		}
 	},
@@ -407,11 +403,11 @@ Filters.Range  = Filters.extend({
 	},
 	
 	makeFilter : function() {
-		if (this.low.filter && this.high.filter) 
+		if (this.lo.filter && this.hi.filter) 
 		
 		this.filter = new Ogc.Logic({
 			type   : Ogc.Logic.AND,
-			filters: [ this.low.filter, this.high.filter ]
+			filters: [ this.lo.filter, this.hi.filter ]
 		})
 		return this.filter
 	},
@@ -422,14 +418,17 @@ Filters.Range  = Filters.extend({
 	
 	subvalidate : function() {
 		var val  = $(this.$el +' input').val()
-		var msg  = this.low.validate(false) 
-		    msg += this.high.validate(false)
-		if (msg.length===0) {
-			msg += Filters.Validate.range(this.low.val(), this.high.val(), this.low.minValue)
+		var msgs = this.lo.validate(false) 
+		msgs = msgs.concat( this.hi.validate(false) )
+		
+		if (msgs.length===0) {
+			var rmsg = Filters.Validate.range(this.lo.val(), this.hi.val(), this.lo.minValue)
+			msgs = msgs.concat(rmsg)
 		}
-		return msg
+		return msgs
 	}
 })
+
 
 Filters.Option = Filters.extend({})
 
@@ -443,10 +442,6 @@ Filters.Option = Filters.extend({})
 	// TODO addOptionFilter    as per addStateFilter
 	// TODO onOptionFocus      as per onStateFocus
 	// TODO onOptionChange     as per onStateChange
-
-// TODO RangeFilter
-	// TODO createRangeDom     as per existing dom in filter.jsp
-	// TODO onRangeBlur        as per onDrainageBlur note that the years filter is an exception because it does not fit into OGC
 
 
 var stateFilter    = new Ogc.Logic({
@@ -578,22 +573,8 @@ $().ready(function(){
 	})
 })
 
-var applyFilterToLayers = function(filter, applyTo) {
-	// default all layers and use all layers for 'all' keyword
-	if ( isUndefined(applyTo) || applyTo === 'all') {
-		applyTo = Object.keys(layers)
-	}
-	$.each(applyTo, function(i,layerId) {
-		layers[layerId].mergeNewParams(filter)
-	})
-}
 
-
-// TODO this will be OpenLayers api soon --- see above
-var applyFilter = function() {
-	var hasErrors = $('.warn:not(:empty)').length>0
-	if (hasErrors) alert('Please address warnings.')
-
+var applyFilterOld = function() {
 	var filter = {And:[]}
 	if (stateFilter.Or.length) {
 		filter.And.push( stateFilter )
@@ -601,163 +582,42 @@ var applyFilter = function() {
 
 		applyFilterToLayers({filter:ogcXml}, ['States','Counties','NID'])
 	}
-	if (hucFilter) {
-		filter.And.push(hucFilter)
-
-		// FYI this layer has HUC_2, HUC_4, HUC_6, HUC_8, and HU_8_STATE fields
-		var layerFilter = {L:{name:'HUC_8',value:hucFilter.L.value}}
-		var ogcXml = Ogc.filter(layerFilter)
-		
-		applyFilterToLayers({filter:ogcXml}, ['HUC8'])
-	}
-	if (basinFilter) {
-		filter.And.push(basinFilter)
-	}
-	if (drainageFilter) {
-		filter.And.push(drainageFilter[0])
-		filter.And.push(drainageFilter[1])
-	}
-	if (refOnlyFilter) {
-		filter.And.push(refOnlyFilter)
-	}
-	
-	// now we get complex because of the way geoserver takes params outside of OGC
-	// first, if there are OGC filters we need to apply them to at least the inst layer
-	// if the daily special filter, minyrs, is not present then include daily layer
-	// then keep track of layers that have been applied because if there is no OGC
-	//   but there is a year range then the year range must be applied on its own
-	var daily = false
-	var inst  = false
-	if (filter.And.length) { // TODO need a layers based approach
-		inst = true
-		var ogcXml = Ogc.filter(filter)
-		var layers = ['Discrete Sites']
-		
-		// min yrs only applies to daily so skip daily if this filters is present
-		if ( ! minYrsFilter ) { 
-			daily = true
-			layers.push('Daily Sites')
-		}
-		
-		applyFilterToLayers({filter:ogcXml,viewparams:yearFilter}, layers)
-	}
-	
-	// minYrsFilter only applies to the daily sites
-	if (minYrsFilter) {
-		daily = true
-		filter.And.push(minYrsFilter)
-		var ogcXml = Ogc.filter(filter)
-		var layers = ['Daily Sites']
-		applyFilterToLayers({filter:ogcXml,viewparams:yearFilter}, layers)
-	}
-	
-	// yearFilter will not have been applied if the only filter
-	if (yearFilter) {
-		// find the layers need to be applied
-		var layers = []
-		if ( ! inst ) {
-			layers.push('Discrete Sites')
-		}
-		if ( ! daily ) { 
-			layers.push('Daily Sites')
-		}
-		// apply to layers if there are layers to apply to
-		if (layers.length>0) {
-			applyFilterToLayers({viewparams:yearFilter}, layers)
-		}
-	}
-
 }
 
 
-var applyRange = function(field, values) {
-	var rangeFilter = []
-	rangeFilter.push( mp('>=',field,values[0]) )
-	rangeFilter.push( mp('<=',field,values[1]) )
-	return rangeFilter
-}
+//
+//var rangeValidate = function(title,fields,warn,min,max) {
+//	var errorText = ""
+//	$(warn).text(errorText) // reset warning msg
+//	var vals = []
+//	$(fields).each(function(i,input) {
+//		var val = $(input).val()
+//		console.log(val)
+//		if (val === "") return
+//		var num = parseInt(val)
+//		if (! $.isNumeric(val) || num<min || ($.isNumeric(max) && num>max) ) {
+//			errorText = title+' must be at least '+min
+//			if ( isDefined(max) ) {
+//				errorText += ', to '+max
+//			}
+//			errorText += '.'
+//			
+//			$(input).focus()
+//		}
+//		vals.push(num)
+//	})
+//	
+//	if (vals.length === 2) {
+//		if (vals[0]>vals[1]) {
+//			errorText = 'Initial value must be less than the second.'
+//		} else {
+//			return vals
+//		}
+//	} 
+//	$(warn).text(errorText)
+//	return false
+//}
 
-var onDrainageBlur  = function() {
-	var vals = false
-	if ( vals = rangeValidate('Drainage', 'input.drainage', '#drainage-warn', 0) ) {
-		drainageFilter = applyRange('DA',vals)
-	}	
-}
-var onYearRangeBlur = function() {
-	var vals = false
-	if ( vals = rangeValidate('Year', 'input.yearRange', '#yearRange-warn', 1900, 'present') ) {
-		var yr1 = vals[0] //$('#yr1').val()
-		var yr2 = vals[1] //$('#yr2').val()
-		yearFilter = 'yr1:'+yr1+';yr2:'+yr2
-	}
-}
-
-var rangeValidate = function(title,fields,warn,min,max) {
-	var errorText = ""
-	$(warn).text(errorText) // reset warning msg
-	var vals = []
-	$(fields).each(function(i,input) {
-		var val = $(input).val()
-		console.log(val)
-		if (val === "") return
-		var num = parseInt(val)
-		if (! $.isNumeric(val) || num<min || ($.isNumeric(max) && num>max) ) {
-			errorText = title+' must be at least '+min
-			if ( isDefined(max) ) {
-				errorText += ', to '+max
-			}
-			errorText += '.'
-			
-			$(input).focus()
-		}
-		vals.push(num)
-	})
-	
-	if (vals.length === 2) {
-		if (vals[0]>vals[1]) {
-			errorText = 'Initial value must be less than the second.'
-		} else {
-			return vals
-		}
-	} 
-	$(warn).text(errorText)
-	return false
-}
-
-var onRefOnlyClick = function() {
-	refOnlyFilter  = undefined
-	if ( $('input.refonly').attr("checked") ) {
-		refOnlyFilter = mp('=','REFERENCE_SITE',"1")
-	}
-}
-
-var onMinYrsBlur = function() {
-	var errorText = ""
-	var val = $('input.minyrs').val()
-	console.log(val)
-	if (val === "") return
-	if (! $.isNumeric(val) || val<0 ) {
-		errorText = 'Min year must be a number between 1 and 60.'
-		$('#drainage-warn').text(errorText)
-		$('input.minyrs').focus()
-		return
-	}
-	
-	minYrsFilter = mp('>','SAMPLE_YEARS',val)
-}
-
-var onHucBlur = function(e) {
-	var el  = e.srcElement
-	var val = $(el).val()
-	hucFilter = mp('L','HUC_12',val)
-}
-
-
-var onBasinBlur = function(e) {
-	var el  = e.srcElement
-	var val = $(el).val()
-	basinFilter = mp('L','BASIN',val)
-}
 
 
 

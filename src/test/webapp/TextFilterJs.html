@@ -16,8 +16,24 @@ console of sorts
 <script>
 var benchmark
 var minYears
-var minYears
 var drainArea
+var theYearFilter
+var huc
+
+var MocLayer = Class.extend({
+	init: function(title) {
+		this.title = title
+	},
+	mergeNewParams: function(params){
+        var msg = this.title + ":: "
+		//{filter:ogcXml,viewparams:yearFilter}
+		$.each(params, function(param,value){
+			msg += param+": "+value+", "
+		})
+		write(msg)
+	}
+})
+var map = {layers:[new MocLayer('A'),new MocLayer('B'),new MocLayer('C'),]}
 
 function write(text) {
     $('#console').append( encodeHtml(text) )
@@ -32,7 +48,8 @@ function test(){
 	    trueVal:'1', 
 	    el:'refonly', 
 	    parent:'#filterDiv', 
-	    label:'Benchmarks Only'
+	    label:'Benchmarks Only',
+	    layers:['A','B']
 	})
 	
 	// test simple filter creation
@@ -40,19 +57,33 @@ function test(){
 	benchmark.onchange()
 	write( Ogc.encode(benchmark.filter) )
 	
-	// test value filter fields
-	minYears = new Filters.Value({
-	    class:"minyrs",
-	    field:'SAMPLE_YEARS', 
-	    el:'minyrs', 
-	    size:4,
-	    maxlength:2,
-	    parent:'#filterDiv', 
-	    label:'Min Years of Daily Data:',
-	    min:19,
-	    pattern: /^\d+$/,
-	    patternMsg: "Expecting a positive number",
-	})
+    // test value filter fields
+    huc = new Filters.Value({
+        class:"hucFilter",
+        field:'HUC_8', 
+        el:'huc', 
+        size:8,
+        maxlength:12,
+        parent:'#filterDiv', 
+        label:'HUC:',
+        pattern: /^\d+\*?$/,
+        patternMsg: "Expecting a HUC number with possible wild card, '*'",
+    })
+	
+    // test value filter fields
+    minYears = new Filters.Value({
+        class:"minyrs",
+        field:'SAMPLE_YEARS', 
+        el:'minyrs', 
+        size:4,
+        maxlength:2,
+        parent:'#filterDiv', 
+        label:'Min Years of Daily Data:',
+        min:19,
+        pattern: /^\d+$/,
+        patternMsg: "Expecting a positive number",
+        layers:['A']
+    })
 	
     $('#minyrs input').val('1950')
     minYears.validate()
@@ -73,7 +104,7 @@ function test(){
 	1000)
 
 	
-	drainArea = new Filters.Range({
+    drainArea = new Filters.Range({
         class:"drainage",
         field:'DA', 
         el:'DRAINAGE_AREA_MI_SQ', 
@@ -85,9 +116,24 @@ function test(){
         max:999999999,
         pattern: /^\d+$/,
         patternMsg: "Expecting a positive number",
-	})
-	
-	
+        layers:['A','B']
+    })
+    
+	theYearFilter = new Filters.Range({
+        class:"yearRange",
+        field:'YEAR', 
+        el:'year', 
+        size:8,
+        maxlength:4,
+        parent:'#filterDiv', 
+        label:'Year Range:',
+        min:1900,
+        max:new Date().getFullYear(),
+        pattern: /^\d+$/,
+        patternMsg: "Expecting a positive number",
+        isMapOgc: false,
+        layers:['A','B']
+    })
 	
 	write( Filters.Instances.length )
 }

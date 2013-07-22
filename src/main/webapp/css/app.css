@@ -63,9 +63,11 @@ div.inputfilterWarnOn {
     padding: 3px;
     border: 1px solid #990000;
 }
-
 div.inputFilterWarn input {
 	border: 1px solid #990000;
+}
+div.hiRange {
+	margin-left:110px;
 }
 
 
