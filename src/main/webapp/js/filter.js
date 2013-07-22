@@ -532,13 +532,7 @@ $().ready(function(){
 
 	// TODO for each filer set click and blur
 	
-	$('input.refonly').click(onRefOnlyClick)
 	$('#applyFilter').click(applyFilter)
-	$('input.basin').blur(onBasinBlur)
-	$('input.huc').blur(onHucBlur)
-	$('input.drainage').blur(onDrainageBlur)
-	$('input.yearRange').blur(onYearRangeBlur)
-	$('input.minyrs').blur(onMinYrsBlur)
 
 	// TODO for option filter set change event to addOptionFilter/createOptionFilter
 	$('#STATE').change(function(e){
@@ -551,13 +545,7 @@ $().ready(function(){
 		
 		// TODO for each filter clear values
 		$('#states').find('input.destroy').parent().remove()
-		$('input.drainage').val('')
-		$('input.yearRange').val('')
-		$('input.basin').val('')
-		$('input.huc').val('')
-		$('input.minyrs').val('')
-		$('input.refonly').attr("checked",false);
-		$('.warn').html('')
+		$('.filterWarn').html('')
 		
 		// TODO for each filter reset
 		stateFilter    = {Or:[]}
@@ -568,56 +556,5 @@ $().ready(function(){
 		minYrsFilter   = undefined
 		refOnlyFilter  = undefined
 		
-		// reset all layers to have no filter
-		applyFilterToLayers({filter:'',viewparams:''},'all')
 	})
 })
-
-
-var applyFilterOld = function() {
-	var filter = {And:[]}
-	if (stateFilter.Or.length) {
-		filter.And.push( stateFilter )
-		var ogcXml = Ogc.filter(filter)
-
-		applyFilterToLayers({filter:ogcXml}, ['States','Counties','NID'])
-	}
-}
-
-
-//
-//var rangeValidate = function(title,fields,warn,min,max) {
-//	var errorText = ""
-//	$(warn).text(errorText) // reset warning msg
-//	var vals = []
-//	$(fields).each(function(i,input) {
-//		var val = $(input).val()
-//		console.log(val)
-//		if (val === "") return
-//		var num = parseInt(val)
-//		if (! $.isNumeric(val) || num<min || ($.isNumeric(max) && num>max) ) {
-//			errorText = title+' must be at least '+min
-//			if ( isDefined(max) ) {
-//				errorText += ', to '+max
-//			}
-//			errorText += '.'
-//			
-//			$(input).focus()
-//		}
-//		vals.push(num)
-//	})
-//	
-//	if (vals.length === 2) {
-//		if (vals[0]>vals[1]) {
-//			errorText = 'Initial value must be less than the second.'
-//		} else {
-//			return vals
-//		}
-//	} 
-//	$(warn).text(errorText)
-//	return false
-//}
-
-
-
-
