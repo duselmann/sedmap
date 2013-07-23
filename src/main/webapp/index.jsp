@@ -54,7 +54,10 @@
             <jsp:param name="development" value="<%= development %>" />
         </jsp:include>
         <script type="text/javascript" src="js/jquery/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript" src="js/openlayers/OpenLayers.js"></script>
         <script type="text/javascript" src="js/utils.js"></script>
+	    <script type="text/javascript" src="js/filter-api.js"></script>
+	    <script type="text/javascript" src="js/filter.js"></script>
     </head>
     
     <body onload="init()">
@@ -104,7 +107,15 @@
                             <a href="http://www.mrlc.gov/nlcd06_leg.php" target="_tab"><img id="nlcdimg" src="images/nlcdlegend.png"></a>
                         </div>
                         <div class="filter" id="filter" >
-                            <jsp:include page="filter.jsp"/>
+					        <div id="filterDiv" style="border:1px solid;padding:3px;">
+					            <div class="floatLeft" style="height:28px;">
+					            Filter By:
+					            <input type="button" id="clearFilter" value="Clear">
+					            <input type="button" id="applyFilter" value="Apply"> 
+					            </div>
+					            <div id="applyFilter-warn" class="hidden filterWarn inputFilterWarnOn floatLeft" >Please address warnings.</div>
+					            <br class="floatClear">
+					        </div>
                         </div>
                         <div id="siteInfo">
                             <jsp:include page="siteInfo.jsp"/>
@@ -149,12 +160,12 @@
     <script type="text/javascript" src="js/jquery-ui/jquery-ui-1.10.0.custom.min.js"></script>
     <script type="text/javascript" src="js/ui/ui.js"></script>
     <script type="text/javascript" src="js/util/util.js"></script>
-    <script type="text/javascript" src="js/openlayers/OpenLayers.js"></script>
     <script src="js/openlayers/extension/Raster.js"></script>
     <script src="js/openlayers/extension/Raster/Grid.js"></script>
     <script src="js/openlayers/extension/Raster/Composite.js"></script>
     <script src="js/openlayers/extension/Raster/Operation.js"></script>
     <script src="js/openlayers/extension/Layer/Raster.js"></script>    
+    <script type="text/javascript" src="js/utils.js"></script>
     <script type="text/javascript" src="js/map.js" defer="defer" ></script>
     <!-- script type="text/javascript" src="js/onReady.js"></script -->
     <jsp:include page="components/config.jsp"></jsp:include>

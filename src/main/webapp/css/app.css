@@ -1,3 +1,13 @@
+.hidden {
+	display:none;
+}
+.floatLeft {
+	float:left;
+}
+.floatClear {
+	clear:both;
+}
+
 .nav {
     margin:0;
 }

@@ -121,6 +121,18 @@ function encodeHtml(value){
 function decodeHtml(value){
   return $('<div/>').html(value).text();
 }
+
+
+function getIdFromEvent(e) {
+	return $(e.srcElement).attr('id')
+}
+function getOptionValues(el) {
+    var val  = $(el).val()
+    var txt  = $(el).find('option:selected').text()
+    return {val:val,txt:txt}
+}
+
+
 	
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/

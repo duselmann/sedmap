@@ -3,13 +3,22 @@
     <script type="text/javascript" src="js/jquery/jquery-1.10.2.js"></script>
     <script type="text/javascript" src="js/openlayers/OpenLayers.js"></script>
     <script type="text/javascript" src="../../main/webapp/js/utils.js"></script>
-    <script type="text/javascript" src="../../main/webapp/js/filter.js"></script>
+    <script type="text/javascript" src="../../main/webapp/js/filter-api.js"></script>
     <link type="text/css" rel="stylesheet" href="../../main/webapp/css/app.css" />
 </head>
 <body>
 
 In the box below should be the filter elements<br>
-<div id="filterDiv" style="border:1px solid;padding:3px;"></div>
+
+<div id="filterDiv" style="border:1px solid;padding:3px;">
+    <div class="floatLeft" style="height:28px;">
+    Filter By:       
+    <input type="button" id="clearFilter" value="Clear">
+    <input type="button" id="applyFilter" value="Apply"> 
+    </div>
+    <div id="applyFilter-warn" class="hidden filterWarn inputFilterWarnOn floatLeft" >Please address warnings.</div>
+    <br class="floatClear">
+</div>
 
 console of sorts
 <div id="console" style="border:1px solid;padding:3px;"></div>
@@ -18,7 +27,13 @@ var benchmark
 var minYears
 var drainArea
 var theYearFilter
+var states
 var huc
+var gageBasin
+var urbanLand
+var agLand
+var forestLand
+var soilKfactor
 
 var MocLayer = Class.extend({
 	init: function(title) {
@@ -58,19 +73,6 @@ function test(){
 	write( Ogc.encode(benchmark.filter) )
 	
     // test value filter fields
-    huc = new Filters.Value({
-        class:"hucFilter",
-        field:'HUC_8', 
-        el:'huc', 
-        size:8,
-        maxlength:12,
-        parent:'#filterDiv', 
-        label:'HUC:',
-        pattern: /^\d+\*?$/,
-        patternMsg: "Expecting a HUC number with possible wild card, '*'",
-    })
-	
-    // test value filter fields
     minYears = new Filters.Value({
         class:"minyrs",
         field:'SAMPLE_YEARS', 
@@ -99,11 +101,24 @@ function test(){
 	        $('#minyrs input').val('1')
 	        minYears.validate()
 	        // lets see if rest works
-	        window.setTimeout(function(){minYears.validateReset()}, 1000)
+//	        window.setTimeout(function(){minYears.validateReset()}, 1000)
 	    },
 	1000)
 
-	
+    // test value filter fields
+    gageBasin = new Filters.Value({
+        class:"gagebasin",
+        field:'GAGE_BASIN_ID', 
+        el:'GAGE_BASIN_ID', 
+        size:11,
+        maxlength:15,
+        parent:'#filterDiv', 
+        label:'Gage Basin ID:',
+        pattern: /^\d+$/,
+        patternMsg: "Expecting a positive number",
+        layers:['A','B']
+    })
+    
     drainArea = new Filters.Range({
         class:"drainage",
         field:'DA', 
@@ -116,6 +131,60 @@ function test(){
         max:999999999,
         pattern: /^\d+$/,
         patternMsg: "Expecting a positive number",
+        layers:['A','B']
+    })
+    
+    soilKfactor = new Filters.Range({
+        class:"soilkfactor",
+        field:'SOIL_K', 
+        el:'SOIL_K', 
+        size:6,
+        maxlength:6,
+        parent:'#filterDiv', 
+        label:'Soil K-Factor:',
+        min:0,
+        max:1,
+        pattern: /^[01]?\.\d{0,3}$/,
+        patternMsg: "Expecting number between 0 and 1",
+        layers:['A','B']
+    })
+    
+    urbanLand = new Filters.Range({
+        class:"urbanLand",
+        field:'PCT_URBAN', 
+        el:'urbanLand', 
+        size:4,
+        maxlength:4,
+        parent:'#filterDiv', 
+        label:'Urban Land Use (%):',
+        min:0,
+        max:100,
+        layers:['A','B']
+    })
+    
+    agLand = new Filters.Range({
+        class:"agLand",
+        field:'PCT_AG', 
+        el:'agLand', 
+        size:4,
+        maxlength:4,
+        parent:'#filterDiv', 
+        label:'Ag Land Use (%):',
+        min:0,
+        max:100,
+        layers:['A','B']
+    })
+    
+    forestLand = new Filters.Range({
+        class:"forestLand",
+        field:'PCT_FOREST', 
+        el:'forestLand', 
+        size:4,
+        maxlength:4,
+        parent:'#filterDiv', 
+        label:'Forest Land Use (%):',
+        min:0,
+        max:100,
         layers:['A','B']
     })
     
@@ -134,6 +203,55 @@ function test(){
         isMapOgc: false,
         layers:['A','B']
     })
+    
+    // test value filter fields
+    huc = new Filters.Value({
+        class:"hucFilter",
+        field:'HUC_8', 
+        el:'huc', 
+        size:8,
+        maxlength:12,
+        parent:'#filterDiv', 
+        label:'HUC:',
+        pattern: /^\d+\*?$/,
+        patternMsg: "Expecting a HUC number with possible wild card, '*'",
+    })
+	
+    states = new Filters.Option({
+        class:"stateFilter",
+        field:'STATE', 
+        el:'state', 
+        parent:'#filterDiv', 
+        label:'States:',
+        baseTxt: "Select a State",
+        options: {
+            "AK":"Alaska","AL":"Alabama","AZ":"Arizona","AR":"Arkansas",
+            "CA":"California","CO":"Colorado","CT":"Connecticut",
+            "DE":"Delaware",
+            "FL":"Florida",
+            "GA":"Georgia",
+            "HI":"Hawaii",
+            "ID":"Idaho","IL":"Illinois","IN":"Indiana","IA":"Iowa",
+            "KS":"Kansas","KY":"Kentucky",
+            "LA":"Louisiana",
+            "ME":"Maine","MD":"Maryland","MA":"Massachusetts",
+            "MI":"Michigan","MN":"Minnesota","MS":"Mississippi",
+            "MO":"Missouri","MT":"Montana",
+            "NE":"Nebraska","NV":"Nevada","NH":"New Hampshire",
+            "NJ":"New Jersey","NM":"New Mexico","NY":"New York",
+            "NC":"North Carolina","ND":"North Dakota",
+            "OH":"Ohio","OK":"Oklahoma","OR":"Oregon",
+            "PA":"Pennsylvania",
+            "RI":"Rhode Island",
+            "SC":"South Carolina","SD":"South Dakota",
+            "TN":"Tennessee","TX":"Texas",
+            "UT":"Utah",
+            "VT":"Vermont","VA":"Virginia",
+            "WA":"Washington","WV":"West Virginia",
+            "WI":"Wisconsin","WY":"Wyoming",
+        }
+    })
+	
 	
 	write( Filters.Instances.length )
 }
