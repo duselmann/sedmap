@@ -165,7 +165,6 @@
     <script src="js/openlayers/extension/Raster/Composite.js"></script>
     <script src="js/openlayers/extension/Raster/Operation.js"></script>
     <script src="js/openlayers/extension/Layer/Raster.js"></script>    
-    <script type="text/javascript" src="js/utils.js"></script>
     <script type="text/javascript" src="js/map.js" defer="defer" ></script>
     <!-- script type="text/javascript" src="js/onReady.js"></script -->
     <jsp:include page="components/config.jsp"></jsp:include>
