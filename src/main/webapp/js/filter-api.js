@@ -24,6 +24,9 @@ var applyFilters = function() {
 	var layerFilters = {}
 	$.each(map.layers, function(i,layer){
 		layerFilters[layer.name]=[]
+		if ( isUndefined(Filters.Layers[layer.name]) ) {
+			Filters.Layers[layer.name] = {filter:'',viewparams:''}
+		} 
 	})
 
 	// build each layers' OGC filter
@@ -70,7 +73,15 @@ var applyFilters = function() {
 		var ogcXml = layerFilters[layer.name]
 		// apply filter
 		if ( isDefined(layer.mergeNewParams) ) {
-			layer.mergeNewParams({filter:ogcXml,viewparams:localYearFilter})
+			// do not render a filter against an unchanged filter layer
+			if (Filters.Layers[layer.name].filter     !== ogcXml
+			 || Filters.Layers[layer.name].viewparams !== localYearFilter) {
+				
+				layer.mergeNewParams({filter:ogcXml,viewparams:localYearFilter})
+				Filters.Layers[layer.name].filter     = ogcXml
+			 	Filters.Layers[layer.name].viewparams = localYearFilter
+				
+			}
 		}
 	})
 
