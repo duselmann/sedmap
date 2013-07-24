@@ -72,12 +72,12 @@ function init(){
     addProjectLayer(map, "HUC8", "sedmap:huc_8_multipart_wgs", false)
     addFlowLinesLayer(map);
     addProjectLayer(map, "Ecoregion Level 2", "sedmap:NA_CEC_Eco_Level2", false)
-    addProjectLayer(map, "USGS Gage Basins for Daily Sites", "sedmap:Alldailybasins", false)
-    addProjectLayer(map, "USGS Gage Basins for Discrete Sites", "sedmap:Alldiscretebasins", false)
-    addProjectLayer(map, "USGS Gage Basins for All Sites", "sedmap:AllbasinswDVs1", false)
-    addProjectLayer(map, "NID", "sedmap:NID", false)
+    addProjectLayer(map, "Daily Site USGS Gage Basins", "sedmap:Alldailybasins", false)
+    addProjectLayer(map, "Discrete Site USGS Gage Basins", "sedmap:Alldiscretebasins", false)
+//    addProjectLayer(map, "All USGS Gage Basins", "sedmap:AllbasinswDVs1", false)
     addProjectLayer(map, "Discrete Sites", "sedmap:instant", true)
     addProjectLayer(map, "Daily Sites", "sedmap:daily", true)
+    addProjectLayer(map, "NID", "sedmap:NID", false)
     
     // zoom and move viewport to desired location
     //map.zoomToMaxExtent();
