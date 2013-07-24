@@ -179,7 +179,6 @@ function setupFilters() {
         layers:[	"Discrete Sites",
                 	"Daily Sites",
                 	"HUC8",
-                	"NID", // TODO maybe
                 ]
     })
 	
@@ -194,8 +193,7 @@ function setupFilters() {
                 	"Daily Sites",
                 	"States",
                 	"Counties",
-                	"HUC8",
-                	"NID", // TODO maybe
+                	"NID",
                 ],
         options: {
             "AK":"Alaska","AL":"Alabama","AZ":"Arizona","AR":"Arkansas",
