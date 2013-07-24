@@ -67,17 +67,17 @@ function init(){
     nlcd.events.register('visibilitychanged', nlcd, nlcdThumbToggle)
 
     // sedmap project maps
-    addProjectLayer(map, "Discrete Sites", "sedmap:instant", true)
-    addProjectLayer(map, "Daily Sites", "sedmap:daily", true)
     addProjectLayer(map, "States", "sedmap:statep010", false) // add a new visible layer *new added 7/23/13 mwarren
     addProjectLayer(map, "Counties", "sedmap:countyp020", false)   // add a new invisible layer
     addProjectLayer(map, "HUC8", "sedmap:huc_8_multipart_wgs", false)
     addFlowLinesLayer(map);
-    addProjectLayer(map, "NID", "sedmap:NID", false)
     addProjectLayer(map, "Ecoregion Level 2", "sedmap:NA_CEC_Eco_Level2", false)
     addProjectLayer(map, "USGS Gage Basins for Daily Sites", "sedmap:Alldailybasins", false)
     addProjectLayer(map, "USGS Gage Basins for Discrete Sites", "sedmap:Alldiscretebasins", false)
     addProjectLayer(map, "USGS Gage Basins for All Sites", "sedmap:AllbasinswDVs1", false)
+    addProjectLayer(map, "NID", "sedmap:NID", false)
+    addProjectLayer(map, "Discrete Sites", "sedmap:instant", true)
+    addProjectLayer(map, "Daily Sites", "sedmap:daily", true)
     
     // zoom and move viewport to desired location
     //map.zoomToMaxExtent();
