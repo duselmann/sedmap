@@ -63,8 +63,15 @@ function init(){
     addArcGisLayer(map, "Topographic", "World_Topo_Map")
     addArcGisLayer(map, "World Image", "World_Imagery")
 //    // etc...
-    var nlcd = addNlcdLayer(map, "NLCD 2006", "24")
-    nlcd.events.register('visibilitychanged', nlcd, nlcdThumbToggle)
+	var nlcd = []
+    nlcd.push( addNlcdLayer(map, "NLCD", "24", true) ) // lower 48
+    nlcd.push( addNlcdLayer(map, "NLCD AK", "18", false) ) // AK
+    nlcd.push( addNlcdLayer(map, "NLCD HI", "17", false) ) // HI
+    nlcd.push( addNlcdLayer(map, "NLCD PR", "16", false) ) // PR
+    nlcd[0].events.register('visibilitychanged', nlcd, function(){
+	    nlcdThumbToggle()
+	    nlcdVisibilty(nlcd, nlcd[0].visibility)
+    })
 
     // sedmap project maps
     addProjectLayer(map, "States", "sedmap:statep010", false) // add a new visible layer *new added 7/23/13 mwarren
@@ -234,6 +241,12 @@ function nlcdThumbToggle() {
         $('#nlcdthumb').fadeOut("slow")
     }
 }
+function nlcdVisibilty(nlcd, visibility) {
+	$.each(nlcd, function(i,layer){
+		setLayerVisibility(layer, visibility)
+	})
+}
+
 
 
 
@@ -313,10 +326,12 @@ function addProjectLayer(map, title, layerId, show) {
 }
 
 //the NLCD topographical world map
-function addNlcdLayer(map, title, layerId) {
+function addNlcdLayer(map, title, layerId, displayInSwitcher) {
     var type    = "wms"
+    
+    var options = {displayInLayerSwitcher: displayInSwitcher}
     // nlcd layer uses the default params and options
-    return _addLayer(map, title, layerId, type, nlcdUrl, {}, {})
+    return _addLayer(map, title, layerId, type, nlcdUrl, options, {})
 }
 
 //the arcgis topographical world map - these are returned as EPSG:3857 or unofficially 900913
@@ -368,6 +383,11 @@ var createFlowlineColor = function(r,g,b,a) {
 };
 createFlowlineColor(100,100,255,255);
 
+function setLayerVisibility(layer, visibility) {
+	if (layer.visibility === visibility) return
+	
+	layer.setVisibility(visibility)
+}
 
 
 var addFlowLinesLayer = function(map) {
@@ -412,13 +432,11 @@ var addFlowLinesLayer = function(map) {
     layers[flowLayerName] = flowlineRaster;
     map.addLayer(flowlineRaster);
     
+    // this prevent the rendering of the lines even if the layer is not checked
     map.events.register('changelayer', null, function(evt){
         if (evt.property === "visibility"
         	&& evt.layer.name === flowLayerName) {
-        	flowlinesWMSData.visibility = evt.layer.visibility
-        	if (flowlinesWMSData.visibility) {
-	        	flowlinesWMSData.redraw()
-	        }
+        	setLayerVisibility(flowlinesWMSData, evt.layer.visibility)
         }
     }
  );
