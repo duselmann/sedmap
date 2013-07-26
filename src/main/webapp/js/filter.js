@@ -10,6 +10,7 @@ var urbanLand
 var agLand
 var forestLand
 var soilKfactor
+var ecoNum
 
 function setupFilters() {
 	
@@ -166,6 +167,21 @@ function setupFilters() {
                 ]
     })
     
+	ecoNum = new Filters.Value({
+        class:"ecoNumFilter",
+        field:'ECOREGION_NUM', 
+        el:'ecoNum', 
+        size:8,
+        maxlength:12,
+        parent:'#filterDiv', 
+        label:'Eco Number:',
+        pattern: /^(\d?(\d\.))+\d?\*?$/,
+        patternMsg: "Eco Region number have the format ##.##.## with possible wild card, '*'",
+        layers:[	"Discrete Sites",
+                	"Daily Sites",
+                ]
+    })
+	
     huc = new Filters.Value({
         class:"hucFilter",
         field:'HUC_8', 
