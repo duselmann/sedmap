@@ -119,7 +119,7 @@ var Filters = Class.extend({
 		this.$warn   = this.$el+'-warn'
 		this.parent  = params.parent
 		this.field   = params.field
-		this.class   = defaultValue(params.class,'')
+		this.classEl = defaultValue(params.class,'') + ' filterAll'
 		this.label   = params.label
 		this.errClass= defaultValue(params.errorClass,'inputFilterWarn')
 		this.layers  = defaultValue(params.layers,['all'])
@@ -132,7 +132,7 @@ var Filters = Class.extend({
 			this.clear = params.clearAction
 		}
 		
-		var dom = this.createDom() + '</div>' 
+		var dom = this.createDom() + this.endDom()
 		// this is so composite filters get one error div
 		if (this.isPrime) {
 			dom += this.errorDom()
@@ -159,8 +159,19 @@ var Filters = Class.extend({
 	// create common dom
 	createDom : function() {
 		var dom = '<div id="'+this.el+'" '
-		if (this.class) dom += 'class="'+this.class+'"'
-		return dom + '>'
+		if (this.classEl) dom += 'class="'+this.classEl+'"'
+		dom += '>' + this.createLabel()
+		return dom
+	},
+	endDom : function() {
+		return '</div>'
+	},
+	createLabel : function() {
+		var label = ''
+		if (isDefined(this.label) && this.label.length) {
+			label = '<span class="label">'+this.label+'</span>'
+		}
+		return label
 	},
 	
 	errorDom : function() {
@@ -302,6 +313,7 @@ Filters.Bool   = Filters.extend({
 	init: function(params) {
 		this.trueVal = params.trueVal
 		
+		params.class += defaultValue(params.class,'') + ' filterBool'
 		this._super(params)
 	},
 	
@@ -329,7 +341,7 @@ Filters.Bool   = Filters.extend({
 	},
 	
 	createDom : function() {
-		return this._super() + this.label+': <input type="checkbox" >'
+		return this._super()+' <input type="checkbox" >'
 	}
 })
 
@@ -345,6 +357,7 @@ Filters.Value  = Filters.extend({
 		this.pattern    = params.pattern
 		this.patternMsg = params.patternMsg
 		
+		params.class += defaultValue(params.class,'') + ' filterValue'
 		this._super(params)
 	},
 	
@@ -372,7 +385,7 @@ Filters.Value  = Filters.extend({
 	},
 	
 	createDom : function() {
-		var dom = this._super() + this.label+' <input type="text" '
+		var dom = this._super()+' <input type="text" '
 		dom += 'size="'+this.size+'" '
 		dom += 'maxlength="'+this.maxlength+'" '
 		dom += '>'
@@ -392,13 +405,16 @@ Filters.Value  = Filters.extend({
 
 Filters.Range  = Filters.extend({
 	init : function(params) {
+		var label = params.label
+		params.label=""
+		params.class += defaultValue(params.class,'') + ' filterRange'
 		this._super(params) // had to call this first so the parent conatiner exists
 		
 		var baseclass      = defaultValue(params.class, '')
 		
 		var minParams      = $.extend({}, params)
 		minParams.el      += "-lo"
-		minParams.label   += " between"
+		minParams.label    = label + " between"
 		minParams.compare  = Ogc.Comp.GREATER_THAN_OR_EQUAL_TO
 		minParams.isPrime  = false
 		minParams.parent   = this.$el
@@ -468,6 +484,7 @@ Filters.Option = Filters.extend({
 		
 		window[this.globalRef] = this
 		
+		params.class += defaultValue(params.class,'') + ' filterOption'
 		this._super(params)
 	},
 
@@ -550,7 +567,7 @@ Filters.Option = Filters.extend({
 	},
 	
 	createDom: function() {
-		var dom = this._super() + this.label+'<div> <div id="'+this.optDiv+'"></div>'
+		var dom = this._super() +'<div> <div id="'+this.optDiv+'"></div>'
 		dom += this.createOptionDom() + '</div>'
 		return dom
 	},

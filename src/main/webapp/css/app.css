@@ -19,6 +19,7 @@ div.filter {
     top: 106px;
     left: 1006px;
 }
+
 #nlcdlegendOld {
 	width: 244px;
 	position: relative;
@@ -65,20 +66,25 @@ div.filter {
     background-color: #345280;
 }
 
-div.warn, div.filterWarn {
+div.filter div.warn, div.filterWarn {
     color:#990000;
     background:#FFCCCC;
 }
-div.inputfilterWarnOn {
+div.filter div.inputfilterWarnOn {
     padding: 3px;
     border: 1px solid #990000;
 }
-div.inputFilterWarn input {
+div.filter div.inputFilterWarn input {
 	border: 1px solid #990000;
 }
-div.hiRange {
-	margin-left:110px;
+div.filter div.hiRange span.label {
+	text-align:right;
 }
+div.filter div.filterAll span.label {
+    width:200px;
+    display:inline-block;
+}
+
 
 
 #siteInfo {

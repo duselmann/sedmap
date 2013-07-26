@@ -19,7 +19,7 @@ function setupFilters() {
 	    trueVal:'1', 
 	    el:'refonly', 
 	    parent:'#filterDiv', 
-	    label:'Benchmarks Only',
+	    label:'Benchmark sites only:',
 	    layers:[
 	        	"Discrete Sites",
 	        	"Daily Sites",
