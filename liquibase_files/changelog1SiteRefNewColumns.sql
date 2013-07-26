@@ -24,3 +24,4 @@ PCT_URBAN  = trunc(DBMS_RANDOM.value(low => 0, high => 10)*10),
 PCT_AG     = trunc(DBMS_RANDOM.value(low => 0, high => 10)*10),
 PCT_FOREST = trunc(DBMS_RANDOM.value(low => 0, high => 10)*10),
 SOIL_K     = trunc(DBMS_RANDOM.value(low => 0, high => 1)*1000)/1000;
+

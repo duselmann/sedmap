@@ -62,4 +62,33 @@ select s.USGS_STATION_ID,STATION_NAME,LATITUDE,LONGITUDE,GEOM_LL,HUC_12,DA,"STAT
      group by usgs_station_id) f 
   on (f.usgs_station_id = s.usgs_station_id)
 ;
+
+
+--changeset duselman:trimEcoRegion1
+update sm_site_ref set ECO1_NAME=trim(ECO1_NAME)
+where ECO1_NAME<>trim(ECO1_NAME);
+
+--changeset duselman:trimEcoRegion2
+update sm_site_ref set ECO2_NAME=trim(ECO2_NAME)
+where ECO2_NAME<>trim(ECO2_NAME);
 			
+--changeset duselman:trimEcoRegion3
+update sm_site_ref set ECO3_NAME=trim(ECO3_NAME)
+where ECO3_NAME<>trim(ECO3_NAME);
+
+
+--changeset duselman:ecoRegion1View
+create or replace view sedmap.ECO1NAMES as
+select distinct ECO1_NAME ECO_NAME from sm_site_ref 
+where ECO1_NAME is not null order by 1;
+
+--changeset duselman:ecoRegion2View
+create or replace view sedmap.ECO2NAMES as
+select distinct ECO2_NAME ECO_NAME from sm_site_ref 
+where ECO2_NAME is not null order by 1;
+
+--changeset duselman:ecoRegion3View
+create or replace view sedmap.ECO3NAMES as
+select distinct ECO3_NAME ECO_NAME from sm_site_ref 
+where ECO3_NAME is not null order by 1;
+
