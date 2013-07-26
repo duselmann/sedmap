@@ -132,11 +132,13 @@ var Filters = Class.extend({
 			this.clear = params.clearAction
 		}
 		
+		if (this.isPrime) {
+			Filters.Instances.push(this)
+		}
 		var dom = this.createDom() + this.endDom()
 		// this is so composite filters get one error div
 		if (this.isPrime) {
 			dom += this.errorDom()
-			Filters.Instances.push(this)
 		}
 		$(this.parent).append(dom)
 		
@@ -159,7 +161,7 @@ var Filters = Class.extend({
 	// create common dom
 	createDom : function() {
 		var dom = '<div id="'+this.el+'" '
-		if (this.classEl) dom += 'class="'+this.classEl+'"'
+		if (this.classEl) dom += 'class="'+this.classEl+' '+this.oddEvenClass()+'"'
 		dom += '>' + this.createLabel()
 		return dom
 	},
@@ -172,6 +174,13 @@ var Filters = Class.extend({
 			label = '<span class="label">'+this.label+'</span>'
 		}
 		return label
+	},
+	oddEvenClass : function() {
+		if (Filters.Instances.length % 2) { // 0 is false so is odd
+			return Filters.OddClass
+		} else {
+			return Filters.EvenClass
+		}
 	},
 	
 	errorDom : function() {
@@ -234,6 +243,9 @@ Filters.Instances = []
 Filters.Layers = {}
 // the openlayers map these filters apply
 Filters.Map = undefined
+
+Filters.OddClass  = 'filterOdd'
+Filters.EvenClass = 'filterEven'
 
 // general validation
 Filters.Validate = {

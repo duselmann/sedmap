@@ -84,6 +84,9 @@ div.filter div.filterAll span.label {
     width:200px;
     display:inline-block;
 }
+div.filter div.filterOdd {
+	background-color:gray;
+}
 
 
 
