@@ -81,6 +81,9 @@ function isNumber(val) {
 function isUndefined(val) {
 	return val === undefined
 }
+function isUndefinedOrNull(val) {
+	return val === undefined || val === null
+}
 function isDefined(val) {
 	return ! isUndefined(val)
 }
@@ -132,6 +135,34 @@ function getOptionValues(el) {
     return {val:val,txt:txt}
 }
 
+
+
+function getStyle(className) {
+	for (var s=0; document.styleSheets.length; s++) {
+	    var classes = document.styleSheets[s].rules || document.styleSheets[s].cssRules
+	    if ( isUndefinedOrNull(classes) ) continue;
+	    
+	    for (var c=0; c<classes.length; c++) {
+	        if ( classes[c].selectorText==className ) {
+	        	var def = isDefined(classes[c].cssText) ? classes[c].cssText : classes[c].style.cssText;
+	        	if ( isDefined(def) ) {
+	        		def = def.substring( def.indexOf('{') )
+	        		def = def.replace(/;/g,',')
+	        		def = def.replace(/px/g,'')
+	        		def = def.replace(/:\s*(.*?),/g,":'$1',")
+	        		var css = eval("("+def+")")
+	        		$.each(css, function(k,v){
+	        			if ($.isNumeric(v)) {
+	        				++v;
+	        				css[k] = --v
+	        			}
+	        		})
+	        		return css
+	        	}
+	        }
+	    }
+	}
+}
 
 	
 /* Simple JavaScript Inheritance
