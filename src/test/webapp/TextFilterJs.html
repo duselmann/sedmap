@@ -1,20 +1,33 @@
 <html>
 <head>
     <script type="text/javascript" src="js/jquery/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="js/jquery/jquery.rule.js"></script>
     <script type="text/javascript" src="js/openlayers/OpenLayers.js"></script>
     <script type="text/javascript" src="../../main/webapp/js/utils.js"></script>
     <script type="text/javascript" src="../../main/webapp/js/filter-api.js"></script>
     <link type="text/css" rel="stylesheet" href="../../main/webapp/css/app.css" />
+    
+    <style type="text/css">
+    div.filter {
+	   position: relative;
+	   top: auto;
+	   left: auto;
+	   border:1px solid;
+	   padding:3px;
+    }
+    
+    
+    </style>
 </head>
 <body>
 
 In the box below should be the filter elements<br>
 
-<div id="filterDiv" style="border:1px solid;padding:3px;">
+<div id="filterDiv" class="filter">
     <div class="floatLeft" style="height:28px;">
-    Filter By:       
-    <input type="button" id="clearFilter" value="Clear">
-    <input type="button" id="applyFilter" value="Apply"> 
+        <span class="label">Filter By:</span>
+        <input type="button" id="clearFilter" value="Clear">
+        <input type="button" id="applyFilter" value="Apply"> 
     </div>
     <div id="applyFilter-warn" class="hidden filterWarn inputFilterWarnOn floatLeft" >Please address warnings.</div>
     <br class="floatClear">
@@ -159,6 +172,8 @@ function test(){
         label:'Urban Land Use (%):',
         min:0,
         max:100,
+        pattern: /^\d+$/,
+        patternMsg: "Expecting number between 0 and 100",
         layers:['A','B']
     })
     

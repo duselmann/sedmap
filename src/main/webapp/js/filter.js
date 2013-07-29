@@ -114,6 +114,8 @@ function setupFilters() {
         label:'Urban Land Use (%):',
         min:0,
         max:100,
+        pattern: /^\d+$/,
+        patternMsg: "Expecting number between 0 and 100",
         layers:[	"Discrete Sites",
                 	"Daily Sites",
                 ]
@@ -129,6 +131,8 @@ function setupFilters() {
         label:'Ag Land Use (%):',
         min:0,
         max:100,
+        pattern: /^\d+$/,
+        patternMsg: "Expecting number between 0 and 100",
         layers:[	"Discrete Sites",
                 	"Daily Sites",
                 ]
@@ -144,6 +148,8 @@ function setupFilters() {
         label:'Forest Land Use (%):',
         min:0,
         max:100,
+        pattern: /^\d+$/,
+        patternMsg: "Expecting number between 0 and 100",
         layers:[	"Discrete Sites",
                 	"Daily Sites",
                 ]
@@ -204,6 +210,7 @@ function setupFilters() {
         el:'state', 
         parent:'#filterDiv', 
         label:'States:',
+        labelClass:"stateFilterLabel",
         baseTxt: "Select a State",
         layers:[	"Discrete Sites",
                 	"Daily Sites",

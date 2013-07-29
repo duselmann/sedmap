@@ -106,17 +106,15 @@
                             <span id="nlcdthumb">NLCD Legend</span>
                             <a href="http://www.mrlc.gov/nlcd06_leg.php" target="_tab"><img id="nlcdimg" src="images/nlcdlegend.png"></a>
                         </div>
-                        <div class="filter" id="filter" >
-					        <div id="filterDiv" style="border:1px solid;padding:3px;">
-					            <div class="floatLeft" style="height:28px;">
-					            Filter By:
-					            <input type="button" id="clearFilter" value="Clear">
-					            <input type="button" id="applyFilter" value="Apply"> 
-					            </div>
-					            <div id="applyFilter-warn" class="hidden filterWarn inputFilterWarnOn floatLeft" >Please address warnings.</div>
-					            <br class="floatClear">
-					        </div>
-                        </div>
+				        <div id="filterDiv" class="filter">
+				            <div class="floatLeft" style="height:28px;">
+				            <span class="label">Filter By:</span>
+				            <input type="button" id="clearFilter" value="Clear">
+				            <input type="button" id="applyFilter" value="Apply"> 
+				            </div>
+				            <div id="applyFilter-warn" class="hidden filterWarn inputFilterWarnOn floatLeft" >Please address warnings.</div>
+				            <br class="floatClear">
+				        </div>
                         <div id="siteInfo">
                             <jsp:include page="siteInfo.jsp"/>
                         </div>

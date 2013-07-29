@@ -14,12 +14,6 @@
 div.olMap {
 	float:left;
 }
-div.filter {
-	position: absolute;
-    top: 106px;
-    left: 1006px;
-}
-
 #nlcdlegendOld {
 	width: 244px;
 	position: relative;
@@ -66,12 +60,76 @@ div.filter {
     background-color: #345280;
 }
 
+
+div.filter {
+    position: absolute;
+    top: 105px;
+    left: 1005px;
+    border:1px solid;
+    padding:3px;
+    width: 337px;
+    height: 544px;
+}
+div.filterScroll {
+    width: 353px;
+	overflow-y: scroll;
+    overflow-x: hidden;
+}
+div.filter input {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 0 4px 0 4px;
+    margin: 1px 0 1px 0;
+}
+
+div.filter
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="color"]:focus,
+.uneditable-input:focus {
+  border-color: rgba(82, 168, 236, 0.8);
+  outline: 0;
+  outline: thin dotted \9;
+  /* IE6-9 */
+
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+}
+
+div.filter
+input[type="radio"],
+input[type="checkbox"] {
+  margin: 4px 0 0;
+  margin-top: 1px \9;
+  *margin-top: 0;
+  line-height: normal;
+}
+
+div.filter span.label {
+	text-align:right;
+	padding-right:3px;
+}
+
 div.filter div.warn, div.filterWarn {
     color:#990000;
     background:#FFCCCC;
+    border-radius: 5px;
+    padding: 0 4px 0 4px;
 }
-div.filter div.inputfilterWarnOn {
-    padding: 3px;
+div.filter div.inputFilterWarnOn {
+    padding: 1px 5px 1px 5px;
     border: 1px solid #990000;
 }
 div.filter div.inputFilterWarn input {
@@ -81,13 +139,21 @@ div.filter div.hiRange span.label {
 	text-align:right;
 }
 div.filter div.filterAll span.label {
-    width:200px;
+    width:210px;
     display:inline-block;
 }
 div.filter div.filterOdd {
 	background-color:#EEEEEE;
 }
 
+.stateFilter {
+	position:relative;
+}
+.stateFilterLabel {
+	width:190px !important;
+	position:absolute;
+	top:1px;
+}
 
 
 #siteInfo {

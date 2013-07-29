@@ -121,6 +121,7 @@ var Filters = Class.extend({
 		this.field   = params.field
 		this.classEl = defaultValue(params.class,'') + ' filterAll'
 		this.label   = params.label
+		this.lblClass= defaultValue(params.labelClass,'')
 		this.errClass= defaultValue(params.errorClass,'inputFilterWarn')
 		this.layers  = defaultValue(params.layers,['all'])
 		this.isMapOgc= defaultValue(params.isMapOgc,true)
@@ -141,6 +142,7 @@ var Filters = Class.extend({
 			dom += this.errorDom()
 		}
 		$(this.parent).append(dom)
+		$(this.parent).trigger('childchange');
 		
 		if (this.isPrime) {
 			this.linkEvents()
@@ -171,7 +173,7 @@ var Filters = Class.extend({
 	createLabel : function() {
 		var label = ''
 		if (isDefined(this.label) && this.label.length) {
-			label = '<span class="label">'+this.label+'</span>'
+			label = '<span class="label '+this.lblClass+'">'+this.label+'</span>'
 		}
 		return label
 	},
@@ -215,11 +217,16 @@ var Filters = Class.extend({
 			$(this.$el).addClass(this.errClass)
 			$(this.$warn).addClass(this.errClass+"On")
 			$(this.$warn).html(msgsText)
+			$(this.parent).trigger('childchange');
 		}
 		return msgs
 	},
 	
 	validateReset : function() {
+		if ($(this.$warn).html() !== ''){
+			$(this.parent).trigger('childchange');
+		}
+		
 		$(this.$el).removeClass(this.errClass)
 		$(this.$warn).removeClass(this.errClass+"On")
 		$(this.$warn).html('')
@@ -325,7 +332,7 @@ Filters.Bool   = Filters.extend({
 	init: function(params) {
 		this.trueVal = params.trueVal
 		
-		params.class += defaultValue(params.class,'') + ' filterBool'
+		params.class = defaultValue(params.class,'') + ' filterBool'
 		this._super(params)
 	},
 	
@@ -369,7 +376,7 @@ Filters.Value  = Filters.extend({
 		this.pattern    = params.pattern
 		this.patternMsg = params.patternMsg
 		
-		params.class += defaultValue(params.class,'') + ' filterValue'
+		params.class = defaultValue(params.class,'') + ' filterValue'
 		this._super(params)
 	},
 	
@@ -419,7 +426,7 @@ Filters.Range  = Filters.extend({
 	init : function(params) {
 		var label = params.label
 		params.label=""
-		params.class += defaultValue(params.class,'') + ' filterRange'
+		params.class = defaultValue(params.class,'') + ' filterRange'
 		this._super(params) // had to call this first so the parent conatiner exists
 		
 		var baseclass      = defaultValue(params.class, '')
@@ -496,7 +503,7 @@ Filters.Option = Filters.extend({
 		
 		window[this.globalRef] = this
 		
-		params.class += defaultValue(params.class,'') + ' filterOption'
+		params.class = defaultValue(params.class,'') + ' filterOption'
 		this._super(params)
 	},
 
@@ -509,7 +516,7 @@ Filters.Option = Filters.extend({
 		this.addFilter(e)
 		var optDom = this.createOptionDom()
 		// add the new state selection to the dom
-		$(this.$optDiv).append(optDom)
+		$(this.$optDiv).prepend(optDom)
 		this.linkEvents()
 		
 		var num = this.filter.filters.length
@@ -579,8 +586,11 @@ Filters.Option = Filters.extend({
 	},
 	
 	createDom: function() {
-		var dom = this._super() +'<div> <div id="'+this.optDiv+'"></div>'
-		dom += this.createOptionDom() + '</div>'
+		var dom = '<div id="'+this.el+'" '
+		if (this.classEl) dom += 'class="'+this.classEl+' '+this.oddEvenClass()+'" style="padding-bottom:15px" ' 
+		dom += '><div id="a" style="display:inline-block">' + this.createLabel()
+		dom += '<div  id="b" style="display:inline-block;position:absolute;top:1px;left:190px;">'
+		dom += this.createOptionDom() + '</div></div><div id="'+this.optDiv+'" style="left: 190px;position: relative;top: 10px;">'
 		return dom
 	},
 	
@@ -613,6 +623,27 @@ Filters.Option = Filters.extend({
 	},
 })
 
+function updateFilterScroll(e) {
+//	setTimeout(function(){
+		var childHeight = 0
+		$(e.target).children().each(function(i,child){
+			childHeight += $(child).height()
+		})
+
+		if ( childHeight > getStyle('div.filter').height) {
+			$(e.target).addClass('filterScroll')
+		} else {
+			$(e.target).removeClass('filterScroll')
+		}
+//	}, 1000)
+/*	
+	div.filterScroll {
+	    width: 353px;
+		overflow-y: scroll;
+	}
+	*/
+}
+
 $().ready(function(){
 	$('body').on('keypress',function(e){
 		if (e.keyCode === 13) {
@@ -622,4 +653,6 @@ $().ready(function(){
 	})
 	$('#applyFilter').click(applyFilters)
 	$('#clearFilter').click(clearFilters)
+	
+	$('.filter').on('childchange',updateFilterScroll)
 })
