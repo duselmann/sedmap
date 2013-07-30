@@ -112,7 +112,9 @@
 				            <input type="button" id="clearFilter" value="Clear">
 				            <input type="button" id="applyFilter" value="Apply"> 
 				            </div>
-				            <div id="applyFilter-warn" class="hidden filterWarn inputFilterWarnOn floatLeft" >Please address warnings.</div>
+                            <div id="applyFilter-warn" class="hidden filterWarn inputFilterWarnOn floatLeft" style="margin-left: 5px;" >
+                                Please address errors.
+                            </div>
 				            <br class="floatClear">
 				        </div>
                         <div id="siteInfo">

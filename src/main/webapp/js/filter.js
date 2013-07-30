@@ -48,7 +48,7 @@ function setupFilters() {
         size:8,
         maxlength:12,
         parent:'#filterDiv', 
-        label:'Min Descrete Samples:',
+        label:'Min Discrete Samples:',
         compare: Ogc.Comp.GREATER_THAN_OR_EQUAL_TO ,
         pattern: /^\d+$/,
         patternMsg: "Expecting a positive number",
@@ -57,7 +57,7 @@ function setupFilters() {
 	
     gageBasin = new Filters.Value({
         class:"gagebasin",
-        field:'GAGE_BASIN_ID', 
+        field:'USGS_STATION_ID', 
         el:'GAGE_BASIN_ID', 
         size:11,
         maxlength:15,
@@ -180,7 +180,7 @@ function setupFilters() {
         size:8,
         maxlength:12,
         parent:'#filterDiv', 
-        label:'Eco Number:',
+        label:'Ecoregion Number:',
         pattern: /^(\d?(\d\.))+\d?\*?$/,
         patternMsg: "Eco Region number have the format ##.##.## with possible wild card, '*'",
         layers:[	"Discrete Sites",
