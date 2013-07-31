@@ -74,10 +74,10 @@ function init(){
     })
 
     // sedmap project maps
+    addProjectLayer(map, "Soil K Factor", "sedmap:soilk", false, 1)
     addProjectLayer(map, "States", "sedmap:statep010", false) // add a new visible layer *new added 7/23/13 mwarren
     addProjectLayer(map, "Counties", "sedmap:countyp020", false)   // add a new invisible layer
     addProjectLayer(map, "HUC8", "sedmap:huc_8_multipart_wgs", false)
-    addProjectLayer(map, "Soil K Factor", "sedmap:soilk", false)
     addFlowLinesLayer(map);
     addProjectLayer(map, "Ecoregion Level 2", "sedmap:NA_CEC_Eco_Level2", false)
     addProjectLayer(map, "Daily Site USGS Gage Basins", "sedmap:Alldailybasins", false)
@@ -311,17 +311,23 @@ function mergeDefaults(obj, defaults) {
 /* 
 it is best to make a method for repetitive tasks.  you will likely have more than one layer and the order they are added determines the order they are overlaid 
 */
-function addProjectLayer(map, title, layerId, show) {
+function addProjectLayer(map, title, layerId, show, opacity) {
 
     var type    = "wms"
     var url     = projectUrl+"wms"
     var params  = {
                tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
            }
-    var options = {
+    
+    var options = {}
+    
+    if (show) {
+	    options = {
                visibility: show,   // initial visibility
                gutter:35,          // the amount of overlap to render large features the cross tile boundaries
            }
+    }
+    options.opacity = opacity?opacity:0.5
     
    return _addLayer(map, title, layerId, type, url, options, params)
 }
