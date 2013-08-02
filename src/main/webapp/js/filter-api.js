@@ -14,8 +14,9 @@ Ogc.encode = function(filter) {
 
 
 // apply for each layer and each filter
-var applyFilters = function() {
-	var hasErrors = $('.filterWarn:not(:empty):not(#applyFilter-warn)').length>0
+// TODO split into two functions genFilter and applyFilter
+var applyFilters = function(parentGroupEl) {
+	var hasErrors = $(parentGroupEl + ' .filterWarn:not(:empty):not(#applyFilter-warn)').length>0
 	if (hasErrors) {
 		$('#applyFilter-warn').fadeIn(1000).delay(1000).fadeOut(1000)
 		return
@@ -30,7 +31,7 @@ var applyFilters = function() {
 	})
 
 	// build each layers' OGC filter
-	$.each(Filters.Instances, function(i,inst) {
+	$.each(Filters.Instances[parentGroupEl], function(i,inst) {
 		if ( inst.isMapOgc && isDefined(inst.filter) ) {
 			// default to filter layers and use all layers for keyword 'all' 
 			var applyTo = inst.layers
@@ -100,8 +101,8 @@ var makeYearFilter = function() {
 }
 
 
-var clearFilters = function() {
-	$.each(Filters.Instances, function(i,filter){
+var clearFilters = function(parentGroup) {
+	$.each(Filters.Instances[parentGroup], function(i,filter){
 		filter.clear()
 	})
 }
@@ -118,6 +119,7 @@ var Filters = Class.extend({
 		this.$el     = '#'+params.el
 		this.$warn   = this.$el+'-warn'
 		this.parent  = params.parent
+		this.group   = defaultValue(params.group, params.parent)
 		this.field   = params.field
 		this.classEl = defaultValue(params.class,'') + ' filterAll'
 		this.label   = params.label
@@ -134,19 +136,47 @@ var Filters = Class.extend({
 		}
 		
 		if (this.isPrime) {
-			Filters.Instances.push(this)
+			this.checkAndInitParentGroup()
+			Filters.Instances[this.parent].push(this)
 		}
 		var dom = this.createDom() + this.endDom()
 		// this is so composite filters get one error div
 		if (this.isPrime) {
 			dom += this.errorDom()
 		}
-		$(this.parent).append(dom)
+		$(this.group).append(dom) // attach the new dom to the parent or if specified then the group
 		$(this.parent).trigger('childchange');
 		
 		if (this.isPrime) {
 			this.linkEvents()
 		}
+	},
+	
+	checkAndInitParentGroup : function() {
+		// if there is no group yet and needed then make it
+		if ( this.group !== this.parent && $(this.group).length === 0 ) {
+			// use the group el without the # for jquery
+			var group = this.group.replace('#','')
+			$(this.parent).append('<div id="'+group+'" class="filterGroup"><div class="filterGroupLabel">'+group+'</div></div>')
+		}
+		if ( isDefined(Filters.Instances[this.parent]) ) return
+		
+		Filters.Instances[this.parent] = []
+		
+		var _this = this
+		
+		$().ready(function(){
+			$(_this.parent).on('keypress',function(e){
+				if (e.keyCode === 13) {
+				    // on enter
+					applyFilters(_this.parent)
+				}
+			})
+			$(_this.parent + ' .applyFilter').click(function(){applyFilters(_this.parent)})
+			$(_this.parent + ' .clearFilter').click(function(){clearFilters(_this.parent)})
+			
+			$(_this.parent).on('childchange',updateFilterScroll)
+		})
 	},
 
 	// function that is called when the user wants to clear this filter
@@ -245,7 +275,7 @@ var Filters = Class.extend({
 })
 
 // storage of the filter obj instances
-Filters.Instances = []
+Filters.Instances = {}
 // storage of the unique filter names
 Filters.Layers = {}
 // the openlayers map these filters apply
@@ -339,10 +369,15 @@ Filters.Bool   = Filters.extend({
 	onchange : function() {
 		if (this._super()) return
 		
-		var val = $(this.$el +' input').attr("checked")
+		var val = $(this.$el +' :checkbox:checked').length > 0
 		if (val) {
 			this.makeFilter()
 		}
+	},
+	
+	linkEvents : function() {
+		var _this = this
+		$(this.$el +' input').click(function(){_this.onchange()})
 	},
 
 	clear: function() {
@@ -437,6 +472,7 @@ Filters.Range  = Filters.extend({
 		minParams.compare  = Ogc.Comp.GREATER_THAN_OR_EQUAL_TO
 		minParams.isPrime  = false
 		minParams.parent   = this.$el
+		minParams.group    = undefined
 		minParams.class    = baseclass + " loRange"
 		this.lo            = new Filters.Value(minParams)
 		this.lo.$warn      = this.$warn
@@ -447,6 +483,7 @@ Filters.Range  = Filters.extend({
 		maxParams.compare  = Ogc.Comp.LESS_THAN_OR_EQUAL_TO
 		maxParams.isPrime  = false
 		maxParams.parent   = this.$el
+		maxParams.group    = undefined
 		maxParams.class    = baseclass + " hiRange"
 		this.hi            = new Filters.Value(maxParams)
 		this.hi.$warn      = this.$warn
@@ -624,35 +661,15 @@ Filters.Option = Filters.extend({
 })
 
 function updateFilterScroll(e) {
-//	setTimeout(function(){
-		var childHeight = 0
-		$(e.target).children().each(function(i,child){
-			childHeight += $(child).height()
-		})
+	var childHeight = 0
+	$(e.target).children().each(function(i,child){
+		childHeight += $(child).height()
+	})
 
-		if ( childHeight > getStyle('div.filter').height) {
-			$(e.target).addClass('filterScroll')
-		} else {
-			$(e.target).removeClass('filterScroll')
-		}
-//	}, 1000)
-/*	
-	div.filterScroll {
-	    width: 353px;
-		overflow-y: scroll;
+	if ( childHeight > getStyle('div.filter').height) {
+		$(e.target).addClass('filterScroll')
+	} else {
+		$(e.target).removeClass('filterScroll')
 	}
-	*/
 }
 
-$().ready(function(){
-	$('body').on('keypress',function(e){
-		if (e.keyCode === 13) {
-		    // on enter
-			applyFilters()
-		}
-	})
-	$('#applyFilter').click(applyFilters)
-	$('#clearFilter').click(clearFilters)
-	
-	$('.filter').on('childchange',updateFilterScroll)
-})

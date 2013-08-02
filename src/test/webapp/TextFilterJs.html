@@ -1,7 +1,6 @@
 <html>
 <head>
     <script type="text/javascript" src="js/jquery/jquery-1.10.2.js"></script>
-    <script type="text/javascript" src="js/jquery/jquery.rule.js"></script>
     <script type="text/javascript" src="js/openlayers/OpenLayers.js"></script>
     <script type="text/javascript" src="../../main/webapp/js/utils.js"></script>
     <script type="text/javascript" src="../../main/webapp/js/filter-api.js"></script>
@@ -14,9 +13,10 @@
 	   left: auto;
 	   border:1px solid;
 	   padding:3px;
+	   width: 337px;
+	   height: 544px;	   
     }
-    
-    
+        
     </style>
 </head>
 <body>
@@ -26,15 +26,16 @@ In the box below should be the filter elements<br>
 <div id="filterDiv" class="filter">
     <div class="floatLeft" style="height:28px;">
         <span class="label">Filter By:</span>
-        <input type="button" id="clearFilter" value="Clear">
-        <input type="button" id="applyFilter" value="Apply"> 
+        <input type="button" class="clearFilter" value="Clear">
+        <input type="button" class="applyFilter" value="Apply"> 
     </div>
-    <div id="applyFilter-warn" class="hidden filterWarn inputFilterWarnOn floatLeft" >Please address warnings.</div>
+    <div id="applyFilter-warn" class="hidden filterWarn inputFilterWarnOn floatLeft" >Please address errors.</div>
     <br class="floatClear">
 </div>
-
+<div style="position:absolute;top:8px;left:355px;margin-right:3px;">
 console of sorts
 <div id="console" style="border:1px solid;padding:3px;"></div>
+</div>
 <script>
 var benchmark
 var minYears
@@ -50,7 +51,8 @@ var soilKfactor
 
 var MocLayer = Class.extend({
 	init: function(title) {
-		this.title = title
+        this.name  = title
+        this.title = title
 	},
 	mergeNewParams: function(params){
         var msg = this.title + ":: "
@@ -75,7 +77,8 @@ function test(){
 	    field:'REFERENCE_SITE', 
 	    trueVal:'1', 
 	    el:'refonly', 
-	    parent:'#filterDiv', 
+        parent:'#filterDiv', 
+        group:'#A', 
 	    label:'Benchmarks Only',
 	    layers:['A','B']
 	})
@@ -93,6 +96,7 @@ function test(){
         size:4,
         maxlength:2,
         parent:'#filterDiv', 
+        group:'#B', 
         label:'Min Years of Daily Data:',
         min:19,
         pattern: /^\d+$/,
@@ -126,6 +130,7 @@ function test(){
         size:11,
         maxlength:15,
         parent:'#filterDiv', 
+        group:'#B', 
         label:'Gage Basin ID:',
         pattern: /^\d+$/,
         patternMsg: "Expecting a positive number",
@@ -139,6 +144,7 @@ function test(){
         size:8,
         maxlength:11,
         parent:'#filterDiv', 
+        group:'#B', 
         label:'Drainage Area (mi<sup>2</sup>):',
         min:0,
         max:999999999,
@@ -169,6 +175,7 @@ function test(){
         size:4,
         maxlength:4,
         parent:'#filterDiv', 
+        group:'#land', 
         label:'Urban Land Use (%):',
         min:0,
         max:100,
@@ -184,6 +191,7 @@ function test(){
         size:4,
         maxlength:4,
         parent:'#filterDiv', 
+        group:'#land', 
         label:'Ag Land Use (%):',
         min:0,
         max:100,
@@ -197,6 +205,7 @@ function test(){
         size:4,
         maxlength:4,
         parent:'#filterDiv', 
+        group:'#land', 
         label:'Forest Land Use (%):',
         min:0,
         max:100,
@@ -210,6 +219,7 @@ function test(){
         size:8,
         maxlength:4,
         parent:'#filterDiv', 
+        group:'#A',
         label:'Year Range:',
         min:1900,
         max:new Date().getFullYear(),
