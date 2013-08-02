@@ -622,12 +622,13 @@ Filters.Option = Filters.extend({
 		this._super()
 	},
 	
+	// TODO pull sytle out into css class
 	createDom: function() {
 		var dom = '<div id="'+this.el+'" '
 		if (this.classEl) dom += 'class="'+this.classEl+' '+this.oddEvenClass()+'" style="padding-bottom:15px" ' 
 		dom += '><div id="a" style="display:inline-block">' + this.createLabel()
-		dom += '<div  id="b" style="display:inline-block;position:absolute;top:1px;left:190px;">'
-		dom += this.createOptionDom() + '</div></div><div id="'+this.optDiv+'" style="left: 190px;position: relative;top: 10px;">'
+		dom += '<div  id="b" style="display:inline-block;position:absolute;top:1px;left:185px;">'
+		dom += this.createOptionDom() + '</div></div><div id="'+this.optDiv+'" style="left: 185px;position: relative;top: 10px;">'
 		return dom
 	},
 	

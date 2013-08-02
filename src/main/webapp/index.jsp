@@ -108,9 +108,9 @@
                         </div>
 				        <div id="filterDiv" class="filter">
 				            <div class="floatLeft" style="height:28px;">
-				            <span class="label">Filter By:</span>
-				            <input type="button" id="clearFilter" value="Clear">
-				            <input type="button" id="applyFilter" value="Apply"> 
+					            <span class="label">Filter By:</span>
+					            <input type="button" class="clearFilter" value="Clear">
+					            <input type="button" class="applyFilter" value="Apply"> 
 				            </div>
                             <div id="applyFilter-warn" class="hidden filterWarn inputFilterWarnOn floatLeft" style="margin-left: 5px;" >
                                 Please address errors.
