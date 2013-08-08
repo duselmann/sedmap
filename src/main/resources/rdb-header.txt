@@ -1,0 +1,394 @@
+# ------------------------------------------------------------------------------------------------------------
+# 
+#  Begin METADATA documentation
+#
+# 
+#  METADATA Basic documentation of dataset elements:
+#
+#       Data Attributes:
+#
+#               SP_RECNO         8s            
+#               SP_DBNUM         2s            
+#               SP_LABID         7s            
+#               SP_agncy         5s            
+#               SP_staid         15s            
+#               SP_sname         50s            
+#               SP_dates         10d
+#               SP_times         4s            
+#               SP_tzs           6s             
+#               SP_edate         10d
+#               SP_etime         4s            
+#               SP_etz           6s             
+#               SP_medim         3s            
+#               SP_stype         1s            
+#               SP_m2lab         1800s          
+#               BG_RECNO         8s            
+#               BG_DBNUM         2s            
+#               BG_LABID         7s            
+#               BG_agncy         5s            
+#               BG_staid         15s            
+#               BG_sname         50s            
+#               BG_dates         10d
+#               BG_times         4s            
+#               BG_tzs           6s             
+#               BG_edate         10d
+#               BG_etime         4s            
+#               BG_etz           6s             
+#               BG_medim         3s            
+#               BG_stype         1s            
+#               BG_m2lab         1800s          
+#               pcode            5s            
+#               pname            50s            
+#               SP_remrk         1s            
+#               SP_value         53n            
+#               SP_units         10s            
+#               SP_method        5s            
+#               SP_RPLEV         53n            
+#               SP_dqi           1s            
+#               BG_remrk         1s            
+#               BG_value         53n            
+#               BG_units         10s            
+#               BG_method        5s            
+#               BG_RPLEV         53n            
+#               BG_dqi           1s            
+#               sam_vol          53n            
+#               samv_units       10s            
+#               spi_vol          53n            
+#               spiv_units       10s            
+#               lotno            5s            
+#               spi_value        53n            
+#               spi_units        10s            
+#               certdate         10d
+#               expdate          10d
+#               lotsched         10s            
+#               Cexp             53n            
+#               Cexp_units       10s            
+#               recov1           10n            
+#               recov2           10n            
+#               recov3           10n            
+#               NCmsg            50s            
+#
+#
+#           Note: The row in the data file that follows the row of attribute labels describes the 
+#                 width of the field and the data type. S or s indicates a text attribute, 
+#                 D or d indicates a date attribute, and N or n indicates a numeric attribute.
+#                 For example: 15s indicates a 0- to 15-character text attribute whereas
+#                 9N indicates a 0- to 9-digit numeric attribute. Attribute labels may be longer
+#                 than the width of the field.
+#
+#
+#       Attribute label: SP_RECNO
+#
+#       Attribute description: NWIS record number for the spiked sample
+#
+#
+#       Attribute label: SP_DBNUM
+#
+#       Attribute description: NWIS database number for the spiked sample
+#
+#
+#       Attribute label: SP_LABID
+#
+#       Attribute description: Laboratory identification number for the spiked sample
+#
+#
+#       Attribute label: SP_agncy
+#
+#       Attribute description: Agency code for the spiked sample
+#
+#
+#       Attribute label: SP_staid
+#
+#       Attribute description: USGS station identification number for the spiked sample
+#
+#
+#       Attribute label: SP_sname
+#
+#       Attribute description: Name of USGS station for the spiked sample
+#
+#
+#       Attribute label: SP_dates
+#
+#       Attribute description: Date (or Start Date) of the spiked sample, YYYY-MM-DD
+#
+#
+#       Attribute label: SP_times
+#
+#       Attribute description: Time (or Start Time) of the spiked sample, 24-hour format, HHHH
+#
+#
+#       Attribute label: SP_tzs
+#
+#       Attribute description: Time zone for SP_times
+#
+#
+#       Attribute label: SP_edate
+#
+#       Attribute description:  End date of the spiked sample, YYYY-MM-DD
+#
+#
+#       Attribute label: SP_etime
+#
+#       Attribute description: End time of the spiked sample, 24-hour format, HHHH
+#
+#
+#       Attribute label: SP_etz
+#
+#       Attribute description: Time zone for SP_etime
+#
+#
+#       Attribute label: SP_medim
+#
+#       Attribute description: Medium code for the spiked sample
+#
+#
+#       Attribute label: SP_stype
+#
+#       Attribute description: Sample type code for the spiked sample
+#
+#
+#       Attribute label: SP_m2lab
+#
+#       Attribute description: Field sample comment for the spiked sample
+#
+#
+#       Attribute label: BG_RECNO
+#
+#       Attribute description: NWIS record number for the background sample
+#
+#
+#       Attribute label: BG_DBNUM
+#
+#       Attribute description: NWIS database number for the background sample
+#
+#
+#       Attribute label: BG_LABID
+#
+#       Attribute description: Laboratory identification number for the background sample
+#
+#
+#       Attribute label: BG_agncy
+#
+#       Attribute description: Agency code for the background sample
+#
+#
+#       Attribute label: BG_staid
+#
+#       Attribute description: USGS station identification number for the background sample
+#
+#
+#       Attribute label: BG_sname
+#
+#       Attribute description: Name of USGS station for the background sample
+#
+#
+#       Attribute label: BG_dates
+#
+#       Attribute description: Date (or Start Date) of the background sample, YYYY-MM-DD
+#
+#
+#       Attribute label: BG_times
+#
+#       Attribute description: Time (or Start Time) of the background sample, 24-hour format, HHHH
+#
+#
+#       Attribute label: BG_tzs
+#
+#       Attribute description: Time zone for BG_times
+#
+#
+#       Attribute label: BG_edate
+#
+#       Attribute description:  End date of the background sample, YYYY-MM-DD
+#
+#
+#       Attribute label: BG_etime
+#
+#       Attribute description: End time of the background sample, 24-hour format, HHHH
+#
+#
+#       Attribute label: BG_etz
+#
+#       Attribute description: Time zone for BG_etime
+#
+#
+#       Attribute label: BG_medim
+#
+#       Attribute description: Medium code for the background sample
+#
+#
+#       Attribute label: BG_stype
+#
+#       Attribute description: Sample type code for the background sample
+#
+#
+#       Attribute label: BG_m2lab
+#
+#       Attribute description: Field sample comment for the background sample
+#
+#
+#       Attribute label: pcode
+#
+#       Attribute description: NWIS parameter code
+#
+#
+#       Attribute label: pname
+#
+#       Attribute description: Name of constituent, property, or code
+#
+#
+#       Attribute label: SP_remrk
+#
+#       Attribute description: Remark code for SP_value
+#
+#
+#       Attribute label: SP_value
+#
+#       Attribute description: Value of constituent, property, or code for the spiked sample
+#
+#
+#       Attribute label: SP_units
+#
+#       Attribute description: Units of measurement for SP_value
+#
+#
+#       Attribute label: SP_method
+#
+#       Attribute description: Method code for SP_value
+#
+#
+#       Attribute label: SP_RPLEV
+#
+#       Attribute description: Reporting level for SP_value
+#
+#
+#       Attribute label: SP_dqi
+#
+#       Attribute description: Data-quality indicator code for SP_value
+#
+#
+#       Attribute label: BG_remrk
+#
+#       Attribute description: Remark code for BG_value
+#
+#
+#       Attribute label: BG_value
+#
+#       Attribute description: Value of constituent, property, or code for the background sample
+#
+#
+#       Attribute label: BG_units
+#
+#       Attribute description: Units of measurement for BG_value
+#
+#
+#       Attribute label: BG_method
+#
+#       Attribute description: Method code for BG_value
+#
+#
+#       Attribute label: BG_RPLEV
+#
+#       Attribute description: Reporting level for BG_value
+#
+#
+#       Attribute label: BG_dqi
+#
+#       Attribute description: Data-quality indicator code for BG_value
+#
+#
+#       Attribute label: sam_vol
+#
+#       Attribute description: Volume of the spiked sample
+#
+#
+#       Attribute label: samv_units
+#
+#       Attribute description: Units of measurement for sam_vol
+#
+#
+#       Attribute label: spi_vol
+#
+#       Attribute description: Volume of spike solution added to the spiked sample
+#
+#
+#       Attribute label: spiv_units
+#
+#       Attribute description: Units of measurement for spi_vol
+#
+#
+#       Attribute label: lotno
+#
+#       Attribute description: NWIS lot number for the spike solution
+#
+#
+#       Attribute label: spi_value
+#
+#       Attribute description: Concentration of the constituent in the spike solution
+#
+#
+#       Attribute label: spi_units
+#
+#       Attribute description: Units of measurement for spi_value
+#
+#
+#       Attribute label: certdate
+#
+#       Attribute description: Certification date for the spike solution, YYYY-MM-DD
+#
+#
+#       Attribute label: expdate
+#
+#       Attribute description: Expiration date for the spike solution, YYYY-MM-DD
+#
+#
+#       Attribute label: lotsched
+#
+#       Attribute description: Appropriate NWQL analytical schedules for the spike solution
+#
+#
+#       Attribute label: Cexp
+#
+#       Attribute description: The expected concentration of the constituent in the spiked sample
+#
+#                 Note: For matrix spikes, Cexp is corrected for concentrations in the background sample
+#
+#
+#       Attribute label: Cexp_units
+#
+#       Attribute description: Units of measurement for Cexp
+#
+#
+#       Attribute label: recov
+#
+#       Attribute description: Recovery of constituent in the spiked sample, in percent
+#
+#                 Note: For matrix spikes where the constituent concentration in the background
+#                       sample is censored (BG_remrk is "<" or ">"), Recovery is reported as a 
+#                       range (recov_low to recov_high)
+#
+#
+#       Attribute label: recov_low
+#
+#       Attribute description: Lower range of Recovery of constituent in the spiked sample, in percent
+#
+#
+#       Attribute label: recov_high
+#
+#       Attribute description: Upper range of Recovery of constituent in the spiked sample, in percent
+#
+#
+#       Attribute label: NCmsg
+#
+#       Attribute description: Reason recovery was not calculated
+#
+#                Code              Description
+#                ----------------  ------------------------------------------------
+#                Not in BG or LOT  pcode not in background sample or spike solution
+#                Not in LOT        pcode not in spike solution
+#                Not in SP or LOT  pcode not in spiked sample or spike solution
+#
+#
+#  End METADATA documentation
+#
+# ------------------------------------------------------------------------------------------------------------
