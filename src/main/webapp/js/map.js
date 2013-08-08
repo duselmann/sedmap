@@ -275,14 +275,14 @@ function _addLayer(map, title, layerId, type, url, options, params, noDefaults) 
 //               yx : {'EPSG:3857' : false}
            }
     
-    if (!noDefaults) {
-	    mergeDefaults(params,paramDefaults)
-	    mergeDefaults(options,optionDefaults)
-    } else {
+    if (noDefaults) {
     	params.layers = layerId
     	params.format = format
     	params.tiled  = true
     	options.isBaseLayer= false
+    } else {
+	    mergeDefaults(params,paramDefaults)
+	    mergeDefaults(options,optionDefaults)
     }
     
     var layer
