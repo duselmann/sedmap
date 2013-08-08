@@ -49,6 +49,7 @@
         <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
         <timestamp>${maven.build.timestamp}</timestamp> 
         <slf4j.version>1.7.5</slf4j.version>
+        <gt.version>9.4</gt.version>
     </properties>
     
 
@@ -116,17 +117,6 @@
             <artifactId>dygraphs-core</artifactId>
             <version>20121127-1</version>
             <type>war</type>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-shapefile</artifactId>
-            <version>8.6</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>xercesImpl</artifactId>
-                    <groupId>xerces</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -214,6 +204,84 @@
             <type>jar</type>
         </dependency>
 
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-shapefile</artifactId>
+            <version>9.4</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>xercesImpl</artifactId>
+                    <groupId>xerces</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jai_imageio</artifactId>
+                    <groupId>javax.media</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jai_core</artifactId>
+                    <groupId>javax.media</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jai_codec</artifactId>
+                    <groupId>javax.media</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jt-utils</artifactId>
+                    <groupId>org.jaitools</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jt-zonalstats</artifactId>
+                    <groupId>org.jaitools</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>imageio-ext-tiff</artifactId>
+                    <groupId>it.geosolutions.imageio-ext</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>imageio-ext-utilities</artifactId>
+                    <groupId>it.geosolutions.imageio-ext</groupId>
+                </exclusion>
+            </exclusions>
+         </dependency>
+		<dependency>
+		    <groupId>org.geotools</groupId>
+		    <artifactId>gt-xml</artifactId>
+		    <version>${gt.version}</version>
+           <exclusions>
+                <exclusion>
+                    <artifactId>xercesImpl</artifactId>
+                    <groupId>xerces</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jai_imageio</artifactId>
+                    <groupId>javax.media</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jai_core</artifactId>
+                    <groupId>javax.media</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jai_codec</artifactId>
+                    <groupId>javax.media</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jt-utils</artifactId>
+                    <groupId>org.jaitools</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jt-zonalstats</artifactId>
+                    <groupId>org.jaitools</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>imageio-ext-tiff</artifactId>
+                    <groupId>it.geosolutions.imageio-ext</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>imageio-ext-utilities</artifactId>
+                    <groupId>it.geosolutions.imageio-ext</groupId>
+                </exclusion>
+            </exclusions>
+ 		</dependency>
 
     </dependencies>
 

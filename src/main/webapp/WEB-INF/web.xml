@@ -28,6 +28,16 @@
         <url-pattern>/flow/*</url-pattern> 
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>DataFetchServlet</servlet-name>
+        <servlet-class>gov.cida.sedmap.web.DataFetch</servlet-class>
+    </servlet>
+    <servlet-mapping> 
+        <servlet-name>DataFetchServlet</servlet-name> 
+        <url-pattern>/data/*</url-pattern> 
+    </servlet-mapping>
+
+
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>	
