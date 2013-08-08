@@ -29,11 +29,11 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>DataFetchServlet</servlet-name>
-        <servlet-class>gov.cida.sedmap.web.DataFetch</servlet-class>
+        <servlet-name>DataService</servlet-name>
+        <servlet-class>gov.cida.sedmap.web.DataService</servlet-class>
     </servlet>
     <servlet-mapping> 
-        <servlet-name>DataFetchServlet</servlet-name> 
+        <servlet-name>DataService</servlet-name> 
         <url-pattern>/data/*</url-pattern> 
     </servlet-mapping>
 

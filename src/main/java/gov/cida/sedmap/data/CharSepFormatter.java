@@ -10,11 +10,12 @@ import java.util.List;
 
 public class CharSepFormatter implements Formatter {
 	private final String CONTENT_TYPE;
+	private final String FILE_TYPE;
 	private final String SEPARATOR;
 
 	private List<Column> columnData;
 
-	public final static class Column {
+	public static final class Column {
 		public final String name;
 		public final int    type;
 		public final int    size;
@@ -26,9 +27,10 @@ public class CharSepFormatter implements Formatter {
 	}
 
 
-	public CharSepFormatter(String contentType, String separator) {
+	public CharSepFormatter(String contentType, String separator, String fileType) {
 		CONTENT_TYPE = contentType;
 		SEPARATOR    = separator;
+		FILE_TYPE    = fileType;
 	}
 
 
@@ -38,6 +40,10 @@ public class CharSepFormatter implements Formatter {
 	}
 	public final String getSeparator() {
 		return SEPARATOR;
+	}
+	@Override
+	public String getFileType() {
+		return FILE_TYPE;
 	}
 
 
@@ -61,6 +67,7 @@ public class CharSepFormatter implements Formatter {
 	}
 
 
+	@Override
 	public String fileHeader(ResultSet rs) throws SQLException {
 		StringBuilder header = new StringBuilder();
 
@@ -77,6 +84,7 @@ public class CharSepFormatter implements Formatter {
 	}
 
 
+	@Override
 	public String fileRow(ResultSet rs) throws SQLException {
 		StringBuilder row = new StringBuilder();
 

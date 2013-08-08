@@ -7,4 +7,5 @@ public interface Formatter {
 	String getContentType();
 	String fileHeader(ResultSet rs) throws SQLException;
 	String fileRow(ResultSet rs) throws SQLException;
+	String getFileType();
 }
