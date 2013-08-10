@@ -29,8 +29,19 @@ public class MockConnection implements Connection {
 		return dataSource.getMockResults(sql);
 	}
 
+	boolean closed = false;
+	@Override
+	public void close() throws SQLException {
+		closed = true;
+	}
+	@Override
+	public boolean isClosed() throws SQLException {
+		return closed;
+	}
+
 	@Override
 	public Statement createStatement() throws SQLException {
+		if (closed) throw new SQLException("Connection closed");
 		MockStatement statement = new MockStatement();
 		statement.conn = this;
 		return statement;
@@ -88,18 +99,6 @@ public class MockConnection implements Connection {
 
 	@Override
 	public void rollback() throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-
-	}
-
-	@Override
-	public void close() throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-
-	}
-
-	@Override
-	public boolean isClosed() throws SQLException {
 		throw new RuntimeException("Not mocked for testing");
 
 	}

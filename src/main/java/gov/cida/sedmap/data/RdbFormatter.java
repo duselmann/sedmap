@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import gov.cida.sedmap.util.IoUtils;
+import gov.cida.sedmap.io.IoUtils;
 
 public class RdbFormatter extends CharSepFormatter {
 
@@ -12,12 +12,11 @@ public class RdbFormatter extends CharSepFormatter {
 
 
 	public RdbFormatter() {
-		super("text/tab-separated-values", "\\t", ".rdb");
+		super("text/tab-separated-values", "\t", ".rdb");
 	}
 
 
 
-	// borrowed from Spike Calculator
 	public String getFileHeader(){
 		return IoUtils.readTextResource(RDB_FILE_HEADER);
 	}
@@ -26,6 +25,11 @@ public class RdbFormatter extends CharSepFormatter {
 	@Override
 	public String fileHeader(ResultSet rs) throws SQLException {
 		StringBuilder header = new StringBuilder( getFileHeader() );
+
+		if ( ! header.toString().endsWith(IoUtils.LINE_SEPARATOR) ) {
+			header.append(IoUtils.LINE_SEPARATOR);
+		}
+
 		header.append( super.fileHeader(rs)   );
 
 		List<Column> cols = getTableColumns(rs);

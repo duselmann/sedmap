@@ -20,17 +20,22 @@ public class MockRowMetaData implements ResultSetMetaData {
 	}
 
 	@Override
+	public int getColumnCount() throws SQLException {
+		return metadata.size();
+	}
+
+	@Override
 	public String getColumnName(int column) throws SQLException {
-		return metadata.get(column+1).name;
+		return metadata.get(column-1).name;
 	}
 
 	@Override
 	public int getColumnType(int column) throws SQLException {
-		return metadata.get(column+1).type;
+		return metadata.get(column-1).type;
 	}
 	@Override
 	public int getScale(int column) throws SQLException {
-		return metadata.get(column+1).size;
+		return metadata.get(column-1).size;
 	}
 
 
@@ -42,12 +47,6 @@ public class MockRowMetaData implements ResultSetMetaData {
 
 	@Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-
-	}
-
-	@Override
-	public int getColumnCount() throws SQLException {
 		throw new RuntimeException("Not mocked for testing");
 
 	}

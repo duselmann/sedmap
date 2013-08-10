@@ -1,6 +1,6 @@
 package gov.cida.sedmap.data;
 
-import gov.cida.sedmap.util.IoUtils;
+import gov.cida.sedmap.io.IoUtils;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -93,7 +93,13 @@ public class CharSepFormatter implements Formatter {
 		String sep = "";
 		for (int c=1; c<=cols.size(); c++) {
 			// JDBC is one-based
-			row.append(sep).append( rs.getString(c) );
+			String val = rs.getString(c);
+			val = val==null ?"" :val;
+			if (val.contains(SEPARATOR)) {
+				val = val.contains("\"") ?val.replaceAll("\"", "'") :val;
+				val = "\""+val+"\"";
+			}
+			row.append(sep).append(val);
 			sep = SEPARATOR;
 		}
 		row.append( IoUtils.LINE_SEPARATOR );

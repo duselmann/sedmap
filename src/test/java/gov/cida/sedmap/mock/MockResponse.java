@@ -1,6 +1,7 @@
 package gov.cida.sedmap.mock;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Locale;
 
@@ -10,46 +11,59 @@ import javax.servlet.http.HttpServletResponse;
 
 public class MockResponse implements HttpServletResponse {
 
+	ServletOutputStream os;
+	PrintWriter writer;
+	String contentType;
+	int    contentLength;
+	String encodong;
+
+	public MockResponse(final OutputStream out) {
+		os = new ServletOutputStream() {
+			@Override
+			public void write(int b) throws IOException {
+				out.write(b);
+			}
+			@Override
+			public void write(byte[] b, int off, int len) throws IOException {
+				out.write(b,off,len);
+			}
+		};
+		writer = new PrintWriter(os);
+	}
+
 	@Override
 	public String getCharacterEncoding() {
-		throw new RuntimeException("Not mocked for testing");
-
+		return encodong;
 	}
 
 	@Override
 	public String getContentType() {
-		throw new RuntimeException("Not mocked for testing");
-
+		return contentType;
 	}
 
 	@Override
 	public ServletOutputStream getOutputStream() throws IOException {
-		throw new RuntimeException("Not mocked for testing");
-
+		return os;
 	}
 
 	@Override
 	public PrintWriter getWriter() throws IOException {
-		throw new RuntimeException("Not mocked for testing");
-
+		return writer;
 	}
 
 	@Override
 	public void setCharacterEncoding(String charset) {
-		throw new RuntimeException("Not mocked for testing");
-
+		encodong = charset;
 	}
 
 	@Override
 	public void setContentLength(int len) {
-		throw new RuntimeException("Not mocked for testing");
-
+		contentLength = len;
 	}
 
 	@Override
 	public void setContentType(String type) {
-		throw new RuntimeException("Not mocked for testing");
-
+		contentType = type;
 	}
 
 	@Override

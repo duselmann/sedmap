@@ -10,6 +10,16 @@ import java.sql.Statement;
 public class MockStatement implements Statement {
 	MockConnection conn;
 
+	boolean closed = false;
+	@Override
+	public void close() throws SQLException {
+		closed = true;
+	}
+	@Override
+	public boolean isClosed() throws SQLException {
+		return closed;
+	}
+
 	@Override
 	public ResultSet executeQuery(String sql) throws SQLException {
 		return conn.getMockResults(sql);
@@ -30,12 +40,6 @@ public class MockStatement implements Statement {
 
 	@Override
 	public int executeUpdate(String sql) throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-
-	}
-
-	@Override
-	public void close() throws SQLException {
 		throw new RuntimeException("Not mocked for testing");
 
 	}
@@ -246,12 +250,6 @@ public class MockStatement implements Statement {
 
 	@Override
 	public int getResultSetHoldability() throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-
-	}
-
-	@Override
-	public boolean isClosed() throws SQLException {
 		throw new RuntimeException("Not mocked for testing");
 
 	}

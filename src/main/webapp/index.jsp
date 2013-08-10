@@ -116,6 +116,7 @@
                                 Please address errors.
                             </div>
 				            <br class="floatClear">
+                            <input type="button" class="download" value="Download Data"> 
 				        </div>
                         <div id="siteInfo">
                             <jsp:include page="siteInfo.jsp"/>

@@ -12,6 +12,38 @@ Ogc.encode = function(filter) {
 }
 
 
+var getFilters = function(parentGroupEl) {
+	var hasErrors = $(parentGroupEl + ' .filterWarn:not(:empty):not(#applyFilter-warn)').length>0
+	if (hasErrors) {
+		$('#applyFilter-warn').fadeIn(1000).delay(1000).fadeOut(1000)
+		return
+	}
+
+	var filters = [];
+
+	// build OGC filter
+	$.each(Filters.Instances[parentGroupEl], function(i,inst) {
+		if ( isDefined(inst.filter) ) {
+		    filters.push(inst.filter)
+		}
+	})
+
+	// encode each layers filters
+	if (filters.length>0) {
+		var filter = new Ogc.Logic({
+			type   : Ogc.Logic.AND,
+			filters: filters
+		})
+		filters = Ogc.encode(filter)
+	} else {
+		filters = ''
+	}
+	
+	return filters;
+}
+
+
+
 
 // apply for each layer and each filter
 // TODO split into two functions genFilter and applyFilter
@@ -32,6 +64,7 @@ var applyFilters = function(parentGroupEl) {
 
 	// build each layers' OGC filter
 	$.each(Filters.Instances[parentGroupEl], function(i,inst) {
+		// isMapOgc is used to identify the view param based filters like year range 
 		if ( inst.isMapOgc && isDefined(inst.filter) ) {
 			// default to filter layers and use all layers for keyword 'all' 
 			var applyTo = inst.layers
@@ -174,6 +207,12 @@ var Filters = Class.extend({
 			})
 			$(_this.parent + ' .applyFilter').click(function(){applyFilters(_this.parent)})
 			$(_this.parent + ' .clearFilter').click(function(){clearFilters(_this.parent)})
+			
+			$(_this.parent + ' .download').click(function(){
+				var url = "/sediment/data?format=csv&dataTypes=daily_discrete_sites&filter=" + getFilters(_this.parent)
+				console.log(url)
+				window.location = url
+			})
 			
 			$(_this.parent).on('childchange',updateFilterScroll)
 		})

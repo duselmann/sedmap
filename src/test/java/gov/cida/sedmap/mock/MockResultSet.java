@@ -33,14 +33,13 @@ public class MockResultSet implements ResultSet {
 	private List<Object[]> results = new LinkedList<Object[]>();
 	private Iterator<Object[]> rs;
 	private Object[] current;
-	private boolean closed;
 
 	ResultSetMetaData metadata;
 
 	public void addMockRow(Object ... values) {
 		results.add(values);
 	}
-	public void addMockData(List<Object[]> rows) {
+	public void addMockRows(List<Object[]> rows) {
 		results.addAll(rows);
 	}
 	@Override
@@ -48,18 +47,23 @@ public class MockResultSet implements ResultSet {
 		if (rs==null) rs = results.iterator();
 		if (closed) throw new SQLException("Closed");
 		boolean result = rs.hasNext();
-		current = rs.next();
+		current = result ?rs.next() : null;
 		return result;
 	}
 
+	boolean closed = false;
 	@Override
 	public void close() throws SQLException {
 		closed = true;
 	}
+	@Override
+	public boolean isClosed() throws SQLException {
+		return closed;
+	}
 
 	@Override
 	public String getString(int columnIndex) throws SQLException {
-		return current[columnIndex+1].toString();
+		return current[columnIndex-1].toString();
 	}
 
 	@Override
@@ -933,12 +937,6 @@ public class MockResultSet implements ResultSet {
 
 	@Override
 	public int getHoldability() throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-
-	}
-
-	@Override
-	public boolean isClosed() throws SQLException {
 		throw new RuntimeException("Not mocked for testing");
 
 	}
