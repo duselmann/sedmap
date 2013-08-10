@@ -45,7 +45,7 @@ public class IoUtilsTest {
 
 		FileDownloadHandler handler = new MultiPartHandler(res, out);
 
-		IoUtils.writeFile(handler, "text/csv", "foo.csv", fileData);
+		handler.writeFile("text/csv", "foo.csv", fileData);
 		res.getWriter().flush();
 		IoUtils.quiteClose(out);
 		String actual = out.toString();
@@ -74,9 +74,9 @@ public class IoUtilsTest {
 
 		FileDownloadHandler handler = new MultiPartHandler(res, out);
 
-		IoUtils.writeFile(handler, "text/csv", "foo1.csv", fileData1);
-		IoUtils.writeFile(handler, "text/csv", "foo2.csv", fileData2);
-		IoUtils.writeFile(handler, "text/csv", "foo3.csv", fileData3);
+		handler.writeFile("text/csv", "foo1.csv", fileData1);
+		handler.writeFile("text/csv", "foo2.csv", fileData2);
+		handler.writeFile("text/csv", "foo3.csv", fileData3);
 		res.getWriter().flush();
 		IoUtils.quiteClose(out);
 		String actual = out.toString();
