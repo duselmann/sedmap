@@ -6,7 +6,7 @@ import java.sql.Date;
 import java.sql.Types;
 import java.util.List;
 
-import gov.cida.sedmap.data.CharSepFormatter.Column;
+import gov.cida.sedmap.data.Column;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.mock.MockDataSource;
 import gov.cida.sedmap.mock.MockResultSet;
@@ -31,10 +31,10 @@ public class CharFormatterTest {
 		rs  = new MockResultSet();
 		md  = new MockRowMetaData();
 
-		md.addMetadata( new Column("Site_Id",     Types.VARCHAR, 10) );
-		md.addMetadata( new Column("Latitude",    Types.NUMERIC,  3) );
-		md.addMetadata( new Column("Longitude",   Types.NUMERIC,  3) );
-		md.addMetadata( new Column("create_date", Types.DATE,     8) ); // TODO 8 is a place-holder
+		md.addMetadata( new Column("Site_Id",     Types.VARCHAR, 10, false) );
+		md.addMetadata( new Column("Latitude",    Types.NUMERIC,  3, false) );
+		md.addMetadata( new Column("Longitude",   Types.NUMERIC,  3, false) );
+		md.addMetadata( new Column("create_date", Types.DATE,     8, false) ); // TODO 8 is a place-holder
 		rs.addMockRow("1234567891",40.1,-90.1,new Date(01,1-1,1));
 		rs.addMockRow("12345678|2",40.2,-90.2,new Date(02,2-1,2));
 		rs.addMockRow("1234567893",40.3,-90.3,new Date(03,3-1,3));

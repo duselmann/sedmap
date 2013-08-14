@@ -30,11 +30,11 @@ import java.util.Map;
 //extend and override for more behavior
 public class MockResultSet implements ResultSet {
 
-	private List<Object[]> results = new LinkedList<Object[]>();
-	private Iterator<Object[]> rs;
-	private Object[] current;
-
-	ResultSetMetaData metadata;
+	protected List<Object[]> results = new LinkedList<Object[]>();
+	protected Iterator<Object[]> rs;
+	protected Object[] current;
+	protected boolean closed = false;
+	protected ResultSetMetaData metadata;
 
 	public void addMockRow(Object ... values) {
 		results.add(values);
@@ -45,13 +45,12 @@ public class MockResultSet implements ResultSet {
 	@Override
 	public boolean next() throws SQLException {
 		if (rs==null) rs = results.iterator();
-		if (closed) throw new SQLException("Closed");
+		if (closed) throw new SQLException("Mock ResultSet is Closed");
 		boolean result = rs.hasNext();
 		current = result ?rs.next() : null;
 		return result;
 	}
 
-	boolean closed = false;
 	@Override
 	public void close() throws SQLException {
 		closed = true;
@@ -71,6 +70,10 @@ public class MockResultSet implements ResultSet {
 		return metadata;
 	}
 
+	@Override
+	public void setFetchSize(int rows) throws SQLException {
+
+	}
 
 	@Override
 	public int getInt(int columnIndex) throws SQLException {
@@ -405,12 +408,6 @@ public class MockResultSet implements ResultSet {
 
 	@Override
 	public int getFetchDirection() throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-
-	}
-
-	@Override
-	public void setFetchSize(int rows) throws SQLException {
 		throw new RuntimeException("Not mocked for testing");
 
 	}

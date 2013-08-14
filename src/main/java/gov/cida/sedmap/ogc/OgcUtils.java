@@ -5,6 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.geotools.data.jdbc.FilterToSQL;
+import org.geotools.data.jdbc.FilterToSQLException;
+import org.geotools.data.oracle.OracleDialect;
+import org.geotools.data.oracle.OracleFilterToSQL;
+import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.xml.Parser;
 import org.opengis.filter.Filter;
 
@@ -44,10 +49,16 @@ public class OgcUtils {
 		logger.debug("ogcXml2Sql");
 		// parse the OGC filter
 		Filter filter = ogcXml2Filter(ogcXml);
-		// convert to string
-		String query  = filter.toString();
+
 		// convert to SQL
-		String sql    = sqlTranslation(query);
+		String sql="";
+		try {
+			JDBCDataStore ds = new JDBCDataStore();
+			FilterToSQL  fsql = new OracleFilterToSQL(new OracleDialect(ds));
+			sql = fsql.encodeToString(filter);
+		} catch (FilterToSQLException e) {
+			throw new RuntimeException("Failed to convert to SQL",e);
+		}
 
 		return sql;
 	}

@@ -8,7 +8,7 @@ import java.sql.Statement;
 
 // this mock statement returns a mock result set
 public class MockStatement implements Statement {
-	MockConnection conn;
+	public MockConnection conn;
 
 	boolean closed = false;
 	@Override
@@ -25,6 +25,15 @@ public class MockStatement implements Statement {
 		return conn.getMockResults(sql);
 	}
 
+	@Override
+	public Connection getConnection() throws SQLException {
+		return conn;
+	}
+
+	@Override
+	public void setFetchSize(int rows) throws SQLException {
+
+	}
 
 	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {
@@ -147,12 +156,6 @@ public class MockStatement implements Statement {
 	}
 
 	@Override
-	public void setFetchSize(int rows) throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-
-	}
-
-	@Override
 	public int getFetchSize() throws SQLException {
 		throw new RuntimeException("Not mocked for testing");
 
@@ -184,12 +187,6 @@ public class MockStatement implements Statement {
 
 	@Override
 	public int[] executeBatch() throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-
-	}
-
-	@Override
-	public Connection getConnection() throws SQLException {
 		throw new RuntimeException("Not mocked for testing");
 
 	}

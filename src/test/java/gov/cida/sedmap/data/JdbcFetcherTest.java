@@ -1,4 +1,4 @@
-package gov.cida.sedmap.web;
+package gov.cida.sedmap.data;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -11,9 +11,11 @@ import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 
-import gov.cida.sedmap.data.CharSepFormatter.Column;
+import gov.cida.sedmap.data.Column;
 import gov.cida.sedmap.data.CsvFormatter;
 import gov.cida.sedmap.data.Formatter;
+import gov.cida.sedmap.data.JdbcFetcher;
+import gov.cida.sedmap.data.JdbcFetcher.Results;
 import gov.cida.sedmap.data.RdbFormatter;
 import gov.cida.sedmap.io.FileDownloadHandler;
 import gov.cida.sedmap.io.IoUtils;
@@ -25,18 +27,18 @@ import gov.cida.sedmap.mock.MockRequest;
 import gov.cida.sedmap.mock.MockResponse;
 import gov.cida.sedmap.mock.MockResultSet;
 import gov.cida.sedmap.mock.MockRowMetaData;
-import gov.cida.sedmap.web.DataService.Results;
+import gov.cida.sedmap.web.DataService;
 
-import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class DataServiceTest {
+public class JdbcFetcherTest {
 
 	String ogc_v1_0 = "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:gml=\"http://www.opengis.net/gml\"> "
 			+ "        <ogc:PropertyIsGreaterThanOrEqualTo>"
@@ -53,11 +55,18 @@ public class DataServiceTest {
 	MockDataSource     ds;
 	MockResultSet      rs;
 	MockRowMetaData    md;
-	DataService        dss; // instance under test
+	JdbcFetcher        dss; // instance under test
 
 	boolean nwisHandlerCalled;
 	boolean localHandlerCalled;
 	int     handleCount;
+
+	@BeforeClass
+	public static void init() {
+		// TODO refactor the need for this
+		DataService.MODE = "TEST";
+	}
+
 
 	@Before
 	public void setup() throws Exception {
@@ -70,36 +79,24 @@ public class DataServiceTest {
 		md  = new MockRowMetaData();
 
 		// populate result sets
-		ds.put(DataService.SQL_QUERIES.get("discrete_sites"), rs);
-		ds.put(DataService.SQL_QUERIES.get("discrete_sites"), md);
+		ds.put("select * from " +Fetcher.DATA_TABLES.get("discrete_sites"), rs);
+		ds.put("select * from " +Fetcher.DATA_TABLES.get("discrete_sites"), md);
 
 		// populate env and params
 		params = new HashMap<String, String>();
 		ctxenv = new HashMap<String, Object>();
-		ctxenv.put(DataService.SEDMAP_DS, ds);
-		ctx    = new MockContext(ctxenv);
+		ctxenv.put(Fetcher.SEDMAP_DS, ds);
+		// link ctx to data service for testing
+		DataService.ctx = new MockContext(ctxenv);
 
 		// link ctx to data service for testing
-		dss = new DataService() {
-			private static final long serialVersionUID = 2L;
-
-			@Override
-			protected Context getContext() throws javax.naming.NamingException {
-				return ctx;
-			}
-		};
+		dss = new JdbcFetcher();
 	}
 
 
 	// override specific behaviors for testing others
-	protected void initDataServiceForDoFetchTesting() {
-		dss = new DataService() {
-			private static final long serialVersionUID = 3L;
-
-			@Override
-			protected Context getContext() throws javax.naming.NamingException {
-				return ctx;
-			}
+	protected void initJdbcFetcherForDoFetchTesting() {
+		dss = new JdbcFetcher() {
 			@Override
 			protected InputStream handleNwisData(String descriptor, String where, Formatter formatter)
 					throws IOException, SQLException, NamingException {
@@ -126,10 +123,10 @@ public class DataServiceTest {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void handleLocalData_csv() throws Exception {
-		md.addMetadata( new Column("Site_Id",     Types.VARCHAR, 10) );
-		md.addMetadata( new Column("Latitude",    Types.NUMERIC,  3) );
-		md.addMetadata( new Column("Longitude",   Types.NUMERIC,  3) );
-		md.addMetadata( new Column("create_date", Types.DATE,     8) ); // TODO 8 is a place-holder
+		md.addMetadata( new Column("Site_Id",     Types.VARCHAR, 10, false) );
+		md.addMetadata( new Column("Latitude",    Types.NUMERIC,  3, false) );
+		md.addMetadata( new Column("Longitude",   Types.NUMERIC,  3, false) );
+		md.addMetadata( new Column("create_date", Types.DATE,     8, false) ); // TODO 8 is a place-holder
 		rs.addMockRow("1234567891",40.1,-90.1,new Date(01,1-1,1));
 		rs.addMockRow("1234567892",40.2,-90.2,new Date(02,2-1,2));
 		rs.addMockRow("1234567893",40.3,-90.3,new Date(03,3-1,3));
@@ -154,13 +151,13 @@ public class DataServiceTest {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void handleLocalData_rdb() throws Exception {
-		md.addMetadata( new Column("Site_Id",     Types.VARCHAR, 10) );
-		md.addMetadata( new Column("Latitude",    Types.NUMERIC,  3) );
-		md.addMetadata( new Column("Longitude",   Types.NUMERIC,  3) );
-		md.addMetadata( new Column("create_date", Types.DATE,     8) ); // TODO 8 is a place-holder
-		rs.addMockRow("1234567891",40.1,-90.1,new Date(2001,1,1));
-		rs.addMockRow("1234567892",40.2,-90.2,new Date(2002,2,2));
-		rs.addMockRow("1234567893",40.3,-90.3,new Date(2003,3,3));
+		md.addMetadata( new Column("Site_Id",     Types.VARCHAR, 10, false) );
+		md.addMetadata( new Column("Latitude",    Types.NUMERIC,  3, false) );
+		md.addMetadata( new Column("Longitude",   Types.NUMERIC,  3, false) );
+		md.addMetadata( new Column("create_date", Types.DATE,     8, false) ); // TODO 8 is a place-holder
+		rs.addMockRow("1234567891",40.1,-90.1,new Date(01,1-1,1));
+		rs.addMockRow("1234567892",40.2,-90.2,new Date(02,2-1,2));
+		rs.addMockRow("1234567893",40.3,-90.3,new Date(03,3-1,3));
 
 		InputStream in = dss.handleLocalData("discrete_sites", "does not matter in this test", new RdbFormatter());
 		String actual  = IoUtils.readStream(in);
@@ -182,7 +179,7 @@ public class DataServiceTest {
 	@Test
 	public void doFetch_2Files_noNWIS() throws Exception {
 
-		initDataServiceForDoFetchTesting();
+		initJdbcFetcherForDoFetchTesting();
 
 		params.put("format", "csv");
 		params.put("filter", ogc_v1_0);
@@ -216,7 +213,7 @@ public class DataServiceTest {
 	@Test
 	public void doFetch_2Files_withNWIS() throws Exception {
 
-		initDataServiceForDoFetchTesting();
+		initJdbcFetcherForDoFetchTesting();
 
 		params.put("format", "rdb");
 		params.put("filter", ogc_v1_0);
@@ -249,7 +246,7 @@ public class DataServiceTest {
 
 	@Test
 	public void getData_ensureAllMocksAreInLine() throws Exception {
-		Results r = dss.getData( DataService.SQL_QUERIES.get("discrete_sites") );
+		Results r = dss.getData( "select * from " +Fetcher.DATA_TABLES.get("discrete_sites") );
 		ResultSet actual = r.rs;
 		ResultSet expect = rs;
 		assertEquals("getData should return the resultset we want", expect, actual);
@@ -321,7 +318,7 @@ public class DataServiceTest {
 	@Test
 	public void ogc2sql_success() throws Exception {
 		String actual = dss.ogc2sql(ogc_v1_0);
-		String expect = " where ( attName >= 5 )";
+		String expect = "WHERE \"attName\" >= ?";
 		assertEquals("ogc to sql should return an sql where clause", expect, actual);
 	}
 	@Test

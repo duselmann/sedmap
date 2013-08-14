@@ -1,7 +1,6 @@
 package gov.cida.sedmap.mock;
 
-import gov.cida.sedmap.data.CharSepFormatter;
-import gov.cida.sedmap.data.CharSepFormatter.Column;
+import gov.cida.sedmap.data.Column;
 
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -10,7 +9,7 @@ import java.util.List;
 
 public class MockRowMetaData implements ResultSetMetaData {
 
-	List<Column> metadata = new LinkedList<CharSepFormatter.Column>();
+	List<Column> metadata = new LinkedList<Column>();
 
 	public void addMetadata(Column col) {
 		metadata.add(col);

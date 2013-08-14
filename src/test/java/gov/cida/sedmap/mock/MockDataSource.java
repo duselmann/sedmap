@@ -2,6 +2,7 @@ package gov.cida.sedmap.mock;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
@@ -15,14 +16,21 @@ public class MockDataSource implements DataSource {
 
 	private Map<String, MockResultSet> mockResults = new HashMap<String, MockResultSet>();
 
+	private MockDbMetaData metadata;
+
+	public DatabaseMetaData getMetadata() {
+		return metadata;
+	}
 
 	public void put(String sql, MockResultSet results) {
 		mockResults.put(sql, results);
 	}
 	MockResultSet getMockResults(String sql) {
 		for (String key : mockResults.keySet()) {
-			if (sql.startsWith(key)) {
-				return mockResults.get(key);
+			if (sql.startsWith(key) || sql.equals(key)) {
+				MockResultSet rs = mockResults.get(key);
+				rs.closed = false; // in case it is called more than once
+				return rs;
 			}
 		}
 		// this should be hard so if you forget to inject a result set you fail early
@@ -35,13 +43,20 @@ public class MockDataSource implements DataSource {
 	}
 
 
-	@Override
-	public Connection getConnection() throws SQLException {
-		MockConnection cn = new MockConnection();
-		cn.dataSource = this;
-		return cn;
+	public void setMetaData(MockDbMetaData metaData) {
+		metadata = metaData;
 	}
 
+
+	@Override
+	public Connection getConnection() throws SQLException {
+		MockConnection cn = createMockConnection();
+		return cn;
+	}
+	// Override this in you tests
+	public MockConnection createMockConnection() {
+		return new MockConnection(this);
+	}
 
 
 

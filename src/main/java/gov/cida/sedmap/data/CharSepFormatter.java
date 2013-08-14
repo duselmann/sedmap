@@ -15,17 +15,6 @@ public class CharSepFormatter implements Formatter {
 
 	private List<Column> columnData;
 
-	public static final class Column {
-		public final String name;
-		public final int    type;
-		public final int    size;
-		public Column(String name, int type, int size) {
-			this.name = name;
-			this.type = type;
-			this.size = size;
-		}
-	}
-
 
 	public CharSepFormatter(String contentType, String separator, String fileType) {
 		CONTENT_TYPE = contentType;
@@ -60,7 +49,7 @@ public class CharSepFormatter implements Formatter {
 			int    type = md.getColumnType(c);
 			int    size = md.getScale(c);
 
-			columnData.add( new Column(name, type, size) );
+			columnData.add( new Column(name, type, size, false) );
 		}
 
 		return columnData;

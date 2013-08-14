@@ -24,13 +24,20 @@ import java.util.concurrent.Executor;
 // this mock connection returns a mock statement
 public class MockConnection implements Connection {
 
-	MockDataSource dataSource;
+	protected MockDataSource dataSource;
+	protected boolean closed = false;
+
+	public MockConnection() {
+		// might not need a data source during testing
+	}
+	public MockConnection(MockDataSource ds) {
+		dataSource = ds;
+	}
 
 	ResultSet getMockResults(String sql) {
 		return dataSource.getMockResults(sql);
 	}
 
-	boolean closed = false;
 	@Override
 	public void close() throws SQLException {
 		closed = true;
@@ -47,6 +54,22 @@ public class MockConnection implements Connection {
 		statement.conn = this;
 		return statement;
 	}
+
+	@Override
+	public DatabaseMetaData getMetaData() throws SQLException {
+		return dataSource.getMetadata();
+	}
+
+	private boolean autocommit;
+	@Override
+	public void setAutoCommit(boolean autoCommit) throws SQLException {
+		autocommit = autoCommit;
+	}
+	@Override
+	public boolean getAutoCommit() throws SQLException {
+		return autocommit;
+	}
+
 
 
 	@Override
@@ -80,17 +103,6 @@ public class MockConnection implements Connection {
 
 	}
 
-	@Override
-	public void setAutoCommit(boolean autoCommit) throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-
-	}
-
-	@Override
-	public boolean getAutoCommit() throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-
-	}
 
 	@Override
 	public void commit() throws SQLException {
@@ -100,12 +112,6 @@ public class MockConnection implements Connection {
 
 	@Override
 	public void rollback() throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-
-	}
-
-	@Override
-	public DatabaseMetaData getMetaData() throws SQLException {
 		throw new RuntimeException("Not mocked for testing");
 
 	}
