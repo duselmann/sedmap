@@ -147,6 +147,8 @@ public abstract class Fetcher {
 					List<Column> columnData = getTableColumns(rs);
 					tableData.put(tableName, Collections.unmodifiableList(columnData));
 					logger.info("Collected " +columnData.size()+ " columns metadata for table " +tableName);
+				} catch (Exception e) {
+					throw new RuntimeException("Did not find metadata for table "+tableName, e);
 				} finally {
 					IoUtils.quiteClose(rs);
 				}
@@ -165,6 +167,32 @@ public abstract class Fetcher {
 
 
 
+	protected static List<Column> loadTableMetadata(String tableName) {
+		logger.info("Static Fetcher loadTableMetadata.");
+		Connection cn = null;
+		Statement  st = null;
+		ResultSet rs = null;
+		try {
+			Context ctx = getContext();
+			DataSource ds = (DataSource) ctx.lookup(SEDMAP_DS);
+			cn = ds.getConnection();
+			st = cn.createStatement();
+			rs = st.executeQuery("select * from " +tableName+ " where 0=1");
+			List<Column> columnData = getTableColumns(rs);
+			logger.info("Collected " +columnData.size()+ " columns metadata for table " +tableName);
+			return columnData;
+		} catch (Exception e) {
+			// when testing we know this will fail
+			if ( ! DataService.MODE.equals("TEST") ) {
+				throw new RuntimeException("Failed it load table metadata",e);
+			}
+		} finally {
+			IoUtils.quiteClose(rs,st,cn);
+		}
+		return null;
+	}
+
+
 	public static List<Column> getTableColumns(ResultSet rs) throws SQLException {
 		List<Column> columnData = new ArrayList<Column>();
 
@@ -180,6 +208,19 @@ public abstract class Fetcher {
 
 		return  Collections.unmodifiableList(columnData);
 	}
+
+
+
+	public static List<Column> getTableMetadata(String tableName) {
+		List<Column> meta = TABLE_METADATA.get(tableName);
+
+		if (meta == null) {
+			meta = loadTableMetadata(tableName);
+		}
+
+		return meta;
+	}
+
 
 
 	public abstract void doFetch(HttpServletRequest req, FileDownloadHandler handler)

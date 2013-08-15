@@ -1,6 +1,5 @@
 package gov.cida.sedmap.data;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -23,19 +22,17 @@ public class RdbFormatter extends CharSepFormatter {
 
 
 	@Override
-	public String fileHeader(ResultSet rs) throws SQLException {
+	public String fileHeader(List<Column> columns) throws SQLException {
 		StringBuilder header = new StringBuilder( getFileHeader() );
 
 		if ( ! header.toString().endsWith(IoUtils.LINE_SEPARATOR) ) {
 			header.append(IoUtils.LINE_SEPARATOR);
 		}
 
-		header.append( super.fileHeader(rs)   );
-
-		List<Column> cols = getTableColumns(rs);
+		header.append( super.fileHeader(columns)   );
 
 		String sep = "";
-		for (Column col : cols) {
+		for (Column col : columns) {
 			char type = rdbType(col.type);
 
 			header.append(sep).append(col.size).append(type);

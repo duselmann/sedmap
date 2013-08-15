@@ -2,18 +2,16 @@ package gov.cida.sedmap.data;
 
 import gov.cida.sedmap.io.IoUtils;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class CharSepFormatter implements Formatter {
+
 	private final String CONTENT_TYPE;
 	private final String FILE_TYPE;
 	private final String SEPARATOR;
 
-	private List<Column> columnData;
 
 
 	public CharSepFormatter(String contentType, String separator, String fileType) {
@@ -21,6 +19,7 @@ public class CharSepFormatter implements Formatter {
 		SEPARATOR    = separator;
 		FILE_TYPE    = fileType;
 	}
+
 
 
 	@Override
@@ -36,34 +35,13 @@ public class CharSepFormatter implements Formatter {
 	}
 
 
-	public final List<Column> getTableColumns(ResultSet rs) throws SQLException {
-		if (columnData != null) return columnData;
-
-		columnData = new ArrayList<Column>();
-
-		ResultSetMetaData md = rs.getMetaData();
-
-		int columnCount = md.getColumnCount();
-		for (int c = 1; c<= columnCount; c++) {
-			String name = md.getColumnName(c);
-			int    type = md.getColumnType(c);
-			int    size = md.getScale(c);
-
-			columnData.add( new Column(name, type, size, false) );
-		}
-
-		return columnData;
-	}
-
 
 	@Override
-	public String fileHeader(ResultSet rs) throws SQLException {
+	public String fileHeader(List<Column> columns) throws SQLException {
 		StringBuilder header = new StringBuilder();
 
-		List<Column> cols = getTableColumns(rs);
-
 		String sep = "";
-		for (Column col : cols) {
+		for (Column col : columns) {
 			header.append(sep).append(col.name);
 			sep = SEPARATOR;
 		}
@@ -73,16 +51,16 @@ public class CharSepFormatter implements Formatter {
 	}
 
 
+
 	@Override
-	public String fileRow(ResultSet rs) throws SQLException {
+	public String fileRow(Iterator<String> values) throws SQLException {
 		StringBuilder row = new StringBuilder();
 
-		List<Column> cols = getTableColumns(rs);
 
 		String sep = "";
-		for (int c=1; c<=cols.size(); c++) {
+		while (values.hasNext()) {
 			// JDBC is one-based
-			String val = rs.getString(c);
+			String val = values.next();
 			val = val==null ?"" :val;
 			if (val.contains(SEPARATOR)) {
 				val = val.contains("\"") ?val.replaceAll("\"", "'") :val;
@@ -95,5 +73,4 @@ public class CharSepFormatter implements Formatter {
 
 		return row.toString();
 	}
-
 }

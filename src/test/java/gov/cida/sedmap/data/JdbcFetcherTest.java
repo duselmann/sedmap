@@ -64,33 +64,49 @@ public class JdbcFetcherTest {
 	@BeforeClass
 	public static void init() {
 		// TODO refactor the need for this
-		DataService.MODE = "TEST";
+		DataService.setMode("TEST");
 	}
 
 
 	@Before
+	@SuppressWarnings("deprecation")
 	public void setup() throws Exception {
 		// init values
 		nwisHandlerCalled  = false;
 		localHandlerCalled = false;
 		handleCount        = 0;
-		ds  = new MockDataSource();
-		rs  = new MockResultSet();
-		md  = new MockRowMetaData();
 
-		// populate result sets
-		ds.put("select * from " +Fetcher.DATA_TABLES.get("discrete_sites"), rs);
-		ds.put("select * from " +Fetcher.DATA_TABLES.get("discrete_sites"), md);
+		rs  = new MockResultSet();
+		rs.addMockRow("1234567891",40.1,-90.1,new Date(01,1-1,1));
+		rs.addMockRow("1234567892",40.2,-90.2,new Date(02,2-1,2));
+		rs.addMockRow("1234567893",40.3,-90.3,new Date(03,3-1,3));
+
+		md  = new MockRowMetaData();
+		md.addMetadata( new Column("Site_Id",     Types.VARCHAR, 10, false) );
+		md.addMetadata( new Column("Latitude",    Types.NUMERIC,  3, false) );
+		md.addMetadata( new Column("Longitude",   Types.NUMERIC,  3, false) );
+		md.addMetadata( new Column("create_date", Types.DATE,     8, false) ); // TODO 8 is a place-holder
 
 		// populate env and params
+		ds  = new MockDataSource();
 		params = new HashMap<String, String>();
 		ctxenv = new HashMap<String, Object>();
 		ctxenv.put(Fetcher.SEDMAP_DS, ds);
 		// link ctx to data service for testing
 		DataService.ctx = new MockContext(ctxenv);
 
+		// populate result sets
+		ds.put("select * from SM_INST_STATIONS", rs);
+		ds.put("select * from SM_INST_STATIONS", md);
+		ds.put("select * from SM_DAILY_STATIONS", rs);
+		ds.put("select * from SM_DAILY_STATIONS", md);
+		// populate result set place holders
+		ds.put("select * from SM_INST_SAMPLE", new MockResultSet());
+		ds.put("select * from SM_INST_SAMPLE", new MockRowMetaData());
+
 		// link ctx to data service for testing
 		dss = new JdbcFetcher();
+
 	}
 
 
@@ -121,16 +137,7 @@ public class JdbcFetcherTest {
 
 
 	@Test
-	@SuppressWarnings("deprecation")
 	public void handleLocalData_csv() throws Exception {
-		md.addMetadata( new Column("Site_Id",     Types.VARCHAR, 10, false) );
-		md.addMetadata( new Column("Latitude",    Types.NUMERIC,  3, false) );
-		md.addMetadata( new Column("Longitude",   Types.NUMERIC,  3, false) );
-		md.addMetadata( new Column("create_date", Types.DATE,     8, false) ); // TODO 8 is a place-holder
-		rs.addMockRow("1234567891",40.1,-90.1,new Date(01,1-1,1));
-		rs.addMockRow("1234567892",40.2,-90.2,new Date(02,2-1,2));
-		rs.addMockRow("1234567893",40.3,-90.3,new Date(03,3-1,3));
-
 		InputStream in = dss.handleLocalData("discrete_sites", "does not matter in this test", new CsvFormatter());
 		String actual  = IoUtils.readStream(in);
 		//		assertTrue("", new File("discrete_sites.csv"));
@@ -140,6 +147,7 @@ public class JdbcFetcherTest {
 		assertTrue("data should not be empty", actual.trim().length()>0);
 
 		String expect = "Site_Id,Latitude,Longitude,create_date";
+		System.out.println(actual);
 		assertTrue("file should contain header row", actual.startsWith(expect));
 
 		assertEquals("expect three rows of data", 3, StrUtils.occurrences("123456789", actual));
@@ -149,16 +157,7 @@ public class JdbcFetcherTest {
 	}
 
 	@Test
-	@SuppressWarnings("deprecation")
 	public void handleLocalData_rdb() throws Exception {
-		md.addMetadata( new Column("Site_Id",     Types.VARCHAR, 10, false) );
-		md.addMetadata( new Column("Latitude",    Types.NUMERIC,  3, false) );
-		md.addMetadata( new Column("Longitude",   Types.NUMERIC,  3, false) );
-		md.addMetadata( new Column("create_date", Types.DATE,     8, false) ); // TODO 8 is a place-holder
-		rs.addMockRow("1234567891",40.1,-90.1,new Date(01,1-1,1));
-		rs.addMockRow("1234567892",40.2,-90.2,new Date(02,2-1,2));
-		rs.addMockRow("1234567893",40.3,-90.3,new Date(03,3-1,3));
-
 		InputStream in = dss.handleLocalData("discrete_sites", "does not matter in this test", new RdbFormatter());
 		String actual  = IoUtils.readStream(in);
 		//		assertTrue("", new File("discrete_sites.csv"));

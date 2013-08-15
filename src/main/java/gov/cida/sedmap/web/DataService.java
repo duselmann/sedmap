@@ -52,4 +52,11 @@ public class DataService extends HttpServlet {
 		FileDownloadHandler handler = new ZipHandler(resp, resp.getOutputStream());
 		new GeoToolsFetcher().doFetch(req, handler);
 	}
+
+
+
+	public static void setMode(String mode) {
+		logger.debug("setMode");
+		MODE = mode;
+	}
 }

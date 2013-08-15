@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
@@ -97,11 +98,13 @@ public class JdbcFetcher extends Fetcher {
 			File   tmp = File.createTempFile(descriptor + StrUtils.uniqueName(12), formatter.getFileType());
 			FileWriter tmpw = new FileWriter(tmp);
 
-			String header = formatter.fileHeader(rs.rs);
+			String     tableName = Fetcher.DATA_TABLES.get(descriptor);
+			List<Column> columns = Fetcher.getTableMetadata(tableName);
+			String header = formatter.fileHeader(columns);
 			//logger.debug(header);
 			tmpw.write(header);
 			while (rs.rs.next()) {
-				String row = formatter.fileRow(rs.rs);
+				String row = formatter.fileRow(new ResultSetColumnIterator(rs.rs));
 				//logger.debug(row);
 				tmpw.write(row);
 			}

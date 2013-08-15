@@ -9,7 +9,7 @@ import java.util.List;
 
 public class MockRowMetaData implements ResultSetMetaData {
 
-	List<Column> metadata = new LinkedList<Column>();
+	protected List<Column> metadata = new LinkedList<Column>();
 
 	public void addMetadata(Column col) {
 		metadata.add(col);

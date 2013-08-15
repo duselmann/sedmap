@@ -1,12 +1,13 @@
 package gov.cida.sedmap.data;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
 
 public interface Formatter {
 	String getContentType();
-	String fileHeader(ResultSet rs) throws SQLException;
-	String fileRow(ResultSet rs) throws SQLException;
+	String fileHeader(List<Column> columns) throws SQLException;
+	String fileRow(Iterator<String> values) throws SQLException;
 	//	String fileHeader(Iterator<String> columns) throws SQLException;
 	//	String fileRow(Iterator<Object> data) throws SQLException;
 	String getFileType();
