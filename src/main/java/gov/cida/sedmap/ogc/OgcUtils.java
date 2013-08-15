@@ -1,15 +1,24 @@
 package gov.cida.sedmap.ogc;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
+import org.geotools.data.DefaultTransaction;
+import org.geotools.data.Query;
+import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.data.oracle.OracleDialect;
 import org.geotools.data.oracle.OracleFilterToSQL;
 import org.geotools.jdbc.JDBCDataStore;
+import org.geotools.jdbc.JDBCDataStoreFactory;
+import org.geotools.jdbc.JDBCFeatureReader;
+import org.geotools.jdbc.JDBCJNDIDataStoreFactory;
 import org.geotools.xml.Parser;
 import org.opengis.filter.Filter;
 
@@ -97,5 +106,67 @@ public class OgcUtils {
 		}
 		return replaced;
 	}
+
+
+
+	public static DataStore jndiOracleDataStore(String jndiName) throws IOException {
+		Map<String, Object> dataStoreEnv = new HashMap<String, Object>();
+		// dataStoreEnv.put( JDBCDataStoreFactory.SCHEMA.getName(), "sedmap"); // OPTIONAL
+		dataStoreEnv.put( JDBCDataStoreFactory.DBTYPE.getName(), "oracle");
+		dataStoreEnv.put( JDBCDataStoreFactory.EXPOSE_PK.getName(), true);
+		dataStoreEnv.put( JDBCJNDIDataStoreFactory.JNDI_REFNAME.getName(), jndiName);
+		DataStore store =  DataStoreFinder.getDataStore(dataStoreEnv);
+
+		return store;
+	}
+
+
+
+	public static JDBCFeatureReader executeQuery(DataStore store, String tableName, Filter filter, String ... properties)
+			throws IOException {
+		Transaction trans = new DefaultTransaction("read-only");
+		return executeQuery(trans, store, tableName, filter, properties);
+	}
+	public static JDBCFeatureReader executeQuery(Transaction trans, DataStore store, String tableName, Filter filter, String ... properties)
+			throws IOException {
+		Query query;
+		if (properties.length==0) {
+			query = new Query("tableName", filter);
+		} else {
+			query = new Query("tableName", filter, properties);
+		}
+
+		JDBCFeatureReader reader = (JDBCFeatureReader) store.getFeatureReader(query, trans);
+		return reader;
+	}
+
+
+
+	//	StringBuilder buf = new StringBuilder();
+	//	while (reader.hasNext()) {
+	//		SimpleFeature feature = reader.next();
+	//
+	//		int attribCount = feature.getAttributeCount();
+	//		int expectedCount = 4;
+	//		assertEquals(expectedCount, attribCount);
+	//
+	//		List<Object> values = feature.getAttributes();
+	//		Collection<Property> props = feature.getProperties();
+	//		Iterator<Property> iterator = props.iterator();
+	//
+	//		for (int a=0; a<4; a++) {
+	//			Property prop = iterator.next();
+	//			buf.append(prop.getName());
+	//			buf.append(":");
+	//
+	//			// String attr = feature.getAttribute(a).toString();
+	//			String attr = values.get(a).toString();
+	//			buf.append(attr);
+	//			buf.append(", ");
+	//		}
+	//		buf.append(IoUtils.LINE_SEPARATOR);
+	//
+	//	}
+
 
 }

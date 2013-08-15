@@ -20,10 +20,14 @@ public class DataService extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	public static String MODE = "NORMAL"; // TODO refactor the need for this out
 
 	// over-ride-able for testing
 	public static Context ctx;
+	public static String MODE = "NORMAL"; // TODO refactor the need for this out
+	public static void setMode(String mode) {
+		logger.debug("setMode");
+		MODE = mode;
+	}
 
 
 
@@ -53,10 +57,4 @@ public class DataService extends HttpServlet {
 		new GeoToolsFetcher().doFetch(req, handler);
 	}
 
-
-
-	public static void setMode(String mode) {
-		logger.debug("setMode");
-		MODE = mode;
-	}
 }

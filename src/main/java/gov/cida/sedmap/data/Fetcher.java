@@ -2,9 +2,11 @@ package gov.cida.sedmap.data;
 
 import gov.cida.sedmap.io.FileDownloadHandler;
 import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.ogc.OgcUtils;
 import gov.cida.sedmap.web.DataService;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -27,6 +29,7 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.JDBCJNDIDataStoreFactory;
+import org.opengis.filter.Filter;
 
 public abstract class Fetcher {
 
@@ -78,7 +81,7 @@ public abstract class Fetcher {
 
 	private static List<String> configDataValues() {
 		logger.info("Static Fetcher configDataTypes.");
-		return Collections.unmodifiableList( Arrays.asList("sites","data") );
+		return Collections.unmodifiableList( Arrays.asList("sites","data") ); // sites first for use with NWIS data
 	}
 
 
@@ -221,8 +224,104 @@ public abstract class Fetcher {
 		return meta;
 	}
 
+	protected abstract InputStream handleLocalData(String descriptor, Filter filter, Formatter formatter)
+			throws IOException, SQLException, NamingException;
+	protected abstract InputStream handleNwisData(String descriptor, Filter filter, Formatter formatter)
+			throws IOException, SQLException, NamingException;
 
 
-	public abstract void doFetch(HttpServletRequest req, FileDownloadHandler handler)
-			throws ServletException, IOException;
+	public void doFetch(HttpServletRequest req, FileDownloadHandler handler)
+			throws ServletException, IOException {
+		logger.debug("doFetch");
+
+		String    dataTypes = getDataTypes(req);
+		Formatter formatter = getFormatter(req);
+		String    ogcXml    = getFilter(req);
+		Filter    filter    = OgcUtils.ogcXml2Filter(ogcXml);
+
+		handler.beginWritingFiles(); // start writing files
+
+		for (String value : DATA_VALUES) { // check for daily and discrete
+			if ( ! dataTypes.contains(value) ) continue;
+			for (String site  : DATA_TYPES) { // check for sites and data
+				if ( ! dataTypes.contains(site) ) continue;
+
+				StringBuilder  name = new StringBuilder();
+				String   descriptor = name.append(site).append('_').append(value).toString();
+				String     filename = descriptor + formatter.getFileType();
+
+				InputStream fileData = null;
+				try {
+					if ( "daily_data".equals(descriptor) ) {
+						fileData = handleNwisData(descriptor, filter, formatter);
+					} else {
+						fileData = handleLocalData(descriptor, filter, formatter);
+					}
+					handler.writeFile(formatter.getContentType(), filename, fileData);
+
+				} catch (Exception e) {
+					logger.error("failed to fetch from DB", e);
+					// TODO empty results and err msg to user
+					return;
+				} finally {
+					IoUtils.quiteClose(fileData);
+				}
+			}
+		}
+		handler.finishWritingFiles(); // done writing files
+
+	}
+
+
+
+	protected String getFilter(HttpServletRequest req) {
+		String ogcXml = req.getParameter("filter");
+
+		if (ogcXml == null) {
+			logger.warn("Failed to locate OGC 'filter' parameter - using default");
+			// TODO empty result
+			return "";
+		}
+
+		return ogcXml;
+	}
+
+
+
+	protected String getDataTypes(HttpServletRequest req) {
+		String types = req.getParameter("dataTypes");
+
+		// expecting a string with terms "daily_discrete_sites_data" in it
+		// sites means site data - no samples
+		// data  means site data - no site info
+		// daily and discrete refer to samples
+		// - "daily_discrete_sites_data" means they want all data
+		// - "daily_sites" means they want all daily site info only
+
+		if (types == null) {
+			logger.warn("Failed to locate 'dataTypes' parameter - using default");
+			types = "daily_discrete_sites";
+		}
+
+		return types;
+	}
+
+
+
+	protected Formatter getFormatter(HttpServletRequest req) {
+		String format = req.getParameter("format");
+		format = FILE_FORMATS.containsKey(format) ?format :"rdb";
+
+		Formatter formatter = null;
+		try {
+			formatter = FILE_FORMATS.get(format).newInstance();
+		} catch (Exception e) {
+			logger.warn("Could not instantiate formatter for '" +format+"' with class "
+					+FILE_FORMATS.get(format)+". Using RDB as fall-back.");
+			formatter = new RdbFormatter();
+		}
+
+		return formatter;
+	}
+
 }

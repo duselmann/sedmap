@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.sql.Date;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashMap;
@@ -15,8 +14,7 @@ import java.util.Map;
 import gov.cida.sedmap.data.Column;
 import gov.cida.sedmap.data.CsvFormatter;
 import gov.cida.sedmap.data.Formatter;
-import gov.cida.sedmap.data.JdbcFetcher;
-import gov.cida.sedmap.data.JdbcFetcher.Results;
+import gov.cida.sedmap.data.GeoToolsFetcher;
 import gov.cida.sedmap.data.RdbFormatter;
 import gov.cida.sedmap.io.FileDownloadHandler;
 import gov.cida.sedmap.io.IoUtils;
@@ -24,10 +22,13 @@ import gov.cida.sedmap.io.MultiPartHandler;
 import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.mock.MockContext;
 import gov.cida.sedmap.mock.MockDataSource;
+import gov.cida.sedmap.mock.MockDbMetaData;
 import gov.cida.sedmap.mock.MockRequest;
 import gov.cida.sedmap.mock.MockResponse;
 import gov.cida.sedmap.mock.MockResultSet;
 import gov.cida.sedmap.mock.MockRowMetaData;
+import gov.cida.sedmap.ogc.MockDS;
+import gov.cida.sedmap.ogc.MockDbMeta;
 import gov.cida.sedmap.web.DataService;
 
 import javax.naming.NamingException;
@@ -44,16 +45,24 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.filter.Filter;
 
-public class JdbcFetcherTest {
+public class GeoToolsFetcherTest {
 
 	String ogc_v1_0 = "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:gml=\"http://www.opengis.net/gml\"> "
 			+ "        <ogc:PropertyIsGreaterThanOrEqualTo>"
-			+ "        <ogc:PropertyName>attName</ogc:PropertyName>"
+			+ "        <ogc:PropertyName>Site_Id</ogc:PropertyName>"
 			+ "        <ogc:Literal>5</ogc:Literal>"
 			+ "        </ogc:PropertyIsGreaterThanOrEqualTo>"
 			+ "        </ogc:Filter>";
+	String sql_1_0   = "SELECT SITE_ID,LATITUDE,LONGITUDE,CREATE_DATE FROM TABLENAME";
+	String where_1_0 = "Site_Id >= ?";
 
 	String ogc_v1_1 = "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"><ogc:And><ogc:PropertyIsEqualTo matchCase=\"true\"><ogc:PropertyName>REFERENCE_SITE</ogc:PropertyName><ogc:Literal>1</ogc:Literal></ogc:PropertyIsEqualTo><ogc:PropertyIsEqualTo matchCase=\"true\"><ogc:PropertyName>SAMPLE_YEARS</ogc:PropertyName><ogc:Literal>19</ogc:Literal></ogc:PropertyIsEqualTo><ogc:PropertyIsEqualTo matchCase=\"true\"><ogc:PropertyName>GAGE_BASIN_ID</ogc:PropertyName><ogc:Literal>23534234</ogc:Literal></ogc:PropertyIsEqualTo><ogc:And><ogc:PropertyIsGreaterThanOrEqualTo><ogc:PropertyName>DA</ogc:PropertyName><ogc:Literal>40</ogc:Literal></ogc:PropertyIsGreaterThanOrEqualTo><ogc:PropertyIsLessThanOrEqualTo><ogc:PropertyName>DA</ogc:PropertyName><ogc:Literal>400</ogc:Literal></ogc:PropertyIsLessThanOrEqualTo></ogc:And><ogc:And><ogc:PropertyIsGreaterThanOrEqualTo><ogc:PropertyName>SOIL_K</ogc:PropertyName><ogc:Literal>.5</ogc:Literal></ogc:PropertyIsGreaterThanOrEqualTo><ogc:PropertyIsLessThanOrEqualTo><ogc:PropertyName>SOIL_K</ogc:PropertyName><ogc:Literal>.7</ogc:Literal></ogc:PropertyIsLessThanOrEqualTo></ogc:And><ogc:Or><ogc:PropertyIsEqualTo matchCase=\"true\"><ogc:PropertyName>STATE</ogc:PropertyName><ogc:Literal>WI</ogc:Literal></ogc:PropertyIsEqualTo><ogc:PropertyIsEqualTo matchCase=\"true\"><ogc:PropertyName>STATE</ogc:PropertyName><ogc:Literal>Wisconsin</ogc:Literal></ogc:PropertyIsEqualTo></ogc:Or></ogc:And></ogc:Filter>";
+	//WHERE (REFERENCE_SITE = 1 AND SAMPLE_YEARS = 19 AND GAGE_BASIN_ID = '23534234' AND (DA >= 40 AND DA <= 400) AND (SOIL_K >= 0.5 AND SOIL_K <= 0.7) AND (STATE = 'WI' OR STATE = 'Wisconsin'))
+
+	String sql_pk_meta = "SELECT Site_Id FROM TABLENAME WHERE 0=1";
+	String sql_pk_seqU = "SELECT * FROM USER_SEQUENCES WHERE SEQUENCE_NAME = 'TABLENAME_SITE_ID_SEQUENCE'";
+	String sql_pk_seqA = "SELECT * FROM ALL_SEQUENCES WHERE SEQUENCE_NAME = 'TABLENAME_SITE_ID_SEQUENCE'";
+
 
 	Map<String,Object> ctxenv;
 	Map<String,String> params;
@@ -61,7 +70,8 @@ public class JdbcFetcherTest {
 	MockDataSource     ds;
 	MockResultSet      rs;
 	MockRowMetaData    md;
-	JdbcFetcher        fetcher; // instance under test
+	MockDbMetaData     dbmd;
+	GeoToolsFetcher    fetcher; // instance under test
 
 	boolean nwisHandlerCalled;
 	boolean localHandlerCalled;
@@ -77,24 +87,38 @@ public class JdbcFetcherTest {
 	@Before
 	@SuppressWarnings("deprecation")
 	public void setup() throws Exception {
+
 		// init values
 		nwisHandlerCalled  = false;
 		localHandlerCalled = false;
 		handleCount        = 0;
 
-		rs  = new MockResultSet();
+
+		rs  = new MockResultSet() {
+			@Override
+			public Object getObject(int columnIndex) throws SQLException {
+				return current[columnIndex-1];
+			}
+		};
 		rs.addMockRow("1234567891",40.1,-90.1,new Date(01,1-1,1));
 		rs.addMockRow("1234567892",40.2,-90.2,new Date(02,2-1,2));
 		rs.addMockRow("1234567893",40.3,-90.3,new Date(03,3-1,3));
 
-		md  = new MockRowMetaData();
+		md  = new MockRowMetaData() {
+			@Override
+			public boolean isAutoIncrement(int column) throws SQLException {
+				return false;
+			}
+		};
 		md.addMetadata( new Column("Site_Id",     Types.VARCHAR, 10, false) );
 		md.addMetadata( new Column("Latitude",    Types.NUMERIC,  3, false) );
 		md.addMetadata( new Column("Longitude",   Types.NUMERIC,  3, false) );
 		md.addMetadata( new Column("create_date", Types.DATE,     8, false) ); // TODO 8 is a place-holder
 
+		dbmd= new MockDbMeta();
+
 		// populate env and params
-		ds  = new MockDataSource();
+		ds     = new MockDS();
 		params = new HashMap<String, String>();
 		ctxenv = new HashMap<String, Object>();
 		ctxenv.put(Fetcher.SEDMAP_DS, ds);
@@ -113,15 +137,26 @@ public class JdbcFetcherTest {
 		ds.put("select * from SM_INST_SAMPLE", new MockResultSet());
 		ds.put("select * from SM_INST_SAMPLE", new MockRowMetaData());
 
+		// populate result sets
+		ds.put(sql_1_0, rs);
+		ds.put(sql_1_0, md);
+		ds.put(sql_pk_meta, rs);
+		ds.put(sql_pk_meta, md);
+		// the pk is a string not a sequence
+		ds.put(sql_pk_seqU, new MockResultSet());
+		ds.put(sql_pk_seqA, new MockResultSet());
+
+		ds.setMetaData(dbmd);
+
 		// link ctx to data service for testing
-		fetcher = new JdbcFetcher();
+		fetcher = new GeoToolsFetcher();
 
 	}
 
 
 	// override specific behaviors for testing others
-	protected void initJdbcFetcherForDoFetchTesting() {
-		fetcher = new JdbcFetcher() {
+	protected void initGeoToolsFetcherForDoFetchTesting() {
+		fetcher = new GeoToolsFetcher() {
 			@Override
 			protected InputStream handleNwisData(String descriptor, Filter filter, Formatter formatter)
 					throws IOException, SQLException, NamingException {
@@ -157,6 +192,7 @@ public class JdbcFetcherTest {
 
 	@Test
 	public void handleLocalData_csv() throws Exception {
+		fetcher.initJndiJdbcStore(Fetcher.SEDMAP_DS);
 		InputStream in = fetcher.handleLocalData("discrete_sites", Filter.INCLUDE, new CsvFormatter());
 		String actual  = IoUtils.readStream(in);
 		//		assertTrue("", new File("discrete_sites.csv"));
@@ -177,6 +213,7 @@ public class JdbcFetcherTest {
 
 	@Test
 	public void handleLocalData_rdb() throws Exception {
+		fetcher.initJndiJdbcStore(Fetcher.SEDMAP_DS);
 		InputStream in = fetcher.handleLocalData("discrete_sites", Filter.INCLUDE, new RdbFormatter());
 		String actual  = IoUtils.readStream(in);
 		//		assertTrue("", new File("discrete_sites.csv"));
@@ -197,7 +234,7 @@ public class JdbcFetcherTest {
 	@Test
 	public void doFetch_2Files_noNWIS() throws Exception {
 
-		initJdbcFetcherForDoFetchTesting();
+		initGeoToolsFetcherForDoFetchTesting();
 
 		params.put("format", "csv");
 		params.put("filter", ogc_v1_0);
@@ -231,7 +268,7 @@ public class JdbcFetcherTest {
 	@Test
 	public void doFetch_2Files_withNWIS() throws Exception {
 
-		initJdbcFetcherForDoFetchTesting();
+		initGeoToolsFetcherForDoFetchTesting();
 
 		params.put("format", "rdb");
 		params.put("filter", ogc_v1_0);
@@ -262,12 +299,5 @@ public class JdbcFetcherTest {
 	}
 
 
-	@Test
-	public void getData_ensureMocksAreInLine() throws Exception {
-		Results r = fetcher.getData( "select * from " +Fetcher.DATA_TABLES.get("discrete_sites") );
-		ResultSet actual = r.rs;
-		ResultSet expect = rs;
-		assertEquals("getData should return the resultset we want", expect, actual);
-	}
 
 }

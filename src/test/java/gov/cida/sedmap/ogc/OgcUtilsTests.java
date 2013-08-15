@@ -119,13 +119,45 @@ public class OgcUtilsTests {
 
 
 	@Test
+	public void test_gt_dataStore_utils() throws Exception {
+		DataStore store = OgcUtils.jndiOracleDataStore(Fetcher.SEDMAP_DS);
+		Filter filter   = OgcUtils.ogcXml2Filter(ogc_v1_0);
+		JDBCFeatureReader reader = OgcUtils.executeQuery(store, "tableName", filter);
+
+		StringBuilder buf = new StringBuilder();
+		while (reader.hasNext()) {
+
+			FeatureValueIterator values = new FeatureValueIterator(reader.next());
+
+			for (String value : values) {
+				buf.append(value);
+				buf.append(", ");
+			}
+			buf.append(IoUtils.LINE_SEPARATOR);
+		}
+		System.out.println(buf);
+
+		assertTrue("expect to find site id 1",buf.indexOf("1234567891")>-1);
+		assertTrue("expect to find site id 2",buf.indexOf("1234567892")>-1);
+		assertTrue("expect to find site id 3",buf.indexOf("1234567893")>-1);
+		assertEquals("expect three rows of data", 3, StrUtils.occurrences("123456789", buf.toString()));
+	}
+
+
+
+	@Test
 	public void test_gt_dataStore_create() throws Exception {
 		DataStore store =  DataStoreFinder.getDataStore(dataStoreEnv);
 		assertNotNull(store);
 	}
 
 	@Test
-	public void test_gt_dataStore_query() throws Exception {
+	public void test_gt_dataStore_raw_access() throws Exception {
+		dataStoreEnv = new HashMap<String, Object>();
+		// dataStoreEnv.put( JDBCDataStoreFactory.SCHEMA.getName(), "sedmap"); // OPTIONAL
+		dataStoreEnv.put( JDBCDataStoreFactory.DBTYPE.getName(), "oracle");
+		dataStoreEnv.put( JDBCDataStoreFactory.EXPOSE_PK.getName(), true);
+		dataStoreEnv.put( JDBCJNDIDataStoreFactory.JNDI_REFNAME.getName(), Fetcher.SEDMAP_DS);
 		DataStore store =  DataStoreFinder.getDataStore(dataStoreEnv);
 
 		Filter filter     = OgcUtils.ogcXml2Filter(ogc_v1_0);
