@@ -1,5 +1,6 @@
 package gov.cida.sedmap.ogc;
 
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -15,12 +16,17 @@ import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.data.oracle.OracleDialect;
 import org.geotools.data.oracle.OracleFilterToSQL;
+import org.geotools.filter.AbstractFilter;
+import org.geotools.filter.BinaryComparisonAbstract;
+import org.geotools.filter.BinaryLogicAbstract;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.JDBCFeatureReader;
 import org.geotools.jdbc.JDBCJNDIDataStoreFactory;
 import org.geotools.xml.Parser;
 import org.opengis.filter.Filter;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
 
 public class OgcUtils {
 
@@ -140,6 +146,45 @@ public class OgcUtils {
 		return reader;
 	}
 
+	public static String findFilterValue(Filter filter, String param) {
+		filter = findFilter(filter, param);
+
+		String value = null;
+
+		if (filter instanceof BinaryComparisonAbstract) {
+			BinaryComparisonAbstract comp = (BinaryComparisonAbstract) filter;
+			Literal literal = (Literal) comp.getExpression2();
+			value = literal.getValue().toString();
+		}
+
+		return value;
+	}
+
+
+	// TODO this will likely need some work to be more robust
+	public static Filter findFilter(Filter filter, String param) {
+		Filter found = null;
+
+		FilterWrapper wrapper = new FilterWrapper( (AbstractFilter) filter );
+
+		if ( wrapper.isaLogicFilter() ) {
+			BinaryLogicAbstract logical = (BinaryLogicAbstract) filter;
+			for (Filter child : logical.getChildren() ) {
+				found = findFilter(child, param);
+				if (found != null) {
+					return found;
+				}
+			}
+		} else if( wrapper.isaMathFilter() ) {
+			BinaryComparisonAbstract comp = (BinaryComparisonAbstract) filter;
+			PropertyName property = (PropertyName) comp.getExpression1();
+			if ( property.getPropertyName().equals(param) ) {
+				return (found = filter);
+			}
+		}
+
+		return found;
+	}
 
 
 	//	StringBuilder buf = new StringBuilder();

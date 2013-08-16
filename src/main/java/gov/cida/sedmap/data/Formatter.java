@@ -11,4 +11,7 @@ public interface Formatter {
 	//	String fileHeader(Iterator<String> columns) throws SQLException;
 	//	String fileRow(Iterator<Object> data) throws SQLException;
 	String getFileType();
+	String getSeparator();
+	String getType();
+	String transform(String line, Formatter from);
 }

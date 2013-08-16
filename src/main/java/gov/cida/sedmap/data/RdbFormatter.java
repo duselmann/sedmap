@@ -11,7 +11,7 @@ public class RdbFormatter extends CharSepFormatter {
 
 
 	public RdbFormatter() {
-		super("text/tab-separated-values", "\t", ".rdb");
+		super("text/tab-separated-values", "\t", "rdb");
 	}
 
 

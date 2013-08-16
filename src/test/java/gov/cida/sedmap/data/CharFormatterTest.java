@@ -96,12 +96,13 @@ public class CharFormatterTest {
 	public void constructor() throws Exception {
 		String contentType   = "a";
 		String separator     = "b";
-		String fileType      = "c";
-		CharSepFormatter frm = new CharSepFormatter(contentType, separator, fileType);
+		String type          = "c";
+		CharSepFormatter frm = new CharSepFormatter(contentType, separator, type);
 
 		assertEquals(contentType, frm.getContentType());
 		assertEquals(separator, frm.getSeparator());
-		assertEquals(fileType, frm.getFileType());
+		assertEquals(type, frm.getType());
+		assertEquals("."+type, frm.getFileType());
 
 	}
 

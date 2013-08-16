@@ -1,12 +1,17 @@
 package gov.cida.sedmap.data;
 
 import gov.cida.sedmap.io.FileDownloadHandler;
+import gov.cida.sedmap.io.FileInputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.util.StringValueIterator;
 import gov.cida.sedmap.ogc.OgcUtils;
 import gov.cida.sedmap.web.DataService;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -16,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -226,7 +233,7 @@ public abstract class Fetcher {
 
 	protected abstract InputStream handleLocalData(String descriptor, Filter filter, Formatter formatter)
 			throws IOException, SQLException, NamingException;
-	protected abstract InputStream handleNwisData(String descriptor, Filter filter, Formatter formatter)
+	protected abstract InputStream handleNwisData(Iterator<String> sites, Filter filter, Formatter formatter)
 			throws IOException, SQLException, NamingException;
 
 
@@ -241,6 +248,8 @@ public abstract class Fetcher {
 
 		handler.beginWritingFiles(); // start writing files
 
+		Iterator<String> dailySites = null;
+
 		for (String value : DATA_VALUES) { // check for daily and discrete
 			if ( ! dataTypes.contains(value) ) continue;
 			for (String site  : DATA_TYPES) { // check for sites and data
@@ -253,9 +262,10 @@ public abstract class Fetcher {
 				InputStream fileData = null;
 				try {
 					if ( "daily_data".equals(descriptor) ) {
-						fileData = handleNwisData(descriptor, filter, formatter);
+						fileData = handleNwisData(dailySites, filter, formatter);
 					} else {
 						fileData = handleLocalData(descriptor, filter, formatter);
+						if (descriptor.contains("daily")) dailySites = makeSiteIterator(fileData, formatter);
 					}
 					handler.writeFile(formatter.getContentType(), filename, fileData);
 
@@ -270,6 +280,36 @@ public abstract class Fetcher {
 		}
 		handler.finishWritingFiles(); // done writing files
 
+	}
+
+
+	// TODO this needs a bit of finessing because we want to be able to read the site data twice.
+	// once for the use return download and again for the NWIS site list.
+	// right now, it assumes that the data comes from a cached file.
+	// it uses the formatter that created the file to know how to split the file
+	private Iterator<String> makeSiteIterator(InputStream fileData, Formatter formatter) throws IOException {
+
+		LinkedList<String> sites = new LinkedList<String>();
+
+		if (fileData instanceof FileInputStreamWithFile) {
+			File file = ((FileInputStreamWithFile) fileData).getFile();
+			fileData = new FileInputStreamWithFile(file);
+			InputStreamReader in = new InputStreamReader(fileData);
+			BufferedReader reader = new BufferedReader(in);
+
+			String line;
+			while ( (line=reader.readLine()) != null ) {
+				String[] lineParts = line.split( formatter.getSeparator() );
+				if (lineParts.length == 0) continue; // trap empty lines
+				String site = lineParts[0];
+				// only preserve site numbers and not comments or header info
+				if (site.matches("^\\d+$")) {
+					sites.add(site);
+				}
+			}
+		}
+
+		return new StringValueIterator( sites.iterator() );
 	}
 
 

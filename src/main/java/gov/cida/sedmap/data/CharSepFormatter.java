@@ -10,14 +10,16 @@ public class CharSepFormatter implements Formatter {
 
 	private final String CONTENT_TYPE;
 	private final String FILE_TYPE;
+	private final String TYPE;
 	private final String SEPARATOR;
 
 
 
-	public CharSepFormatter(String contentType, String separator, String fileType) {
+	public CharSepFormatter(String contentType, String separator, String type) {
 		CONTENT_TYPE = contentType;
 		SEPARATOR    = separator;
-		FILE_TYPE    = fileType;
+		FILE_TYPE    = "."+type;
+		TYPE         = type;
 	}
 
 
@@ -26,6 +28,7 @@ public class CharSepFormatter implements Formatter {
 	public final String getContentType() {
 		return CONTENT_TYPE;
 	}
+	@Override
 	public final String getSeparator() {
 		return SEPARATOR;
 	}
@@ -33,7 +36,21 @@ public class CharSepFormatter implements Formatter {
 	public String getFileType() {
 		return FILE_TYPE;
 	}
+	@Override
+	public String getType() {
+		return TYPE;
+	}
 
+
+	@Override
+	public String transform(String line, Formatter from) {
+
+		if ( ! SEPARATOR.equals( from.getSeparator() ) ) {
+			line = line.replaceAll(from.getSeparator(), SEPARATOR);
+		}
+
+		return line;
+	}
 
 
 	@Override

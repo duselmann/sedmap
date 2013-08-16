@@ -78,6 +78,22 @@ public class FetcherTest {
 
 	}
 
+
+	@Test
+	public void getRegExExpectations_number() throws Exception {
+		String site = "11111";
+		boolean actual = site.matches("^\\d+$");
+		assertTrue("expect number string to match", actual);
+	}
+	@Test
+	public void getRegExExpectations_alphnumeric() throws Exception {
+		String site = "11a111";
+		boolean actual = site.matches("^\\d+$");
+		assertFalse("expect alph char in string not to match", actual);
+	}
+
+
+
 	@Test
 	public void getFormatter_csv() throws Exception {
 		params.put("format", "csv");

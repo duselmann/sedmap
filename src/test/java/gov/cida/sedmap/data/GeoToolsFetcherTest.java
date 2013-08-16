@@ -9,6 +9,7 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import gov.cida.sedmap.data.Column;
@@ -158,10 +159,10 @@ public class GeoToolsFetcherTest {
 	protected void initGeoToolsFetcherForDoFetchTesting() {
 		fetcher = new GeoToolsFetcher() {
 			@Override
-			protected InputStream handleNwisData(String descriptor, Filter filter, Formatter formatter)
+			protected InputStream handleNwisData(Iterator<String> sites, Filter filter, Formatter formatter)
 					throws IOException, SQLException, NamingException {
 				nwisHandlerCalled = true;
-				return handleData(descriptor, filter, formatter);
+				return handleData("NWIS", filter, formatter);
 			}
 			@Override
 			protected InputStream handleLocalData(String descriptor, Filter filter, Formatter formatter)

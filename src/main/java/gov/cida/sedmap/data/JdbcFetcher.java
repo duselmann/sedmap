@@ -1,11 +1,11 @@
 package gov.cida.sedmap.data;
 
+import gov.cida.sedmap.io.FileInputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.ogc.OgcUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +13,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.naming.Context;
@@ -45,7 +46,7 @@ public class JdbcFetcher extends Fetcher {
 	@Override
 	protected InputStream handleLocalData(String descriptor, Filter filter, Formatter formatter)
 			throws IOException, SQLException, NamingException {
-		InputStream fileData = null;
+		FileInputStreamWithFile fileData = null;
 		Results rs = new Results();
 
 		try {
@@ -69,7 +70,7 @@ public class JdbcFetcher extends Fetcher {
 			}
 			IoUtils.quiteClose(tmpw);
 
-			fileData = new FileInputStream(tmp);
+			fileData = new FileInputStreamWithFile(tmp);
 			tmp.delete(); // TODO not for delayed download
 
 		} catch (FilterToSQLException e) {
@@ -83,7 +84,7 @@ public class JdbcFetcher extends Fetcher {
 
 
 	@Override
-	protected InputStream handleNwisData(String descriptor, Filter filter, Formatter formatter)
+	protected InputStream handleNwisData(Iterator<String> sites, Filter filter, Formatter formatter)
 			throws IOException, SQLException, NamingException {
 		throw new RuntimeException("Not implemented.");
 	}
