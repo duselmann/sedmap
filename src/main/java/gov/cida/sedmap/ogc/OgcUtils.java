@@ -179,7 +179,7 @@ public class OgcUtils {
 			BinaryComparisonAbstract comp = (BinaryComparisonAbstract) filter;
 			PropertyName property = (PropertyName) comp.getExpression1();
 			if ( property.getPropertyName().equals(param) ) {
-				return (found = filter);
+				return filter;
 			}
 		}
 

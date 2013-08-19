@@ -3,13 +3,21 @@ package gov.cida.sedmap.io;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
-public class FileInputStreamWithFile extends FileInputStream {
+public class FileInputStreamWithFile extends InputStream {
 
+	protected InputStream in;
 	protected File file;
 
+
 	public FileInputStreamWithFile(File file) throws FileNotFoundException {
-		super(file);
+		in   = new FileInputStream(file);
+		this.file = file;
+	}
+	public FileInputStreamWithFile(InputStream in, File file) throws FileNotFoundException {
+		this.in = in;
 		this.file = file;
 	}
 
@@ -17,7 +25,24 @@ public class FileInputStreamWithFile extends FileInputStream {
 		return file;
 	}
 
-	public void delete() {
-		file.delete();
+	public void deleteFile() {
+		IoUtils.quiteClose(this);
+
+		if ( ! file.delete() ) {
+			file.deleteOnExit();
+		}
+	}
+
+	@Override
+	public int read() throws IOException {
+		return in.read();
+	}
+	@Override
+	public int read(byte[] b) throws IOException {
+		return in.read(b);
+	}
+	@Override
+	public int read(byte[] b, int off, int len) throws IOException {
+		return in.read(b, off, len);
 	}
 }

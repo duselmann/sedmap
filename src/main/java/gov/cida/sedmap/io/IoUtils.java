@@ -1,12 +1,21 @@
 package gov.cida.sedmap.io;
 
+import gov.cida.sedmap.io.util.StrUtils;
+
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.log4j.Logger;
 
@@ -83,6 +92,34 @@ public class IoUtils {
 		}
 
 		return buf.toString();
+	}
+
+
+
+	public static WriterWithFile createTmpZipWriter(String fileName, String extention) throws IOException {
+		File   file = File.createTempFile(fileName + StrUtils.uniqueName(12), ".zip");
+
+		FileOutputStream out   = new FileOutputStream(file);
+		ZipOutputStream zip    = new ZipOutputStream(out);
+		ZipEntry entry         = new ZipEntry(fileName + extention);
+		OutputStreamWriter osw = new OutputStreamWriter(zip);
+		WriterWithFile tmp     = new WriterWithFile(osw, file);
+
+		zip.putNextEntry(entry);
+
+		return tmp;
+	}
+
+
+
+	public static FileInputStreamWithFile createTmpZipStream(File file) throws IOException {
+		FileInputStream fis = new FileInputStream(file);
+		ZipInputStream  zip = new ZipInputStream(fis);
+		FileInputStreamWithFile fisf = new FileInputStreamWithFile(zip, file);
+
+		zip.getNextEntry();
+
+		return fisf;
 	}
 
 }

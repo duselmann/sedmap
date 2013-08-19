@@ -51,6 +51,26 @@ public class CharFormatterTest {
 	}
 
 
+	@Test
+	public void transform_comma2pip() throws Exception {
+		CharSepFormatter pip = new CharSepFormatter("","|","");
+		CharSepFormatter com = new CharSepFormatter("",",","");
+		String expect = "Site_Id|Latitude|Longitude|create_date";
+		String actual = com.transform("Site_Id,Latitude,Longitude,create_date", pip);
+		assertEquals(expect,actual);
+	}
+
+
+	@Test
+	public void transform_noChange() throws Exception {
+		CharSepFormatter pip = new CharSepFormatter("","|","");
+		String expect = "Site_Id|Latitude|Longitude|create_date";
+		String actual = pip.transform(expect, pip);
+		assertEquals(expect,actual);
+		assertTrue(expect==actual); // pointer check intentional
+	}
+
+
 	//	@Test
 	//	public void getTableColumns() throws Exception {
 	//		List<Column> cols = new CharSepFormatter("","","").getTableColumns(rs);

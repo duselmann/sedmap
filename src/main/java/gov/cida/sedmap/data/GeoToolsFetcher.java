@@ -2,13 +2,11 @@ package gov.cida.sedmap.data;
 
 import gov.cida.sedmap.io.FileInputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
-import gov.cida.sedmap.io.util.StrUtils;
+import gov.cida.sedmap.io.WriterWithFile;
 import gov.cida.sedmap.ogc.FeatureValueIterator;
 import gov.cida.sedmap.ogc.OgcUtils;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -70,8 +68,7 @@ public class GeoToolsFetcher extends Fetcher {
 		url = url.replace("_endDate_",   endDate);
 
 		// open temp file
-		File   tmp = File.createTempFile("daily_data" + StrUtils.uniqueName(12), formatter.getFileType());
-		FileWriter tmpw = new FileWriter(tmp);
+		WriterWithFile tmp = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());
 		try {
 			while (sites.hasNext()) {
 				int batch = 0;
@@ -94,17 +91,20 @@ public class GeoToolsFetcher extends Fetcher {
 					while ((line = nwis.readLine()) != null) {
 						// translate from NWIS format to requested format
 						line = formatter.transform(line, rdb);
-						tmpw.write(line);
+						tmp.write(line);
 					}
 				} finally {
 					IoUtils.quiteClose(nwis);
 				}
 			}
+			// TODO
+			// } catch (Exception e) {
+			//     tmp.deleteFile();
 		} finally {
-			IoUtils.quiteClose(tmpw);
+			IoUtils.quiteClose(tmp);
 		}
 
-		return new FileInputStreamWithFile(tmp);
+		return IoUtils.createTmpZipStream( tmp.getFile() );
 	}
 
 
@@ -127,25 +127,27 @@ public class GeoToolsFetcher extends Fetcher {
 		try {
 			reader = OgcUtils.executeQuery(store, "tableName", filter);
 
-			File   tmp = File.createTempFile(descriptor + StrUtils.uniqueName(12), formatter.getFileType());
-			FileWriter tmpw = new FileWriter(tmp);
+			WriterWithFile tmp = IoUtils.createTmpZipWriter(descriptor, formatter.getFileType());
 
 			try {
-				String     tableName = Fetcher.DATA_TABLES.get(descriptor);
-				List<Column> columns = Fetcher.getTableMetadata(tableName);
+				String     tableName = getDataTable(descriptor);
+				List<Column> columns = getTableMetadata(tableName);
 				String header = formatter.fileHeader(columns);
-				tmpw.write(header);
+				tmp.write(header);
 
 				while (reader.hasNext()) {
 					FeatureValueIterator values = new FeatureValueIterator(reader.next());
 					String line = formatter.fileRow(values);
-					tmpw.write(line);
+					tmp.write(line);
 				}
+				// TODO
+				// } catch (Exception e) {
+				//     tmp.deleteFile();
 			} finally {
-				IoUtils.quiteClose(tmpw);
+				IoUtils.quiteClose(tmp);
 			}
 
-			fileData = new FileInputStreamWithFile(tmp);
+			fileData = IoUtils.createTmpZipStream( tmp.getFile() );
 		} finally {
 			IoUtils.quiteClose(reader);
 		}

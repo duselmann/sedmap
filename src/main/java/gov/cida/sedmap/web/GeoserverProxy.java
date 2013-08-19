@@ -116,8 +116,10 @@ public class GeoserverProxy extends ProxyServlet {
 			}
 
 			//This err is caught before writing to the output stream, so send err content
-			response.setStatus(targetConn.getResponseCode());
-			handleErrorStream(targetConn, responseOutputStream);
+			if (targetConn != null) {
+				response.setStatus(targetConn.getResponseCode());
+				handleErrorStream(targetConn, responseOutputStream);
+			}
 		} finally {
 			if (targetConnWriter != null) {
 				//This is likely not an err at all - could already be closed.

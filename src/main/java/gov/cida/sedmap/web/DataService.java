@@ -1,11 +1,13 @@
 package gov.cida.sedmap.web;
 
+import gov.cida.sedmap.data.Fetcher;
+import gov.cida.sedmap.data.FetcherConfig;
 import gov.cida.sedmap.data.GeoToolsFetcher;
 import gov.cida.sedmap.io.FileDownloadHandler;
 import gov.cida.sedmap.io.ZipHandler;
 import java.io.IOException;
 
-import javax.naming.Context;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -20,20 +22,21 @@ public class DataService extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-
-	// over-ride-able for testing
-	public static Context ctx;
-	public static String MODE = "NORMAL"; // TODO refactor the need for this out
-	public static void setMode(String mode) {
-		logger.debug("setMode");
-		MODE = mode;
-	}
+	protected String jndiDS = "java:comp/env/jdbc/sedmapDS";
 
 
 
 	static {
 		// this lets me know the container has initialized this servlet
 		logger.debug("class loaded: " + DataService.class.getName());
+	}
+
+
+
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		logger.info("initializing fetcher configuration");
+		Fetcher.conf = new FetcherConfig(jndiDS).init();
 	}
 
 

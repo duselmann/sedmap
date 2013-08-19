@@ -51,15 +51,15 @@ public class JdbcFetcher extends Fetcher {
 
 		try {
 			String where = new FilterToSQL().encodeToString(filter);
-			String sql = "select * from " +DATA_TABLES.get(descriptor) + where;
+			String sql = "select * from " +getDataTable(descriptor) + where;
 			logger.debug(sql);
 			rs = getData(sql);
 
 			File   tmp = File.createTempFile(descriptor + StrUtils.uniqueName(12), formatter.getFileType());
 			FileWriter tmpw = new FileWriter(tmp);
 
-			String     tableName = Fetcher.DATA_TABLES.get(descriptor);
-			List<Column> columns = Fetcher.getTableMetadata(tableName);
+			String     tableName = getDataTable(descriptor);
+			List<Column> columns = getTableMetadata(tableName);
 			String header = formatter.fileHeader(columns);
 			//logger.debug(header);
 			tmpw.write(header);
@@ -99,7 +99,7 @@ public class JdbcFetcher extends Fetcher {
 		try {
 			where = OgcUtils.ogcXml2Sql(ogcXml);
 			if (where != null && where.trim().length()>0) {
-				where = OgcUtils.sqlTranslation(where, FIELD_TRANSLATIONS);
+				where = OgcUtils.sqlTranslation(where, conf.FIELD_TRANSLATIONS);
 			} else {
 				where = "";
 			}

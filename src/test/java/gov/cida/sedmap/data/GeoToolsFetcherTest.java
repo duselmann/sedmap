@@ -30,8 +30,7 @@ import gov.cida.sedmap.mock.MockResultSet;
 import gov.cida.sedmap.mock.MockRowMetaData;
 import gov.cida.sedmap.ogc.MockDS;
 import gov.cida.sedmap.ogc.MockDbMeta;
-import gov.cida.sedmap.web.DataService;
-
+import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,7 +41,6 @@ import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.factory.GeoTools;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.filter.Filter;
 
@@ -77,12 +75,6 @@ public class GeoToolsFetcherTest {
 	boolean nwisHandlerCalled;
 	boolean localHandlerCalled;
 	int     handleCount;
-
-	@BeforeClass
-	public static void init() {
-		// TODO refactor the need for this
-		DataService.setMode("TEST");
-	}
 
 
 	@Before
@@ -124,10 +116,10 @@ public class GeoToolsFetcherTest {
 		ctxenv = new HashMap<String, Object>();
 		ctxenv.put(Fetcher.SEDMAP_DS, ds);
 		// link ctx to data service for testing
-		DataService.ctx = new MockContext(ctxenv);
+		ctx = new MockContext(ctxenv);
 		Field geoToolsCtx = GeoTools.class.getDeclaredField("context");
 		geoToolsCtx.setAccessible(true);
-		geoToolsCtx.set(null, DataService.ctx);
+		geoToolsCtx.set(null, ctx);
 
 		// populate result sets
 		ds.put("select * from SM_INST_STATIONS", rs);
@@ -149,9 +141,16 @@ public class GeoToolsFetcherTest {
 
 		ds.setMetaData(dbmd);
 
+
+		Fetcher.conf = new FetcherConfig() {
+			@Override
+			protected Context getContext() throws NamingException {
+				return ctx;
+			}
+		}.init();
+
 		// link ctx to data service for testing
 		fetcher = new GeoToolsFetcher();
-
 	}
 
 
