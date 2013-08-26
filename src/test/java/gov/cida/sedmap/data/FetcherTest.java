@@ -100,6 +100,10 @@ public class FetcherTest {
 
 		Fetcher test = new Fetcher() {
 			@Override
+			public Fetcher initJndiJdbcStore(String jndiJdbc) throws IOException {
+				return null;
+			}
+			@Override
 			protected InputStream handleNwisData(Iterator<String> sites, Filter filter, Formatter formatter)
 					throws IOException, SQLException, NamingException {
 				return null;
@@ -132,6 +136,10 @@ public class FetcherTest {
 		CharSepFormatter pipe = new CharSepFormatter("","|","");
 
 		Fetcher test = new Fetcher() {
+			@Override
+			public Fetcher initJndiJdbcStore(String jndiJdbc) throws IOException {
+				return null;
+			}
 			@Override
 			protected InputStream handleNwisData(Iterator<String> sites, Filter filter, Formatter formatter)
 					throws IOException, SQLException, NamingException {
@@ -166,6 +174,10 @@ public class FetcherTest {
 		CharSepFormatter pipe = new CharSepFormatter("","|","");
 
 		Fetcher test = new Fetcher() {
+			@Override
+			public Fetcher initJndiJdbcStore(String jndiJdbc) throws IOException {
+				return null;
+			}
 			@Override
 			protected InputStream handleNwisData(Iterator<String> sites, Filter filter, Formatter formatter)
 					throws IOException, SQLException, NamingException {
@@ -252,16 +264,16 @@ public class FetcherTest {
 	@Test
 	public void getFilter_success() throws Exception {
 		String expect = ogc_v1_0;
-		params.put("filter", expect);
+		params.put("aFilter", expect);
 		HttpServletRequest req = new MockRequest(params);
-		String actual = dss.getFilter(req);
+		String actual = dss.getFilter(req,"a");
 		assertEquals("getFilter should return what is in that param", expect, actual);
 	}
 	@Test
 	public void getFilter_default() throws Exception {
-		params.put("filter", null);
+		params.put("aFilter", null);
 		HttpServletRequest req = new MockRequest(params);
-		String actual = dss.getFilter(req);
+		String actual = dss.getFilter(req,"a");
 		String expect = "";
 		assertEquals("getFilter default should be the empty string not null", expect, actual);
 	}

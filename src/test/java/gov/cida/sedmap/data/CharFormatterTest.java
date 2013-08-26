@@ -95,6 +95,7 @@ public class CharFormatterTest {
 
 	@Test
 	public void getFileRows() throws Exception {
+		rs.open();
 		rs.next();
 		String actual = new CharSepFormatter("","|","").fileRow(new ResultSetColumnIterator(rs));
 		String expect = "1234567891|40.1|-90.1|1901-01-01"+IoUtils.LINE_SEPARATOR;
@@ -104,6 +105,7 @@ public class CharFormatterTest {
 
 	@Test
 	public void getFileRows_ensureQuoteAroundDataContainingDelimitor() throws Exception {
+		rs.open();
 		rs.next(); // by pass first row
 		rs.next();
 		String actual = new CharSepFormatter("","|","").fileRow( new ResultSetColumnIterator(rs) );

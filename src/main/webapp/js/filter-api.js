@@ -12,7 +12,7 @@ Ogc.encode = function(filter) {
 }
 
 
-var getFilters = function(parentGroupEl) {
+var getFilters = function(parentGroupEl, layerName) {
 	var hasErrors = $(parentGroupEl + ' .filterWarn:not(:empty):not(#applyFilter-warn)').length>0
 	if (hasErrors) {
 		$('#applyFilter-warn').fadeIn(1000).delay(1000).fadeOut(1000)
@@ -23,8 +23,12 @@ var getFilters = function(parentGroupEl) {
 
 	// build OGC filter
 	$.each(Filters.Instances[parentGroupEl], function(i,inst) {
+		// if the user entered a value for this filter
 		if ( isDefined(inst.filter) ) {
-		    filters.push(inst.filter)
+			// also if it is of the layer of interest
+			if ( inst.layers.indexOf('all') !== -1 || inst.layers.indexOf(layerName) !== -1 ) {
+				filters.push(inst.filter)
+			}
 		}
 	})
 
@@ -209,9 +213,21 @@ var Filters = Class.extend({
 			$(_this.parent + ' .clearFilter').click(function(){clearFilters(_this.parent)})
 			
 			$(_this.parent + ' .download').click(function(){
-				var url = "/sediment/data?format=csv&dataTypes=daily_discrete_sites&filter=" + getFilters(_this.parent)
+				// TODO re-factor to use map.layers in some fashion
+				var isDaily = layers[DAILY].visibility
+				var isDiscr = layers[DISCRETE].visibility
+				var isData  = $('#sitesOnly:checkbox:checked').length == 0
+				var urlPart = []
+				var p = 0
+				urlPart[p++] = "/sediment/data?format=csv&dataTypes=sites_" // always include site info
+				urlPart[p++] = isData  ?"data_"     :""
+				urlPart[p++] = isDaily ?"daily_"    :""
+				urlPart[p++] = isDiscr ?"discrete_" :""
+				urlPart[p++] = isDaily ?"&dailyFilter="   +getFilters(_this.parent, DAILY)    :""
+				urlPart[p++] = isDiscr ?"&discreteFilter="+getFilters(_this.parent, DISCRETE) :""
+				var url = urlPart.join("")
 				console.log(url)
-				window.location = url
+				window.location.href = url
 			})
 			
 			$(_this.parent).on('childchange',updateFilterScroll)
@@ -593,6 +609,7 @@ Filters.Option = Filters.extend({
 		var optDom = this.createOptionDom()
 		// add the new state selection to the dom
 		$(this.$optDiv).prepend(optDom)
+		$(this.parent).trigger('childchange');
 		this.linkEvents()
 		
 		var num = this.filter.filters.length
@@ -700,9 +717,11 @@ Filters.Option = Filters.extend({
 	},
 })
 
+
+// called when 'childchange' triggered 
 function updateFilterScroll(e) {
 	var childHeight = 0
-	$(e.target).children().each(function(i,child){
+	$(e.target).children().each(function(i,child) {
 		childHeight += $(child).height()
 	})
 

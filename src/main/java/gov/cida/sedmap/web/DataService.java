@@ -2,7 +2,7 @@ package gov.cida.sedmap.web;
 
 import gov.cida.sedmap.data.Fetcher;
 import gov.cida.sedmap.data.FetcherConfig;
-import gov.cida.sedmap.data.GeoToolsFetcher;
+import gov.cida.sedmap.data.JdbcFetcher;
 import gov.cida.sedmap.io.FileDownloadHandler;
 import gov.cida.sedmap.io.ZipHandler;
 import java.io.IOException;
@@ -56,8 +56,10 @@ public class DataService extends HttpServlet {
 		logger.debug("doPost");
 
 		// TODO catch and return empty file
+		Fetcher fetcher = new JdbcFetcher().initJndiJdbcStore(jndiDS);
+
 		FileDownloadHandler handler = new ZipHandler(resp, resp.getOutputStream());
-		new GeoToolsFetcher().doFetch(req, handler);
+		fetcher.doFetch(req, handler);
 	}
 
 }

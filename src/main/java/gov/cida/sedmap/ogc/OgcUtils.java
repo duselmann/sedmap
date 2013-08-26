@@ -137,9 +137,9 @@ public class OgcUtils {
 			throws IOException {
 		Query query;
 		if (properties.length==0) {
-			query = new Query("tableName", filter);
+			query = new Query(tableName, filter);
 		} else {
-			query = new Query("tableName", filter, properties);
+			query = new Query(tableName, filter, properties);
 		}
 
 		JDBCFeatureReader reader = (JDBCFeatureReader) store.getFeatureReader(query, trans);

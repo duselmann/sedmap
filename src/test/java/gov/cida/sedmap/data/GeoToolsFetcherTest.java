@@ -96,6 +96,8 @@ public class GeoToolsFetcherTest {
 		rs.addMockRow("1234567891",40.1,-90.1,new Date(01,1-1,1));
 		rs.addMockRow("1234567892",40.2,-90.2,new Date(02,2-1,2));
 		rs.addMockRow("1234567893",40.3,-90.3,new Date(03,3-1,3));
+		//		rs.addMockRow("1234567894",40.4,-90.4,new Date(04,4-1,4));
+		//		rs.addMockRow("1234567895",40.5,-90.5,new Date(05,5-1,5));
 
 		md  = new MockRowMetaData() {
 			@Override
@@ -122,13 +124,16 @@ public class GeoToolsFetcherTest {
 		geoToolsCtx.set(null, ctx);
 
 		// populate result sets
-		ds.put("select * from SM_INST_STATIONS", rs);
-		ds.put("select * from SM_INST_STATIONS", md);
-		ds.put("select * from SM_DAILY_STATIONS", rs);
-		ds.put("select * from SM_DAILY_STATIONS", md);
-		// populate result set place holders
-		ds.put("select * from SM_INST_SAMPLE", new MockResultSet());
-		ds.put("select * from SM_INST_SAMPLE", new MockRowMetaData());
+		ds.put("select * from TABLENAME", rs);
+		ds.put("select * from TABLENAME", md);
+
+		//		ds.put("select * from SM_INST_STATIONS", rs);
+		//		ds.put("select * from SM_INST_STATIONS", md);
+		//		ds.put("select * from SM_DAILY_STATIONS", rs);
+		//		ds.put("select * from SM_DAILY_STATIONS", md);
+		//		// populate result set place holders
+		//		ds.put("select * from SM_INST_SAMPLE_FACT", new MockResultSet());
+		//		ds.put("select * from SM_INST_SAMPLE_FACT", new MockRowMetaData());
 
 		// populate result sets
 		ds.put(sql_1_0, rs);
@@ -147,10 +152,24 @@ public class GeoToolsFetcherTest {
 			protected Context getContext() throws NamingException {
 				return ctx;
 			}
+			@Override
+			protected Map<String,String> configTables() {
+				Map<String,String> tables = new HashMap<String,String>();
+				tables.put("daily_sites",    "TABLENAME");
+				tables.put("discrete_sites", "TABLENAME");
+				tables.put("discrete_data",  "TABLENAME");
+				return tables ;
+			};
 		}.init();
+		//Fetcher.conf.loadTableMetadata("TABLENAME");
 
 		// link ctx to data service for testing
-		fetcher = new GeoToolsFetcher();
+		fetcher = new GeoToolsFetcher() {
+			@Override
+			protected String getDataTable(String descriptor) {
+				return "TABLENAME";
+			}
+		};
 	}
 
 
@@ -237,12 +256,13 @@ public class GeoToolsFetcherTest {
 		initGeoToolsFetcherForDoFetchTesting();
 
 		params.put("format", "csv");
-		params.put("filter", ogc_v1_0);
+		params.put("dailyFilter", ogc_v1_0);
+		params.put("discreteFilter", ogc_v1_0);
 		params.put("dataTypes", "daily_discrete_sites"); // requests site info for daily and discrete
-		HttpServletRequest    req = new MockRequest(params);
+		HttpServletRequest      req = new MockRequest(params);
 
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		HttpServletResponse   res = new MockResponse(out);
+		ByteArrayOutputStream   out = new ByteArrayOutputStream();
+		HttpServletResponse     res = new MockResponse(out);
 
 		FileDownloadHandler handler = new MultiPartHandler(res, out);
 
@@ -271,12 +291,13 @@ public class GeoToolsFetcherTest {
 		initGeoToolsFetcherForDoFetchTesting();
 
 		params.put("format", "rdb");
-		params.put("filter", ogc_v1_0);
+		params.put("dailyFilter", ogc_v1_0);
+		params.put("discreteFilter", ogc_v1_0);
 		params.put("dataTypes", "daily_sites_data"); // this requests both site and data for daily
-		HttpServletRequest req = new MockRequest(params);
+		HttpServletRequest      req = new MockRequest(params);
 
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		HttpServletResponse   res = new MockResponse(out);
+		ByteArrayOutputStream   out = new ByteArrayOutputStream();
+		HttpServletResponse     res = new MockResponse(out);
 
 		FileDownloadHandler handler = new MultiPartHandler(res, out);
 

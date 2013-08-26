@@ -20,7 +20,9 @@ public class MockDbMeta extends MockDbMetaData {
 				return null;
 			}
 		};
-		rs.addMockRow("schema","tableName");
+		rs.addMockRow("schema","TABLENAME");
+		rs.open();
+
 		return rs;
 	}
 	@Override
@@ -36,6 +38,7 @@ public class MockDbMeta extends MockDbMetaData {
 		rs.addMockRow("TABLE");
 		rs.addMockRow("VIEW");
 		rs.addMockRow("SYNONYM");
+		rs.open();
 
 		return rs;
 	}
@@ -50,7 +53,7 @@ public class MockDbMeta extends MockDbMetaData {
 			public String getString(String columnName) throws SQLException {
 				MockColumn column = (MockColumn) current[0];
 				if ("TABLE_NAME".equals(columnName))
-					return "tableName";
+					return "TABLENAME";
 				if ("COLUMN_NAME".equals(columnName))
 					return column.name;
 				if (  "TYPE_NAME".equals(columnName))
@@ -80,6 +83,7 @@ public class MockDbMeta extends MockDbMetaData {
 		rs.addMockRow( new MockColumn("Latitude",    Types.NUMERIC,  3, false, "NUMBER") );
 		rs.addMockRow( new MockColumn("Longitude",   Types.NUMERIC,  3, false, "NUMBER") );
 		rs.addMockRow( new MockColumn("create_date", Types.DATE,     8, false, "DATE") ); // TODO 8 is a place-holder
+		rs.open();
 
 		return rs;
 	}
@@ -91,7 +95,7 @@ public class MockDbMeta extends MockDbMetaData {
 			@Override
 			public String getString(String columnName) throws SQLException {
 				if ("TABLE_NAME".equals(columnName))
-					return "tableName";
+					return "TABLENAME";
 				if ("COLUMN_NAME".equals(columnName))
 					return current[0].toString();
 				if (  "TYPE_NAME".equals(columnName))
@@ -103,6 +107,7 @@ public class MockDbMeta extends MockDbMetaData {
 		};
 
 		rs.addMockRow("Site_Id");
+		rs.open();
 
 		return rs;
 	}

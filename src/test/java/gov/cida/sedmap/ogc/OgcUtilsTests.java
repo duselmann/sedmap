@@ -163,7 +163,7 @@ public class OgcUtilsTests {
 	public void test_gt_dataStore_utils() throws Exception {
 		DataStore store = OgcUtils.jndiOracleDataStore(Fetcher.SEDMAP_DS);
 		Filter filter   = OgcUtils.ogcXml2Filter(ogc_v1_0);
-		JDBCFeatureReader reader = OgcUtils.executeQuery(store, "tableName", filter);
+		JDBCFeatureReader reader = OgcUtils.executeQuery(store, "TABLENAME", filter);
 
 		StringBuilder buf = new StringBuilder();
 		while (reader.hasNext()) {
@@ -202,7 +202,7 @@ public class OgcUtilsTests {
 		DataStore store =  DataStoreFinder.getDataStore(dataStoreEnv);
 
 		Filter filter     = OgcUtils.ogcXml2Filter(ogc_v1_0);
-		Query query       = new Query("tableName", filter);
+		Query query       = new Query("TABLENAME", filter);
 		// the no-arg constructor interrogates the call stack for a handle
 		Transaction trans = new DefaultTransaction("test handle");
 		JDBCFeatureReader reader = (JDBCFeatureReader) store.getFeatureReader(query, trans);

@@ -103,8 +103,8 @@ public class JdbcFetcherTest {
 		ds.put("select * from SM_DAILY_STATIONS", rs);
 		ds.put("select * from SM_DAILY_STATIONS", md);
 		// populate result set place holders
-		ds.put("select * from SM_INST_SAMPLE", new MockResultSet());
-		ds.put("select * from SM_INST_SAMPLE", new MockRowMetaData());
+		ds.put("select * from SM_INST_SAMPLE_FACT", new MockResultSet());
+		ds.put("select * from SM_INST_SAMPLE_FACT", new MockRowMetaData());
 
 		Fetcher.conf = new FetcherConfig() {
 			@Override
@@ -199,12 +199,13 @@ public class JdbcFetcherTest {
 		initJdbcFetcherForDoFetchTesting();
 
 		params.put("format", "csv");
-		params.put("filter", ogc_v1_0);
+		params.put("dailyFilter", ogc_v1_0);
+		params.put("discreteFilter", ogc_v1_0);
 		params.put("dataTypes", "daily_discrete_sites"); // requests site info for daily and discrete
-		HttpServletRequest    req = new MockRequest(params);
+		HttpServletRequest      req = new MockRequest(params);
 
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		HttpServletResponse   res = new MockResponse(out);
+		ByteArrayOutputStream   out = new ByteArrayOutputStream();
+		HttpServletResponse     res = new MockResponse(out);
 
 		FileDownloadHandler handler = new MultiPartHandler(res, out);
 
@@ -233,12 +234,13 @@ public class JdbcFetcherTest {
 		initJdbcFetcherForDoFetchTesting();
 
 		params.put("format", "rdb");
-		params.put("filter", ogc_v1_0);
+		params.put("dailyFilter", ogc_v1_0);
+		params.put("discreteFilter", ogc_v1_0);
 		params.put("dataTypes", "daily_sites_data"); // this requests both site and data for daily
-		HttpServletRequest req = new MockRequest(params);
+		HttpServletRequest      req = new MockRequest(params);
 
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		HttpServletResponse   res = new MockResponse(out);
+		ByteArrayOutputStream   out = new ByteArrayOutputStream();
+		HttpServletResponse     res = new MockResponse(out);
 
 		FileDownloadHandler handler = new MultiPartHandler(res, out);
 

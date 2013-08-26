@@ -42,6 +42,8 @@ public abstract class Fetcher {
 	}
 
 
+	public abstract Fetcher initJndiJdbcStore(String jndiJdbc) throws IOException;
+
 	protected abstract InputStream handleLocalData(String descriptor, Filter filter, Formatter formatter)
 			throws IOException, SQLException, NamingException;
 	protected abstract InputStream handleNwisData(Iterator<String> sites, Filter filter, Formatter formatter)
@@ -54,21 +56,23 @@ public abstract class Fetcher {
 
 		String    dataTypes = getDataTypes(req);
 		Formatter formatter = getFormatter(req);
-		String    ogcXml    = getFilter(req);
-		Filter    filter    = OgcUtils.ogcXml2Filter(ogcXml);
 
 		handler.beginWritingFiles(); // start writing files
 
 		Iterator<String> dailySites = null;
 
-		for (String value : conf.DATA_VALUES) { // check for daily and discrete
-			if ( ! dataTypes.contains(value) ) continue;
-			for (String site  : conf.DATA_TYPES) { // check for sites and data
-				if ( ! dataTypes.contains(site) ) continue;
+		for (String site  : conf.DATA_TYPES) { // check for daily and discrete
+			if ( ! dataTypes.contains(site) ) continue;
 
-				StringBuilder  name = new StringBuilder();
-				String   descriptor = name.append(site).append('_').append(value).toString();
-				String     filename = descriptor + formatter.getFileType();
+			String    ogcXml = getFilter(req, site);
+			Filter    filter = OgcUtils.ogcXml2Filter(ogcXml);
+
+			for (String value : conf.DATA_VALUES) { // check for sites and data
+				if ( ! dataTypes.contains(value) ) continue;
+
+				StringBuilder   name = new StringBuilder();
+				String    descriptor = name.append(site).append('_').append(value).toString();
+				String      filename = descriptor + formatter.getFileType();
 
 				InputStream fileData = null;
 				try {
@@ -124,8 +128,8 @@ public abstract class Fetcher {
 
 
 
-	protected String getFilter(HttpServletRequest req) {
-		String ogcXml = req.getParameter("filter");
+	protected String getFilter(HttpServletRequest req, String dataType) {
+		String ogcXml = req.getParameter(dataType+"Filter");
 
 		if (ogcXml == null) {
 			logger.warn("Failed to locate OGC 'filter' parameter - using default");

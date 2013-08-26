@@ -33,7 +33,7 @@ public class MockResultSet implements ResultSet {
 	protected List<Object[]> results = new LinkedList<Object[]>();
 	protected Iterator<Object[]> rs;
 	protected Object[] current;
-	protected boolean closed = false;
+	protected boolean closed = true; // the mock datasource will mark it open
 	protected ResultSetMetaData metadata;
 
 	public void addMockRow(Object ... values) {
@@ -51,6 +51,9 @@ public class MockResultSet implements ResultSet {
 		return result;
 	}
 
+	public void open() {
+		closed = false;
+	}
 	@Override
 	public void close() throws SQLException {
 		closed = true;

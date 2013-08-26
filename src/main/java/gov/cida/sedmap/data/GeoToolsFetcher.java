@@ -41,8 +41,10 @@ public class GeoToolsFetcher extends Fetcher {
 	 * total  lines => 316
 	 */
 
-	public void initJndiJdbcStore(String jndiJdbc) throws IOException {
+	@Override
+	public Fetcher initJndiJdbcStore(String jndiJdbc) throws IOException {
 		store = OgcUtils.jndiOracleDataStore(jndiJdbc);
+		return this;
 	}
 
 
@@ -125,12 +127,12 @@ public class GeoToolsFetcher extends Fetcher {
 
 		JDBCFeatureReader reader = null;
 		try {
-			reader = OgcUtils.executeQuery(store, "tableName", filter);
+			String tableName = getDataTable(descriptor);
+			reader = OgcUtils.executeQuery(store, tableName, filter);
 
 			WriterWithFile tmp = IoUtils.createTmpZipWriter(descriptor, formatter.getFileType());
 
 			try {
-				String     tableName = getDataTable(descriptor);
 				List<Column> columns = getTableMetadata(tableName);
 				String header = formatter.fileHeader(columns);
 				tmp.write(header);

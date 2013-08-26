@@ -20,6 +20,8 @@ OpenLayers.IMAGE_RELOAD_ATTEMPTS = 3;
 OpenLayers.DOTS_PER_INCH = 90; // 25.4 / 0.28;
 
 var NUM_ZOOM_LEVELS = 18
+var DAILY    = "Daily Sites"
+var DISCRETE = "Discrete Sites"
 
 var map // this will be your main openlayers handle
 var format     = 'image/png'; // your default wms return type. 
@@ -27,7 +29,6 @@ var projectUrl = '/sediment/map/'; // your project server.
 var arcgisUrl  = 'http://services.arcgisonline.com/ArcGIS/rest/services/'; // ArcGIS server. 
 var nlcdUrl    = 'http://raster.nationalmap.gov/ArcGIS/services/TNM_LandCover/MapServer/WMSServer'; // NLCD server ?request=GetCapabilities&service=WMS&version=1.3.0
 var flowUrl    = '/sediment/flow/'; // url to the flow proxy point
-
 
 var layers = {}
 
@@ -80,11 +81,11 @@ function init(){
     addProjectLayer(map, "HUC8", "sedmap:huc_8_multipart_wgs", false)
     addFlowLinesLayer(map);
     addProjectLayer(map, "Ecoregion Level 2", "sedmap:NA_CEC_Eco_Level2", false)
-    addProjectLayer(map, "Daily Site USGS Gage Basins", "sedmap:Alldailybasins", false)
-    addProjectLayer(map, "Discrete Site USGS Gage Basins", "sedmap:Alldiscretebasins", false)
+    addProjectLayer(map, DAILY+" USGS Gage Basins", "sedmap:Alldailybasins", false)
+    addProjectLayer(map, DISCRETE+" USGS Gage Basins", "sedmap:Alldiscretebasins", false)
 //    addProjectLayer(map, "All USGS Gage Basins", "sedmap:AllbasinswDVs1", false)
-    addProjectLayer(map, "Discrete Sites", "sedmap:instant", true)
-    addProjectLayer(map, "Daily Sites", "sedmap:daily", true)
+    addProjectLayer(map, DAILY, "sedmap:daily", true)
+    addProjectLayer(map, DISCRETE, "sedmap:instant", true)
     addProjectLayer(map, "NID", "sedmap:NID", false)
     
     // zoom and move viewport to desired location
@@ -103,7 +104,7 @@ function init(){
 }
 
 function getSiteInfo(e) {
-    var layer = layers['Daily Sites']
+    var layer = layers[DAILY]
     
     var buffer= Math.round(map.zoom * Math.pow(3, map.zoom/20))
     if (map.zoom >= 10) buffer*=2

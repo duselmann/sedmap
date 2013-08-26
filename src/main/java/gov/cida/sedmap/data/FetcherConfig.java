@@ -102,7 +102,7 @@ public class FetcherConfig {
 		Map<String,String> tables = new HashMap<String,String>();
 		tables.put("daily_sites",    "SM_DAILY_STATIONS");
 		tables.put("discrete_sites", "SM_INST_STATIONS");
-		tables.put("discrete_data",  "SM_INST_SAMPLE ");
+		tables.put("discrete_data",  "SM_INST_SAMPLE_FACT");
 		return Collections.unmodifiableMap(tables);
 	}
 

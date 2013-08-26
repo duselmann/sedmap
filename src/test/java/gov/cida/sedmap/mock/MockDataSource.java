@@ -29,7 +29,7 @@ public class MockDataSource implements DataSource {
 		for (String key : mockResults.keySet()) {
 			if (sql.startsWith(key) || sql.equals(key)) {
 				MockResultSet rs = mockResults.get(key);
-				rs.closed = false; // in case it is called more than once
+				rs.open();
 				return rs;
 			}
 		}

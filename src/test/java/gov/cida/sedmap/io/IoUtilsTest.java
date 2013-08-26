@@ -132,7 +132,9 @@ public class IoUtilsTest {
 	}
 	@Test
 	public void quiteClose_sqlResultSet() throws Exception {
-		ResultSet test = new MockResultSet();
+		MockResultSet test = new MockResultSet();
+		test.open();
+
 		assertFalse("Expect open", test.isClosed());
 		IoUtils.quiteClose(test);
 		assertTrue("Expect closed", test.isClosed());
@@ -162,7 +164,8 @@ public class IoUtilsTest {
 	public void quiteClose_many() throws Exception {
 		Connection cn = new MockConnection();
 		Statement  st = new MockStatement();
-		ResultSet  rs = new MockResultSet();
+		MockResultSet rs = new MockResultSet();
+		rs.open();
 
 		final boolean[] closed = {false};
 		Closeable closeable = new Closeable() {

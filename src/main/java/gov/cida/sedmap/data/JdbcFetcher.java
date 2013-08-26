@@ -30,6 +30,7 @@ public class JdbcFetcher extends Fetcher {
 
 	private static final Logger logger = Logger.getLogger(JdbcFetcher.class);
 
+	private String jndiDS = SEDMAP_DS;
 
 
 	protected static class Results {
@@ -40,7 +41,11 @@ public class JdbcFetcher extends Fetcher {
 
 
 
-
+	@Override
+	public Fetcher initJndiJdbcStore(String jndiJdbc) throws IOException {
+		jndiDS = jndiJdbc;
+		return this;
+	}
 
 
 	@Override
@@ -118,7 +123,7 @@ public class JdbcFetcher extends Fetcher {
 
 		try {
 			Context ctx = getContext();
-			DataSource ds = (DataSource) ctx.lookup(SEDMAP_DS);
+			DataSource ds = (DataSource) ctx.lookup(jndiDS);
 			r.cn = ds.getConnection();
 			r.st = r.cn.createStatement();
 			r.rs = r.st.executeQuery(sql);
