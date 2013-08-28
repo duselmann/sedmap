@@ -56,7 +56,7 @@ public class DataService extends HttpServlet {
 		logger.debug("doPost");
 
 		// TODO catch and return empty file
-		Fetcher fetcher = new JdbcFetcher().initJndiJdbcStore(jndiDS);
+		Fetcher fetcher = new JdbcFetcher(jndiDS);
 
 		FileDownloadHandler handler = new ZipHandler(resp, resp.getOutputStream());
 		fetcher.doFetch(req, handler);

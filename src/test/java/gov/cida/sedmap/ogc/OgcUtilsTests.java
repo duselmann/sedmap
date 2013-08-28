@@ -23,7 +23,6 @@ import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.factory.GeoTools;
-import org.geotools.filter.AbstractFilter;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.JDBCFeatureReader;
 import org.geotools.jdbc.JDBCJNDIDataStoreFactory;
@@ -118,7 +117,37 @@ public class OgcUtilsTests {
 	}
 
 
+	@Test
+	public void test_removeFilter_yr1() throws Exception {
+		Filter filter = OgcUtils.ogcXml2Filter(ogc_v1_1);
+		String sql0   = OgcUtils.ogcXmlToParameterQueryWherClause(filter);
+		assertTrue("original filter should contain the yr1 param", sql0.contains("yr1"));
 
+		String value  = OgcUtils.removeFilter(filter, "yr1");
+		assertEquals("1900",value);
+
+		String sql1   = OgcUtils.ogcXmlToParameterQueryWherClause(filter);
+		assertFalse("removed yr1 should not be present", sql1.contains("yr1"));
+	}
+
+	@Test
+	public void test_removeFilter_yr1_yr2() throws Exception {
+		Filter filter = OgcUtils.ogcXml2Filter(ogc_v1_1);
+		String sql0   = OgcUtils.ogcXmlToParameterQueryWherClause(filter);
+		assertTrue("original filter should contain the yr1 param", sql0.contains("yr1"));
+		assertTrue("original filter should contain the yr1 param", sql0.contains("yr2"));
+
+		String value  = OgcUtils.removeFilter(filter, "yr1");
+		assertEquals("1900",value);
+
+		value  = OgcUtils.removeFilter(filter, "yr2");
+		assertEquals("1950",value);
+
+		String sql1   = OgcUtils.ogcXmlToParameterQueryWherClause(filter);
+		assertFalse("removed yr1 should not be present", sql1.contains("yr1"));
+		assertFalse("removed yr2 should not be present", sql1.contains("yr2"));
+		assertFalse("removed yr1 and yr2 should not leave an empty clause", sql1.contains("AND []"));
+	}
 
 
 	@Test
@@ -128,8 +157,8 @@ public class OgcUtilsTests {
 		assertEquals("org.geotools.filter.AndImpl", filter.getClass().getName());
 		System.out.println(filter.toString());
 
-		FilterWrapper wrapper = new FilterWrapper( (AbstractFilter) filter );
-		assertFalse("expected a logical filter", wrapper.isaMathFilter() );
+		FilterWrapper wrapper = new FilterWrapper( filter );
+		assertFalse("expected a logical filter", wrapper.isaLiteralFilter() );
 		assertTrue("expected a logical filter",  wrapper.isaLogicFilter() );
 	}
 	@Test
@@ -252,8 +281,8 @@ public class OgcUtilsTests {
 
 	@Test
 	public void test_ogcXml2Sql_simple_v1_0() {
-		String expected = "WHERE \"Site_Id\" >= ?";
-		String actual   = OgcUtils.ogcXml2Sql(ogc_v1_0);
+		String expected = "\"Site_Id\" >= ?";
+		String actual   = OgcUtils.ogcXmlToParameterQueryWherClause(ogc_v1_0);
 
 		assertEquals("Testing conversion from toString to SQL", expected, actual);
 	}
@@ -262,7 +291,7 @@ public class OgcUtilsTests {
 	public void test_ogcXml2Sql_complex_v1_1() {
 		String sql = "Parse Failed";
 		try {
-			sql = OgcUtils.ogcXml2Sql(ogc_v1_1);
+			sql = OgcUtils.ogcXmlToParameterQueryWherClause(ogc_v1_1);
 		} catch (Exception e) {
 			fail("Requires OGC Filter v1.1 parsing to pass. " + e.getMessage());
 		}
@@ -270,37 +299,42 @@ public class OgcUtilsTests {
 		System.out.println( sql );
 	}
 
+
+	// the following test used to work as translated to values and the data type tests where important
+	// now they are used to test assumptions that the parameters are parsed as expected
+	// still useful just not as useful as initially written.
+
 	@Test
 	public void test_ogcXml2Sql_complex_v1_1_numeric() throws Exception {
-		String sql = OgcUtils.ogcXml2Sql(ogc_v1_1);
+		String sql = OgcUtils.ogcXmlToParameterQueryWherClause(ogc_v1_1);
 		String expect = "\"SAMPLE_YEARS\" = ?";
 		assertEquals("expect ["+expect+"] to be present", 1, StrUtils.occurrences(expect, sql) );
 	}
 
 	@Test
 	public void test_ogcXml2Sql_complex_v1_1_string() throws Exception {
-		String sql = OgcUtils.ogcXml2Sql(ogc_v1_1);
+		String sql = OgcUtils.ogcXmlToParameterQueryWherClause(ogc_v1_1);
 		String expect = "\"STATE\" = ?";
 		assertEquals("expect ["+expect+"] to be present", 2, StrUtils.occurrences(expect, sql) );
 	}
 
 	@Test
 	public void test_ogcXml2Sql_complex_v1_1_boolean() throws Exception {
-		String sql = OgcUtils.ogcXml2Sql(ogc_v1_1);
+		String sql = OgcUtils.ogcXmlToParameterQueryWherClause(ogc_v1_1);
 		String expect = "\"REFERENCE_SITE\" = ?";
 		assertEquals("expect ["+expect+"] to be present", 1, StrUtils.occurrences(expect, sql) );
 	}
 
 	@Test
 	public void test_ogcXml2Sql_complex_v1_1_or() throws Exception {
-		String sql = OgcUtils.ogcXml2Sql(ogc_v1_1);
+		String sql = OgcUtils.ogcXmlToParameterQueryWherClause(ogc_v1_1);
 		String expect = "(\"STATE\" = ? OR \"STATE\" = ?)";
 		assertEquals("expect ["+expect+"] to be present", 1, StrUtils.occurrences(expect, sql) );
 	}
 
 	@Test
 	public void test_ogcXml2Sql_complex_v1_1_numericString() throws Exception {
-		String sql = OgcUtils.ogcXml2Sql(ogc_v1_1);
+		String sql = OgcUtils.ogcXmlToParameterQueryWherClause(ogc_v1_1);
 		String expect = "\"GAGE_BASIN_ID\" = ?";
 		assertEquals("expect ["+expect+"] to be present", 1, StrUtils.occurrences(expect, sql) );
 	}

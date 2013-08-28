@@ -3,6 +3,7 @@ package gov.cida.sedmap.data;
 import gov.cida.sedmap.io.FileDownloadHandler;
 import gov.cida.sedmap.io.FileInputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.WriterWithFile;
 import gov.cida.sedmap.io.util.StringValueIterator;
 import gov.cida.sedmap.ogc.OgcUtils;
 import java.io.BufferedReader;
@@ -10,6 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -27,6 +30,8 @@ public abstract class Fetcher {
 	public static final String SEDMAP_DS = "java:comp/env/jdbc/sedmapDS";
 
 	private static final Logger logger = Logger.getLogger(Fetcher.class);
+
+	protected static String NWIS_URL = "http://waterservices.usgs.gov/nwis/dv/?format=_format_&sites=_sites_&startDT=_startDate_&endDT=_endDate_&statCd=00003&parameterCd=00060";
 
 	public static FetcherConfig conf;
 
@@ -46,8 +51,74 @@ public abstract class Fetcher {
 
 	protected abstract InputStream handleLocalData(String descriptor, Filter filter, Formatter formatter)
 			throws IOException, SQLException, NamingException;
-	protected abstract InputStream handleNwisData(Iterator<String> sites, Filter filter, Formatter formatter)
-			throws IOException, SQLException, NamingException;
+
+	protected InputStream handleNwisData(Iterator<String> sites, Filter filter, Formatter formatter)
+			throws IOException, SQLException, NamingException {
+		String url = NWIS_URL;
+
+		// NWIS offers RDB only
+		String format = "rdb";
+		Formatter rdb = new RdbFormatter();
+		url = url.replace("_format_",    format);
+
+		// extract expressions from the filter we can handle
+		String yr1 = OgcUtils.findFilterValue(filter, "yr1");
+		String yr2 = OgcUtils.findFilterValue(filter, "yr1");
+
+		// translate the filters to NWIS Web query params
+		String startDate = yr1 + "-01-01"; // Jan  1st of the given year
+		String endDate   = yr2 + "-12-31"; // Dec 31st of the given year
+
+		url = url.replace("_startDate_", startDate);
+		url = url.replace("_endDate_",   endDate);
+
+		// open temp file
+		WriterWithFile tmp = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());
+		try {
+			while (sites.hasNext()) {
+				int batch = 0;
+				String sep = "";
+				StringBuilder siteList = new StringBuilder();
+
+				// site list should be in batches of 99 site IDs
+				while (batch++<99 && sites.hasNext()) {
+					siteList.append(sep).append(sites.next());
+					sep=",";
+				}
+				String sitesUrl = url.replace("_sites_",   siteList);
+
+				// fetch the data from NWIS
+				BufferedReader nwis = null;
+				try {
+					nwis = fetchNwisData(sitesUrl);
+
+					String line;
+					while ((line = nwis.readLine()) != null) {
+						// translate from NWIS format to requested format
+						line = formatter.transform(line, rdb);
+						tmp.write(line);
+					}
+				} finally {
+					IoUtils.quiteClose(nwis);
+				}
+			}
+			// TODO
+			// } catch (Exception e) {
+			//     tmp.deleteFile();
+		} finally {
+			IoUtils.quiteClose(tmp);
+		}
+
+		return IoUtils.createTmpZipStream( tmp.getFile() );
+	}
+
+	protected BufferedReader fetchNwisData(String urlStr) throws IOException {
+		URL url = new URL(urlStr);
+		URLConnection cn = url.openConnection();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(cn.getInputStream()));
+
+		return reader;
+	}
 
 
 	public void doFetch(HttpServletRequest req, FileDownloadHandler handler)

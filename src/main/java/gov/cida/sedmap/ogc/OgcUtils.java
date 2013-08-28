@@ -3,7 +3,10 @@ package gov.cida.sedmap.ogc;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -12,17 +15,18 @@ import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.data.oracle.OracleDialect;
 import org.geotools.data.oracle.OracleFilterToSQL;
-import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.BinaryComparisonAbstract;
 import org.geotools.filter.BinaryLogicAbstract;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.JDBCFeatureReader;
 import org.geotools.jdbc.JDBCJNDIDataStoreFactory;
+import org.geotools.jdbc.NonIncrementingPrimaryKeyColumn;
+import org.geotools.jdbc.PrimaryKey;
+import org.geotools.jdbc.PrimaryKeyColumn;
 import org.geotools.xml.Parser;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Literal;
@@ -59,18 +63,29 @@ public class OgcUtils {
 		}
 	}
 
-
-	public static String ogcXml2Sql(String ogcXml) {
+	public static String ogcXmlToParameterQueryWherClause(String ogcXml) {
 		logger.debug("ogcXml2Sql");
 		// parse the OGC filter
 		Filter filter = ogcXml2Filter(ogcXml);
-
+		return ogcXmlToParameterQueryWherClause(filter);
+	}
+	public static String ogcXmlToParameterQueryWherClause(Filter filter) {
 		// convert to SQL
 		String sql="";
 		try {
 			JDBCDataStore ds = new JDBCDataStore();
-			FilterToSQL  fsql = new OracleFilterToSQL(new OracleDialect(ds));
-			sql = fsql.encodeToString(filter);
+			OracleFilterToSQL osql = new OracleFilterToSQL(new OracleDialect(ds));
+
+			List<PrimaryKeyColumn> columns = new ArrayList<PrimaryKeyColumn>();
+			columns.add(new NonIncrementingPrimaryKeyColumn("USGS_STATION_ID", String.class));
+			PrimaryKey pk = new PrimaryKey("SM_DIALY_STATION", columns);
+			osql.setPrimaryKey(pk);
+			osql.setInline(true); // prevent addition of WHERE key word in clause
+			StringWriter buf = new StringWriter();
+			osql.setWriter(buf);
+			osql.encode(filter);
+
+			sql = buf.getBuffer().toString();
 		} catch (FilterToSQLException e) {
 			throw new RuntimeException("Failed to convert to SQL",e);
 		}
@@ -162,10 +177,12 @@ public class OgcUtils {
 
 
 	// TODO this will likely need some work to be more robust
+	// used to find the literal value of the parameter.
+	// this might not be used in favor of the removeFilter method
 	public static Filter findFilter(Filter filter, String param) {
 		Filter found = null;
 
-		FilterWrapper wrapper = new FilterWrapper( (AbstractFilter) filter );
+		FilterWrapper wrapper = new FilterWrapper( filter );
 
 		if ( wrapper.isaLogicFilter() ) {
 			BinaryLogicAbstract logical = (BinaryLogicAbstract) filter;
@@ -175,8 +192,9 @@ public class OgcUtils {
 					return found;
 				}
 			}
-		} else if( wrapper.isaMathFilter() ) {
+		} else { // TODO this will fail on geometry filters and will need attention when that is incorporated
 			BinaryComparisonAbstract comp = (BinaryComparisonAbstract) filter;
+			// expression1 is the parameter name while experssion2 is the literal value
 			PropertyName property = (PropertyName) comp.getExpression1();
 			if ( property.getPropertyName().equals(param) ) {
 				return filter;
@@ -186,6 +204,51 @@ public class OgcUtils {
 		return found;
 	}
 
+	// TODO this will likely need some work to be more robust
+	// removes a filter and returns is litter value
+	// used to remove parameter query values not associated with columns in the table
+	// for example: yearStart and yearEnd would not match up to a column
+	public static String removeFilter(Filter filter, String param) {
+		return removeFilter(new FilterWrapper(filter), param);
+	}
+
+	public static String removeFilter(FilterWrapper filter, String param) {
+		String value = null;
+
+		if ( filter.isaLogicFilter() ) {
+			for (Filter child : filter.getChildren() ) {
+				FilterWrapper wrapped = new FilterWrapper(child, filter);
+				value = removeFilter(wrapped, param);
+				if (value != null) {
+					return value;
+				}
+			}
+		} else { // TODO this will fail on geometry filters and will need attention when that is incorporated
+			// expression1 is the parameter name while experssion2 is the literal value
+			PropertyName property = filter.getExpression1();
+			if ( property.getPropertyName().equals(param) ) {
+
+				filter.remove();
+				return filter.getExpression2();
+			}
+		}
+
+		return value;
+	}
+
+
+	// gets the value from a the literal portion of a filter
+	// returns null if the filter is not a literal
+	public static String getValue(Filter filter) {
+		FilterWrapper fw = new FilterWrapper(filter);
+		if ( filter instanceof FilterWrapper ) {
+			fw = (FilterWrapper)filter;
+		}
+		if ( fw.isaLiteralFilter() ) {
+			return fw.getExpression2();
+		}
+		return null;
+	}
 
 	//	StringBuilder buf = new StringBuilder();
 	//	while (reader.hasNext()) {
