@@ -2,7 +2,7 @@
 
 --This is for the sedmap schema
 
---changeset ajmccart:CreateDailySites
+--changeset ajmccart:CreatePopulateDailySites
 CREATE TABLE SEDMAP.DAILY_SITES
 (
   SITE_NO  VARCHAR2(255 BYTE)
@@ -19,15 +19,13 @@ ALTER TABLE SEDMAP.DAILY_SITES ADD (
   REFERENCES SEDMAP.SITE_REF (SITE_NO));
   
 GRANT SELECT ON SEDMAP.DAILY_SITES TO SEDUSER;
---rollback Drop table daily_sites;
 
---changeset ajmccart:PopulateDailySites
 insert into daily_sites
 select distinct "site_no" from SRC_DAILYSSL_INVENTORY_8_15_13;
---rollback truncate table daily_sites;
+--rollback Drop table daily_sites;
 
 
---changeset ajmccart:CreateDailyYears
+--changeset ajmccart:CreatePopulateDailyYears
 CREATE TABLE SEDMAP.DAILY_YEARS
 (
   SITE_NO               VARCHAR2(255 BYTE),
@@ -157,9 +155,7 @@ ALTER TABLE SEDMAP.DAILY_YEARS ADD (
   REFERENCES SEDMAP.DAILY_SITES (SITE_NO));
   
  GRANT SELECT ON SEDMAP.DAILY_YEARS TO SEDUSER; 
- --rollback Drop table daily_years;
  
- --changeset ajmccart:PopulateDailyYears
  insert into daily_years
 select "site_no",
   "station_nm"  ,
@@ -277,7 +273,7 @@ select "site_no",
   "2012",
   "2013"
    from SRC_DAILYSSL_INVENTORY_8_15_13;
---rollback truncate table daily_years;     
+ --rollback Drop table daily_years;    
   
 
 

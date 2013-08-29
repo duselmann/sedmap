@@ -2,7 +2,7 @@
 
 --This is for the sedmap schema
  
---changeset ajmccart:CreateFlowExceedance
+--changeset ajmccart:CreatePoulateFlowExceedance
 CREATE TABLE SEDMAP.FLOW_EXCEEDANCE
 (
   SITE_NO  VARCHAR2(255 BYTE),
@@ -29,9 +29,7 @@ ALTER TABLE SEDMAP.FLOW_EXCEEDANCE ADD (
   REFERENCES SEDMAP.SITE_REF (SITE_NO));
   
 GRANT SELECT ON SEDMAP.FLOW_EXCEEDANCE TO SEDUSER;
---rollback Drop table flow_exceedance;
 
---changeset ajmccart:PopulateFlowExceedance
 insert into flow_exceedance
 select "site_no",
   "nhdp1",
@@ -50,4 +48,4 @@ select "site_no",
   "nhdp95",
   "nhdp99"
    from SRC_SSC_SITE_INFO_8_27_13;
---rollback truncate table flow_exceedance;
+--rollback Drop table flow_exceedance;

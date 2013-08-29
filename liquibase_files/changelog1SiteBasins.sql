@@ -2,7 +2,7 @@
 
 --This is for the sedmap schema
  
---changeset ajmccart:CreateSiteBasins
+--changeset ajmccart:CreatePopulateSiteBasins
 CREATE TABLE SEDMAP.SITE_BASINS_REF
 (
   SITE_NO  VARCHAR2(255 BYTE),
@@ -44,9 +44,7 @@ ALTER TABLE SEDMAP.SITE_BASINS_REF ADD (
   REFERENCES SEDMAP.SITE_REF (SITE_NO));
 
 GRANT SELECT ON SEDMAP.SITE_BASINS_REF TO SEDUSER;
---rollback Drop table site_basins_ref;
 
---changeset ajmccart:PopulateSiteBasins
 insert into site_basins_ref
 select 
 "site_no",
@@ -76,4 +74,4 @@ select
   V25 ,
   V26 ,
   V27 from SRC_SEDSITES_BASINS;
---rollback truncate table site_basins_ref;  
+--rollback Drop table site_basins_ref;  

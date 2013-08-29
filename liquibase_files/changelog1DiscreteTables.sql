@@ -2,7 +2,7 @@
 
 --This is for the sedmap schema
 
---changeset ajmccart:CreateDiscreteSites
+--changeset ajmccart:CreatePopulateDiscreteSites
 CREATE TABLE SEDMAP.DISCRETE_SITES
 (
   SITE_NO  VARCHAR2(255 BYTE)
@@ -19,15 +19,13 @@ ALTER TABLE SEDMAP.DISCRETE_SITES ADD (
   REFERENCES SEDMAP.SITE_REF (SITE_NO));
   
 GRANT SELECT ON SEDMAP.DISCRETE_SITES TO SEDUSER;
---rollback Drop table discrete_sites;
 
---changeset ajmccart:PopulateDiscreteSites
 insert into discrete_sites
 select distinct "site_no" from SRC_ALLSSCDATACOMBINED_8_14_13;
---rollback truncate table discrete_sites;
+--rollback Drop table discrete_sites;
 
 
---changeset ajmccart:CreateDiscreteSample
+--changeset ajmccart:CreatePopulateDiscreteSample
 CREATE TABLE SEDMAP.DISCRETE_SAMPLE_FACT
 (
   SITE_NO        VARCHAR2(255 BYTE),
@@ -84,9 +82,7 @@ ALTER TABLE SEDMAP.DISCRETE_SAMPLE_FACT ADD (
   CONSTRAINT DISCRETE_SAMPLE_FACT_R01 
   FOREIGN KEY (SITE_NO) 
   REFERENCES SEDMAP.DISCRETE_SITES (SITE_NO));
---rollback Drop table discrete_sample_fact;  
 
---changeset ajmccart:PopulateDiscreteSample
 insert into discrete_sample_fact
 select 
 "site_no",
@@ -135,4 +131,4 @@ select
   "pH",
   "pHfield" 
    from SRC_ALLSSCDATACOMBINED_8_14_13;
- --rollback truncate table discrete_sample_fact;
+--rollback Drop table discrete_sample_fact;  
