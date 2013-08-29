@@ -1,9 +1,8 @@
 package gov.cida.sedmap.ogc;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.AbstractFilter;
 import org.opengis.feature.simple.SimpleFeature;
@@ -13,7 +12,8 @@ import org.opengis.filter.FilterVisitor;
 public class FilterWithViewParams  extends AbstractFilter implements Iterable<String> {
 
 	protected AbstractFilter delegate;
-	protected List<String> viewParams = new ArrayList<String>();
+	protected ArrayList<String> viewParamNames = new ArrayList<String>();
+	protected HashMap<String,String> viewParams = new HashMap<String,String>();
 
 
 	public FilterWithViewParams(AbstractFilter filter) {
@@ -22,17 +22,40 @@ public class FilterWithViewParams  extends AbstractFilter implements Iterable<St
 	}
 
 
-
-	public void add(String value) {
-		viewParams.add(value);
+	public String getViewParam(String name) {
+		return viewParams.get(name);
 	}
 
+
+	public void putViewParam(String name, String defaultValue, String value) {
+		viewParamNames.add(name);
+		viewParams.put(name, value==null ?defaultValue :value);
+	}
 
 
 	@Override
 	public Iterator<String> iterator() {
-		return null;
+		return new Iterator<String>() {
+			Iterator<String> names = viewParamNames.iterator();
+			@Override
+			public boolean hasNext() {
+				return names.hasNext();
+			}
+			@Override
+			public String next() {
+				return viewParams.get( names.next() );
+			}
+			@Override
+			public void remove() {
+			}
+		};
 	}
+
+
+	public AbstractFilter getFilter() {
+		return delegate;
+	}
+
 
 	@Override
 	public boolean evaluate(SimpleFeature feature) {
@@ -92,6 +115,4 @@ public class FilterWithViewParams  extends AbstractFilter implements Iterable<St
 	public String toString() {
 		return delegate.toString();
 	}
-
-
 }

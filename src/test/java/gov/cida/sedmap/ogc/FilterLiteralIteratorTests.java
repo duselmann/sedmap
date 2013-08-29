@@ -20,7 +20,7 @@ public class FilterLiteralIteratorTests {
 	public void test_singleValue() {
 		System.out.println();
 		int count = 0;
-		Filter filter = OgcUtils.ogcXml2Filter(ogc_v1_0);
+		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_0);
 		for (String value : new FilterLiteralIterator(filter)) {
 			System.out.println(value);
 			count++;
@@ -31,7 +31,7 @@ public class FilterLiteralIteratorTests {
 	public void test_multipleValues() {
 		System.out.println();
 		int count = 0;
-		Filter filter = OgcUtils.ogcXml2Filter(ogc_v1_1);
+		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
 		for (String value : new FilterLiteralIterator(filter)) {
 			System.out.println(value);
 			count++;

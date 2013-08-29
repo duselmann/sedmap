@@ -13,6 +13,7 @@ import gov.cida.sedmap.mock.MockRequest;
 import gov.cida.sedmap.mock.MockResponse;
 import gov.cida.sedmap.mock.MockResultSet;
 import gov.cida.sedmap.mock.MockRowMetaData;
+import gov.cida.sedmap.ogc.FilterWithViewParams;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,7 +37,6 @@ import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.factory.GeoTools;
 import org.junit.Before;
 import org.junit.Test;
-import org.opengis.filter.Filter;
 
 public class JdbcFetcherTest {
 
@@ -117,19 +117,19 @@ public class JdbcFetcherTest {
 	protected void initJdbcFetcherForDoFetchTesting() {
 		fetcher = new JdbcFetcher(Fetcher.SEDMAP_DS) {
 			@Override
-			protected InputStream handleNwisData(Iterator<String> sites, Filter filter, Formatter formatter)
+			protected InputStream handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
 					throws IOException, SQLException, NamingException {
 				nwisHandlerCalled = true;
 				return handleData("NWIS", filter, formatter);
 			}
 			@Override
-			protected InputStream handleLocalData(String descriptor, Filter filter, Formatter formatter)
+			protected InputStream handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
 					throws IOException, SQLException, NamingException {
 				localHandlerCalled = true;
 				return handleData(descriptor, filter, formatter);
 			}
 
-			protected InputStream handleData(String descriptor, Filter filter, Formatter formatter)
+			protected InputStream handleData(String descriptor, FilterWithViewParams filter, Formatter formatter)
 					throws IOException, SQLException, NamingException {
 				handleCount++;
 
@@ -137,7 +137,7 @@ public class JdbcFetcherTest {
 
 				if (filter != null) {
 					try {
-						where = new FilterToSQL().encodeToString(filter);
+						where = new FilterToSQL().encodeToString(filter.getFilter());
 					} catch (FilterToSQLException e) {
 						throw new SQLException("Failed to convert filter to sql where clause.",e);
 					}

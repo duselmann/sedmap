@@ -5,9 +5,12 @@ import gov.cida.sedmap.io.FileInputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.WriterWithFile;
 import gov.cida.sedmap.io.util.StringValueIterator;
+import gov.cida.sedmap.ogc.FilterWithViewParams;
 import gov.cida.sedmap.ogc.OgcUtils;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,7 +26,7 @@ import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
-import org.opengis.filter.Filter;
+import org.geotools.filter.AbstractFilter;
 
 public abstract class Fetcher {
 
@@ -49,12 +52,19 @@ public abstract class Fetcher {
 
 	public abstract Fetcher initJndiJdbcStore(String jndiJdbc) throws IOException;
 
-	protected abstract InputStream handleLocalData(String descriptor, Filter filter, Formatter formatter)
+	protected abstract InputStream handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
+			throws IOException, SQLException, NamingException;
+	protected abstract InputStream handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
 			throws IOException, SQLException, NamingException;
 
-	protected InputStream handleNwisData(Iterator<String> sites, Filter filter, Formatter formatter)
+	protected InputStream handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
 			throws IOException, SQLException, NamingException {
 		String url = NWIS_URL;
+
+		if ( !sites.hasNext() ) {
+			// return nothing if there are no sites
+			return new ByteArrayInputStream("".getBytes());
+		}
 
 		// NWIS offers RDB only
 		String format = "rdb";
@@ -62,8 +72,8 @@ public abstract class Fetcher {
 		url = url.replace("_format_",    format);
 
 		// extract expressions from the filter we can handle
-		String yr1 = OgcUtils.findFilterValue(filter, "yr1");
-		String yr2 = OgcUtils.findFilterValue(filter, "yr1");
+		String yr1 = filter.getViewParam("yr1");
+		String yr2 = filter.getViewParam("yr2");
 
 		// translate the filters to NWIS Web query params
 		String startDate = yr1 + "-01-01"; // Jan  1st of the given year
@@ -71,6 +81,9 @@ public abstract class Fetcher {
 
 		url = url.replace("_startDate_", startDate);
 		url = url.replace("_endDate_",   endDate);
+
+		boolean needHeader = true;
+		int readLineCountAfterComments = 0;
 
 		// open temp file
 		WriterWithFile tmp = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());
@@ -94,9 +107,24 @@ public abstract class Fetcher {
 
 					String line;
 					while ((line = nwis.readLine()) != null) {
+						if (line.startsWith("#")) {
+							readLineCountAfterComments = 0;
+							continue;
+						}
+						if (readLineCountAfterComments++<2) {
+							if (needHeader) {
+								if (readLineCountAfterComments==1) {
+									line = line.replace("03_00060_00003", "Discharge");
+								}
+								needHeader = readLineCountAfterComments<2;
+							} else {
+								continue;
+							}
+						}
 						// translate from NWIS format to requested format
 						line = formatter.transform(line, rdb);
 						tmp.write(line);
+						tmp.write(IoUtils.LINE_SEPARATOR);
 					}
 				} finally {
 					IoUtils.quiteClose(nwis);
@@ -130,13 +158,18 @@ public abstract class Fetcher {
 
 		handler.beginWritingFiles(); // start writing files
 
-		Iterator<String> dailySites = null;
+		Iterator<String> sites = null;
 
 		for (String site  : conf.DATA_TYPES) { // check for daily and discrete
 			if ( ! dataTypes.contains(site) ) continue;
 
 			String    ogcXml = getFilter(req, site);
-			Filter    filter = OgcUtils.ogcXml2Filter(ogcXml);
+			AbstractFilter aFilter = OgcUtils.ogcXmlToFilter(ogcXml);
+			String yr1 = OgcUtils.removeFilter(aFilter, "yr1");
+			String yr2 = OgcUtils.removeFilter(aFilter, "yr2");
+			FilterWithViewParams filter = new FilterWithViewParams(aFilter);
+			filter.putViewParam("yr1", "1900", yr1);
+			filter.putViewParam("yr2", "2100", yr2);
 
 			for (String value : conf.DATA_VALUES) { // check for sites and data
 				if ( ! dataTypes.contains(value) ) continue;
@@ -148,15 +181,20 @@ public abstract class Fetcher {
 				InputStream fileData = null;
 				try {
 					if ( "daily_data".equals(descriptor) ) {
-						fileData = handleNwisData(dailySites, filter, formatter);
-					} else {
-						fileData = handleLocalData(descriptor, filter, formatter);
-						if (descriptor.contains("daily")) dailySites = makeSiteIterator(fileData, formatter);
+						fileData = handleNwisData(sites, filter, formatter);
+						sites = null;
+					} else if ( "discrete_data".equals(descriptor) ) {
+						fileData = handleDiscreteData(sites, filter, formatter);
+						sites = null;
+					} else if (descriptor.contains("sites") ) {
+						fileData = handleSiteData(descriptor, filter, formatter);
+						sites = makeSiteIterator(fileData, formatter);
 					}
 					handler.writeFile(formatter.getContentType(), filename, fileData);
 
 				} catch (Exception e) {
 					logger.error("failed to fetch from DB", e);
+					logger.error(e);
 					// TODO empty results and err msg to user
 					return;
 				} finally {
@@ -178,19 +216,28 @@ public abstract class Fetcher {
 		LinkedList<String> sites = new LinkedList<String>();
 
 		if (fileData instanceof FileInputStreamWithFile) {
-			File file = ((FileInputStreamWithFile) fileData).getFile();
-			InputStreamReader in  = new InputStreamReader( IoUtils.createTmpZipStream(file) );
-			BufferedReader reader = new BufferedReader(in);
+			File file = ((FileInputStreamWithFile) fileData).getFile(); // TODO change to zip for temp files
+			InputStream       fin = null;// IoUtils.createTmpZipStream(file) );
+			InputStreamReader rin = null;
+			BufferedReader reader = null;
 
-			String line;
-			while ( (line=reader.readLine()) != null ) {
-				int pos = line.indexOf( formatter.getSeparator() );
-				if (pos == -1) continue; // trap empty lines
-				String site = line.substring(0, pos );
-				// only preserve site numbers and not comments or header info
-				if (site.matches("^\\d+$")) {
-					sites.add(site);
+			try {
+				fin    = new FileInputStream(file);
+				rin    = new InputStreamReader(fin);
+				reader = new BufferedReader(rin);
+
+				String line;
+				while ( (line=reader.readLine()) != null ) {
+					int pos = line.indexOf( formatter.getSeparator() );
+					if (pos == -1) continue; // trap empty lines
+					String site = line.substring(0, pos );
+					// only preserve site numbers and not comments or header info
+					if (site.matches("^\\d+$")) {
+						sites.add(site);
+					}
 				}
+			} finally {
+				IoUtils.quiteClose(reader, rin, fin);
 			}
 		}
 

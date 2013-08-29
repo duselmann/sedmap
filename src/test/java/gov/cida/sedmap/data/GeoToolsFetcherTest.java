@@ -1,5 +1,25 @@
 package gov.cida.sedmap.data;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import gov.cida.sedmap.io.FileDownloadHandler;
+import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.MultiPartHandler;
+import gov.cida.sedmap.io.util.StrUtils;
+import gov.cida.sedmap.mock.MockContext;
+import gov.cida.sedmap.mock.MockDataSource;
+import gov.cida.sedmap.mock.MockDbMetaData;
+import gov.cida.sedmap.mock.MockRequest;
+import gov.cida.sedmap.mock.MockResponse;
+import gov.cida.sedmap.mock.MockResultSet;
+import gov.cida.sedmap.mock.MockRowMetaData;
+import gov.cida.sedmap.ogc.FilterWithViewParams;
+import gov.cida.sedmap.ogc.MockDS;
+import gov.cida.sedmap.ogc.MockDbMeta;
+import gov.cida.sedmap.ogc.OgcUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -12,37 +32,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import gov.cida.sedmap.data.Column;
-import gov.cida.sedmap.data.CsvFormatter;
-import gov.cida.sedmap.data.Formatter;
-import gov.cida.sedmap.data.GeoToolsFetcher;
-import gov.cida.sedmap.data.RdbFormatter;
-import gov.cida.sedmap.io.FileDownloadHandler;
-import gov.cida.sedmap.io.IoUtils;
-import gov.cida.sedmap.io.MultiPartHandler;
-import gov.cida.sedmap.io.util.StrUtils;
-import gov.cida.sedmap.mock.MockContext;
-import gov.cida.sedmap.mock.MockDataSource;
-import gov.cida.sedmap.mock.MockDbMetaData;
-import gov.cida.sedmap.mock.MockRequest;
-import gov.cida.sedmap.mock.MockResponse;
-import gov.cida.sedmap.mock.MockResultSet;
-import gov.cida.sedmap.mock.MockRowMetaData;
-import gov.cida.sedmap.ogc.MockDS;
-import gov.cida.sedmap.ogc.MockDbMeta;
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import static org.junit.Assert.*;
 
 import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.factory.GeoTools;
 import org.junit.Before;
 import org.junit.Test;
-import org.opengis.filter.Filter;
 
 public class GeoToolsFetcherTest {
 
@@ -177,19 +176,19 @@ public class GeoToolsFetcherTest {
 	protected void initGeoToolsFetcherForDoFetchTesting() {
 		fetcher = new GeoToolsFetcher() {
 			@Override
-			protected InputStream handleNwisData(Iterator<String> sites, Filter filter, Formatter formatter)
+			protected InputStream handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
 					throws IOException, SQLException, NamingException {
 				nwisHandlerCalled = true;
 				return handleData("NWIS", filter, formatter);
 			}
 			@Override
-			protected InputStream handleLocalData(String descriptor, Filter filter, Formatter formatter)
+			protected InputStream handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
 					throws IOException, SQLException, NamingException {
 				localHandlerCalled = true;
 				return handleData(descriptor, filter, formatter);
 			}
 
-			protected InputStream handleData(String descriptor, Filter filter, Formatter formatter)
+			protected InputStream handleData(String descriptor, FilterWithViewParams filter, Formatter formatter)
 					throws IOException, SQLException, NamingException {
 				handleCount++;
 
@@ -197,7 +196,7 @@ public class GeoToolsFetcherTest {
 
 				if (filter != null) {
 					try {
-						where = new FilterToSQL().encodeToString(filter);
+						where = new FilterToSQL().encodeToString(filter.getFilter());
 					} catch (FilterToSQLException e) {
 						throw new SQLException("Failed to convert filter to sql where clause.",e);
 					}
@@ -212,7 +211,9 @@ public class GeoToolsFetcherTest {
 	@Test
 	public void handleLocalData_csv() throws Exception {
 		fetcher.initJndiJdbcStore(Fetcher.SEDMAP_DS);
-		InputStream in = fetcher.handleLocalData("discrete_sites", Filter.INCLUDE, new CsvFormatter());
+
+		FilterWithViewParams filter = new FilterWithViewParams( OgcUtils.ogcXmlToFilter(ogc_v1_0));
+		InputStream in = fetcher.handleSiteData("discrete_sites", filter, new CsvFormatter());
 		String actual  = IoUtils.readStream(in);
 		//		assertTrue("", new File("discrete_sites.csv"));
 		//		System.out.println(actual);
@@ -233,7 +234,8 @@ public class GeoToolsFetcherTest {
 	@Test
 	public void handleLocalData_rdb() throws Exception {
 		fetcher.initJndiJdbcStore(Fetcher.SEDMAP_DS);
-		InputStream in = fetcher.handleLocalData("discrete_sites", Filter.INCLUDE, new RdbFormatter());
+		FilterWithViewParams filter = new FilterWithViewParams( OgcUtils.ogcXmlToFilter(ogc_v1_0));
+		InputStream in = fetcher.handleSiteData("discrete_sites", filter, new RdbFormatter());
 		String actual  = IoUtils.readStream(in);
 		//		assertTrue("", new File("discrete_sites.csv"));
 		//		System.out.println(actual);

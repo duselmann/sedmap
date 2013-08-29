@@ -119,7 +119,7 @@ public class OgcUtilsTests {
 
 	@Test
 	public void test_removeFilter_yr1() throws Exception {
-		Filter filter = OgcUtils.ogcXml2Filter(ogc_v1_1);
+		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
 		String sql0   = OgcUtils.ogcXmlToParameterQueryWherClause(filter);
 		assertTrue("original filter should contain the yr1 param", sql0.contains("yr1"));
 
@@ -132,7 +132,7 @@ public class OgcUtilsTests {
 
 	@Test
 	public void test_removeFilter_yr1_yr2() throws Exception {
-		Filter filter = OgcUtils.ogcXml2Filter(ogc_v1_1);
+		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
 		String sql0   = OgcUtils.ogcXmlToParameterQueryWherClause(filter);
 		assertTrue("original filter should contain the yr1 param", sql0.contains("yr1"));
 		assertTrue("original filter should contain the yr1 param", sql0.contains("yr2"));
@@ -153,7 +153,7 @@ public class OgcUtilsTests {
 	@Test
 	public void test_gt_filter_extract_expression() throws Exception {
 
-		Filter filter = OgcUtils.ogcXml2Filter(ogc_v1_1);
+		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
 		assertEquals("org.geotools.filter.AndImpl", filter.getClass().getName());
 		System.out.println(filter.toString());
 
@@ -163,7 +163,7 @@ public class OgcUtilsTests {
 	}
 	@Test
 	public void test_findFilter() throws Exception {
-		Filter filter = OgcUtils.ogcXml2Filter(ogc_v1_1);
+		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
 
 		Filter year1 = OgcUtils.findFilter(filter, "yr1");
 		assertNotNull(year1);
@@ -176,7 +176,7 @@ public class OgcUtilsTests {
 	@Test
 	public void test_findFilterValue() throws Exception {
 
-		Filter filter = OgcUtils.ogcXml2Filter(ogc_v1_1);
+		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
 
 		String yr1_actual = OgcUtils.findFilterValue(filter, "yr1");
 		assertEquals("1900", yr1_actual);
@@ -191,7 +191,7 @@ public class OgcUtilsTests {
 	@Test
 	public void test_gt_dataStore_utils() throws Exception {
 		DataStore store = OgcUtils.jndiOracleDataStore(Fetcher.SEDMAP_DS);
-		Filter filter   = OgcUtils.ogcXml2Filter(ogc_v1_0);
+		Filter filter   = OgcUtils.ogcXmlToFilter(ogc_v1_0);
 		JDBCFeatureReader reader = OgcUtils.executeQuery(store, "TABLENAME", filter);
 
 		StringBuilder buf = new StringBuilder();
@@ -230,7 +230,7 @@ public class OgcUtilsTests {
 		dataStoreEnv.put( JDBCJNDIDataStoreFactory.JNDI_REFNAME.getName(), Fetcher.SEDMAP_DS);
 		DataStore store =  DataStoreFinder.getDataStore(dataStoreEnv);
 
-		Filter filter     = OgcUtils.ogcXml2Filter(ogc_v1_0);
+		Filter filter     = OgcUtils.ogcXmlToFilter(ogc_v1_0);
 		Query query       = new Query("TABLENAME", filter);
 		// the no-arg constructor interrogates the call stack for a handle
 		Transaction trans = new DefaultTransaction("test handle");
@@ -271,7 +271,7 @@ public class OgcUtilsTests {
 
 	@Test
 	public void test_ogcXml2Filter_simple_v1_0() {
-		Filter filter = OgcUtils.ogcXml2Filter(ogc_v1_0);
+		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_0);
 
 		String expected = "[ Site_Id >= 5 ]";
 		String actual   = filter.toString();

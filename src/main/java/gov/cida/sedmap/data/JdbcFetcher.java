@@ -4,6 +4,7 @@ import gov.cida.sedmap.io.FileInputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.ogc.FilterLiteralIterator;
+import gov.cida.sedmap.ogc.FilterWithViewParams;
 import gov.cida.sedmap.ogc.OgcUtils;
 
 import java.io.File;
@@ -15,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +26,6 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.jdbc.FilterToSQLException;
-import org.opengis.filter.Filter;
 
 public class JdbcFetcher extends Fetcher {
 
@@ -67,9 +68,6 @@ public class JdbcFetcher extends Fetcher {
 			+ "    and usgs_station_id=?"
 			+ "  order by usgs_station_id, datetime";
 
-	// these are appended only if there is not sample number field provided
-	//	static final String WHERE_SAMPLE_YEARS = " and sample_years > 0 ";
-	//	static final String WHERE_SAMPLE_COUNT = " and sample_count > 0 ";
 
 	protected String jndiDS;
 
@@ -77,8 +75,6 @@ public class JdbcFetcher extends Fetcher {
 		// default queries that could be changed other need like testing
 		putQuery("daily_sites",           DEFAULT_DAILY_SITE_SQL);
 		putQuery("discrete_sites",        DEFAULT_DISCRETE_SITE_SQL);
-		//		putQuery("daily_sites_amount",    WHERE_SAMPLE_YEARS);
-		//		putQuery("discrete_sites_amount", WHERE_SAMPLE_COUNT);
 		putQuery("discrete_data",         DEFAULT_DISCRETE_DATA_SQL);
 	}
 	public static void putQuery(String descriptor, String sql) {
@@ -113,7 +109,7 @@ public class JdbcFetcher extends Fetcher {
 
 
 	@Override
-	protected InputStream handleLocalData(String descriptor, Filter filter, Formatter formatter)
+	protected InputStream handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
 			throws IOException, SQLException, NamingException {
 
 		FileInputStreamWithFile fileData = null;
@@ -124,14 +120,10 @@ public class JdbcFetcher extends Fetcher {
 			List<Column> columns = getTableMetadata(tableName);
 			String header = formatter.fileHeader(columns);
 
-			// TODO need to make a container for this because the filter is used twice for site and data
-			String yr1 = OgcUtils.removeFilter(filter, "yr1");
-			String yr2 = OgcUtils.removeFilter(filter, "yr2");
-
 			String sql = buildQuery(descriptor, filter);
 			logger.debug(sql);
 			rs = initData(sql);
-			getData(rs, filter, yr1==null?"1900":yr1, yr2==null?"2100":yr2);
+			getData(rs, filter, true);
 
 			File   tmp = File.createTempFile(descriptor + StrUtils.uniqueName(12), formatter.getFileType());
 			FileWriter tmpw = new FileWriter(tmp);
@@ -156,13 +148,66 @@ public class JdbcFetcher extends Fetcher {
 
 		return fileData;
 	}
+	@Override
+	protected InputStream handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
+			throws IOException, SQLException, NamingException {
+
+		FileInputStreamWithFile fileData = null;
+		Results rs = new Results();
+
+		try {
+			String    descriptor = "descrete_data";
+			String     tableName = getDataTable(descriptor);
+			List<Column> columns = getTableMetadata(tableName);
+			String header = formatter.fileHeader(columns);
+
+			StringBuilder sitesClause = new StringBuilder();
+			String join="";
+			if (sites.hasNext()) {
+				sitesClause.append(" usgs_station_id in ( ");
+			}
+			while ( sites.hasNext() ) {
+				sitesClause.append(join).append("'").append(sites.next()).append("'");
+				join=",";
+			}
+			if (sitesClause.length()>0) {
+				sitesClause.append(" ) ");
+			}
+			logger.debug(sitesClause.toString());
+
+			String sql = getQuery(descriptor) + sitesClause.toString();
+			logger.debug(sql);
+			rs = initData(sql);
+			getData(rs, filter, false);
+
+			File   tmp = File.createTempFile(descriptor + StrUtils.uniqueName(12), formatter.getFileType());
+			FileWriter tmpw = new FileWriter(tmp);
+
+			//logger.debug(header);
+			tmpw.write(header);
+			while (rs.rs.next()) {
+				String row = formatter.fileRow(new ResultSetColumnIterator(rs.rs));
+				//logger.debug(row);
+				tmpw.write(row);
+			}
+			IoUtils.quiteClose(tmpw);
+
+			fileData = new FileInputStreamWithFile(tmp);
+			tmp.delete(); // TODO not for delayed download
+
+		} finally {
+			IoUtils.quiteClose(rs.rs, rs.ps, rs.cn);
+		}
+
+		return fileData;
+	}
 
 
-	protected String buildQuery(String descriptor, Filter filter) throws FilterToSQLException {
+	protected String buildQuery(String descriptor, FilterWithViewParams filter) throws FilterToSQLException {
 		//		FilterToSQL trans = new FilterToSQL();
 		//		trans.setInline(true);
 
-		String where = OgcUtils.ogcXmlToParameterQueryWherClause(filter);
+		String where = OgcUtils.ogcXmlToParameterQueryWherClause(filter.getFilter());
 
 		//		trans.encodeToString(filter);
 		String sql = getQuery(descriptor) + where; // + getQuery(descriptor+"_amount");
@@ -211,20 +256,23 @@ public class JdbcFetcher extends Fetcher {
 
 		return r;
 	}
-	protected Results getData(Results r, Filter filter, String ... initialParams) throws NamingException, SQLException {
+	protected Results getData(Results r, FilterWithViewParams filter, boolean doFilterValues) throws NamingException, SQLException {
 
 		try {
 			int index = 1;
-			for (String value : initialParams) {
-				logger.debug("setting value " + value);
-				r.ps.setString(index++, value);
-			}
-			FilterLiteralIterator values = new FilterLiteralIterator(filter);
-			for (String value : values) {
+			for (String value : filter) {
 				logger.debug("setting value " + value);
 				r.ps.setString(index++, value);
 			}
 
+			// this is because only sites uses the filter
+			if (doFilterValues) {
+				FilterLiteralIterator values = new FilterLiteralIterator(filter.getFilter());
+				for (String value : values) {
+					logger.debug("setting value " + value);
+					r.ps.setString(index++, value);
+				}
+			}
 			r.rs = r.ps.executeQuery();
 		} catch (SQLException e) {
 			logger.error(e);

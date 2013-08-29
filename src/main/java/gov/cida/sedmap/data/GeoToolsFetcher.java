@@ -4,18 +4,19 @@ import gov.cida.sedmap.io.FileInputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.WriterWithFile;
 import gov.cida.sedmap.ogc.FeatureValueIterator;
+import gov.cida.sedmap.ogc.FilterWithViewParams;
 import gov.cida.sedmap.ogc.OgcUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.naming.NamingException;
 
 import org.geotools.data.DataStore;
 import org.geotools.jdbc.JDBCFeatureReader;
-import org.opengis.filter.Filter;
 
 public class GeoToolsFetcher extends Fetcher {
 
@@ -45,14 +46,14 @@ public class GeoToolsFetcher extends Fetcher {
 	// this will work if the query is against a table or layer feature but not a join query
 
 	@Override
-	protected InputStream handleLocalData(String descriptor, Filter filter, Formatter formatter)
+	protected InputStream handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
 			throws IOException, SQLException, NamingException {
 		FileInputStreamWithFile fileData = null;
 
 		JDBCFeatureReader reader = null;
 		try {
 			String tableName = getDataTable(descriptor);
-			reader = OgcUtils.executeQuery(store, tableName, filter);
+			reader = OgcUtils.executeQuery(store, tableName, filter.getFilter());
 
 			WriterWithFile tmp = IoUtils.createTmpZipWriter(descriptor, formatter.getFileType());
 
@@ -79,5 +80,13 @@ public class GeoToolsFetcher extends Fetcher {
 		}
 
 		return fileData;
+	}
+
+
+	@Override
+	protected InputStream handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
+			throws IOException, SQLException, NamingException {
+		// TODO IMPL
+		throw new RuntimeException("Not yet impl");
 	}
 }

@@ -18,6 +18,7 @@ import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.data.oracle.OracleDialect;
 import org.geotools.data.oracle.OracleFilterToSQL;
+import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.BinaryComparisonAbstract;
 import org.geotools.filter.BinaryLogicAbstract;
 import org.geotools.jdbc.JDBCDataStore;
@@ -48,14 +49,14 @@ public class OgcUtils {
 	}
 
 
-	public static Filter ogcXml2Filter(String ogcXml) {
+	public static AbstractFilter ogcXmlToFilter(String ogcXml) {
 		try {
 			logger.debug("ogcXml2Filter");
 			// parse the OGC filter
 			ByteArrayInputStream ogcStream = new ByteArrayInputStream( ogcXml.getBytes() );
 			Parser parser = new Parser( new org.geotools.filter.v1_1.OGCConfiguration() );
 			Filter filter = (Filter) parser.parse( ogcStream );
-			return filter;
+			return (AbstractFilter)filter;
 		} catch (Exception e) {
 			// 			throws IOException, SAXException, ParserConfigurationException
 			// TODO handle the exceptions
@@ -66,7 +67,7 @@ public class OgcUtils {
 	public static String ogcXmlToParameterQueryWherClause(String ogcXml) {
 		logger.debug("ogcXml2Sql");
 		// parse the OGC filter
-		Filter filter = ogcXml2Filter(ogcXml);
+		Filter filter = ogcXmlToFilter(ogcXml);
 		return ogcXmlToParameterQueryWherClause(filter);
 	}
 	public static String ogcXmlToParameterQueryWherClause(Filter filter) {
