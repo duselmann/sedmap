@@ -65,7 +65,7 @@ public class JdbcFetcher extends Fetcher {
 			+ "   from sm_inst_sample_fact "
 			+ "  where EXTRACT(year FROM datetime)>=? " // yr1
 			+ "    and EXTRACT(year FROM datetime)<=? " // yr2
-			+ "    and usgs_station_id=?"
+			+ "    and usgs_station_id in (_siteList_) "
 			+ "  order by usgs_station_id, datetime";
 
 
@@ -156,26 +156,21 @@ public class JdbcFetcher extends Fetcher {
 		Results rs = new Results();
 
 		try {
-			String    descriptor = "descrete_data";
+			String    descriptor = "discrete_data";
 			String     tableName = getDataTable(descriptor);
 			List<Column> columns = getTableMetadata(tableName);
 			String header = formatter.fileHeader(columns);
 
 			StringBuilder sitesClause = new StringBuilder();
 			String join="";
-			if (sites.hasNext()) {
-				sitesClause.append(" usgs_station_id in ( ");
-			}
 			while ( sites.hasNext() ) {
 				sitesClause.append(join).append("'").append(sites.next()).append("'");
 				join=",";
 			}
-			if (sitesClause.length()>0) {
-				sitesClause.append(" ) ");
-			}
 			logger.debug(sitesClause.toString());
 
-			String sql = getQuery(descriptor) + sitesClause.toString();
+			String sql = getQuery(descriptor);
+			sql=sql.replace("_siteList_", sitesClause.toString() );
 			logger.debug(sql);
 			rs = initData(sql);
 			getData(rs, filter, false);

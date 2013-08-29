@@ -184,6 +184,7 @@ public class FetcherConfig {
 			logger.info("Collected " +columnData.size()+ " columns metadata for table " +tableName);
 			return columnData;
 		} catch (Exception e) {
+			logger.error("failed to load table metadata " + tableName);
 			handleMetadataException(e);
 		} finally {
 			IoUtils.quiteClose(rs,st,cn);
