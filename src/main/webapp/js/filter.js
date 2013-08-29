@@ -45,7 +45,7 @@ function setupFilters() {
 
     minSamples = new Filters.Value({
         class:"minSamples",
-        field:'SAMPLE_YEARS', 
+        field:'SAMPLE_COUNT', 
         el:'minSamples', 
         size:8,
         maxlength:12,
