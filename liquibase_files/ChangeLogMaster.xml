@@ -12,13 +12,15 @@
 
 
 	<include file="changelog1SiteRef.sql" relativeToChangelogFile="true"/>
-	<include file="changelog1DailyTables.sql" relativeToChangelogFile="true"/>
+    <include file="changelog1DailyTables.sql" relativeToChangelogFile="true"/>
 	<include file="changelog1DiscreteTables.sql" relativeToChangelogFile="true"/>
 	<include file="changelog1FlowExceedance.sql" relativeToChangelogFile="true"/>
 	<include file="changelog1SiteBasins.sql" relativeToChangelogFile="true"/>
-
+	
+	
 	<include file="changelog1DailyYear.sql" relativeToChangelogFile="true"/>
     <include file="changelog1Views.sql" relativeToChangelogFile="true"/>
     <include file="changelog1SiteRefNewColumns.sql" relativeToChangelogFile="true"/>
+
 
 </databaseChangeLog>
