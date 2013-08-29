@@ -47,8 +47,8 @@ public class CharSepFormatter implements Formatter {
 
 		if ( ! SEPARATOR.equals( from.getSeparator() ) ) {
 			// String.replaceAll uses regex string and comma is a special char
-			while ( line.contains(SEPARATOR) ) {
-				line = line.replace(SEPARATOR, from.getSeparator());
+			while ( line.contains(from.getSeparator()) ) {
+				line = line.replace(from.getSeparator(), SEPARATOR);
 			}
 		}
 		return line;

@@ -84,6 +84,7 @@ public abstract class Fetcher {
 
 		boolean needHeader = true;
 		int readLineCountAfterComments = 0;
+		int headerLines = formatter instanceof RdbFormatter ?2 :1;
 
 		// open temp file
 		WriterWithFile tmp = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());
@@ -116,7 +117,7 @@ public abstract class Fetcher {
 								if (readLineCountAfterComments==1) {
 									line = line.replace("03_00060_00003", "Discharge");
 								}
-								needHeader = readLineCountAfterComments<2;
+								needHeader = readLineCountAfterComments < headerLines;
 							} else {
 								continue;
 							}

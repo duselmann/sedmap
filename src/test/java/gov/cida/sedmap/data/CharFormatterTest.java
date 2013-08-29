@@ -52,11 +52,11 @@ public class CharFormatterTest {
 
 
 	@Test
-	public void transform_comma2pip() throws Exception {
+	public void transform_comma2pipe() throws Exception {
 		CharSepFormatter pip = new CharSepFormatter("","|","");
 		CharSepFormatter com = new CharSepFormatter("",",","");
 		String expect = "Site_Id|Latitude|Longitude|create_date";
-		String actual = com.transform("Site_Id,Latitude,Longitude,create_date", pip);
+		String actual = pip.transform("Site_Id,Latitude,Longitude,create_date", com);
 		assertEquals(expect,actual);
 	}
 
