@@ -1083,18 +1083,18 @@ public class MockDbMetaData implements DatabaseMetaData {
 
 	}
 
-	@Override
-	public ResultSet getPseudoColumns(String catalog, String schemaPattern,
-			String tableNamePattern, String columnNamePattern)
-					throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-
-	}
-
-	@Override
-	public boolean generatedKeyAlwaysReturned() throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-
-	}
+	//	@Override
+	//	public ResultSet getPseudoColumns(String catalog, String schemaPattern,
+	//			String tableNamePattern, String columnNamePattern)
+	//					throws SQLException {
+	//		throw new RuntimeException("Not mocked for testing");
+	//
+	//	}
+	//
+	//	@Override
+	//	public boolean generatedKeyAlwaysReturned() throws SQLException {
+	//		throw new RuntimeException("Not mocked for testing");
+	//
+	//	}
 
 }

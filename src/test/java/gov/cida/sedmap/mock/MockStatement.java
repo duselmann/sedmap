@@ -262,14 +262,15 @@ public class MockStatement implements Statement {
 		throw new RuntimeException("Not mocked for testing");
 
 	}
-	@Override
-	public void closeOnCompletion() throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
 
-	}
-	@Override
-	public boolean isCloseOnCompletion() throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-	}
+	//	@Override
+	//	public void closeOnCompletion() throws SQLException {
+	//		throw new RuntimeException("Not mocked for testing");
+	//
+	//	}
+	//	@Override
+	//	public boolean isCloseOnCompletion() throws SQLException {
+	//		throw new RuntimeException("Not mocked for testing");
+	//	}
 
 }

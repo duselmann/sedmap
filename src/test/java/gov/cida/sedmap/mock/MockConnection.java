@@ -19,7 +19,6 @@ import java.sql.Statement;
 import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.Executor;
 
 // this mock connection returns a mock statement
 public class MockConnection implements Connection {
@@ -349,30 +348,30 @@ public class MockConnection implements Connection {
 
 	}
 
-	@Override
-	public void setSchema(String schema) throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-
-	}
-	@Override
-	public String getSchema() throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-	}
-	@Override
-	public void abort(Executor executor) throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-
-	}
-	@Override
-	public void setNetworkTimeout(Executor executor, int milliseconds)
-			throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-
-	}
-	@Override
-	public int getNetworkTimeout() throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
-	}
+	//	@Override
+	//	public void setSchema(String schema) throws SQLException {
+	//		throw new RuntimeException("Not mocked for testing");
+	//
+	//	}
+	//	@Override
+	//	public String getSchema() throws SQLException {
+	//		throw new RuntimeException("Not mocked for testing");
+	//	}
+	//	@Override
+	//	public void abort(Executor executor) throws SQLException {
+	//		throw new RuntimeException("Not mocked for testing");
+	//
+	//	}
+	//	@Override
+	//	public void setNetworkTimeout(Executor executor, int milliseconds)
+	//			throws SQLException {
+	//		throw new RuntimeException("Not mocked for testing");
+	//
+	//	}
+	//	@Override
+	//	public int getNetworkTimeout() throws SQLException {
+	//		throw new RuntimeException("Not mocked for testing");
+	//	}
 
 }
 

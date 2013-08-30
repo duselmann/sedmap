@@ -5,11 +5,8 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
-
 import javax.sql.DataSource;
 
 public class MockDataSource implements DataSource {
@@ -103,9 +100,10 @@ public class MockDataSource implements DataSource {
 		throw new RuntimeException("Not mocked for testing");
 
 	}
-	@Override
-	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-		throw new RuntimeException("Not mocked for testing");
-	}
+
+	//	@Override
+	//	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+	//		throw new RuntimeException("Not mocked for testing");
+	//	}
 
 }
