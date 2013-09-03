@@ -99,6 +99,8 @@ public class IoUtils {
 	public static WriterWithFile createTmpZipWriter(String fileName, String extention) throws IOException {
 		File   file = File.createTempFile(fileName + StrUtils.uniqueName(12), ".zip");
 
+		logger.info(file.getAbsolutePath());
+
 		FileOutputStream out   = new FileOutputStream(file);
 		ZipOutputStream zip    = new ZipOutputStream(out);
 		ZipEntry entry         = new ZipEntry(fileName + extention);

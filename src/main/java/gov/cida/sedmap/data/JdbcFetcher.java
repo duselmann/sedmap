@@ -175,7 +175,9 @@ public class JdbcFetcher extends Fetcher {
 			rs = initData(sql);
 			getData(rs, filter, false);
 
+			// TODO use IoUtils tmp file creator
 			File   tmp = File.createTempFile(descriptor + StrUtils.uniqueName(12), formatter.getFileType());
+			logger.info(tmp.getAbsolutePath());
 			FileWriter tmpw = new FileWriter(tmp);
 
 			//logger.debug(header);
