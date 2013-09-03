@@ -126,6 +126,7 @@ public class JdbcFetcher extends Fetcher {
 			getData(rs, filter, true);
 
 			File   tmp = File.createTempFile(descriptor + StrUtils.uniqueName(12), formatter.getFileType());
+			logger.debug(tmp.getAbsolutePath());
 			FileWriter tmpw = new FileWriter(tmp);
 
 			//logger.debug(header);
@@ -138,7 +139,7 @@ public class JdbcFetcher extends Fetcher {
 			IoUtils.quiteClose(tmpw);
 
 			fileData = new FileInputStreamWithFile(tmp);
-			tmp.delete(); // TODO not for delayed download
+			//tmp.delete(); // TODO not for delayed download
 
 		} catch (FilterToSQLException e) {
 			throw new SQLException("Failed to convert filter to sql where clause.",e);
@@ -177,7 +178,7 @@ public class JdbcFetcher extends Fetcher {
 
 			// TODO use IoUtils tmp file creator
 			File   tmp = File.createTempFile(descriptor + StrUtils.uniqueName(12), formatter.getFileType());
-			logger.info(tmp.getAbsolutePath());
+			logger.debug(tmp.getAbsolutePath());
 			FileWriter tmpw = new FileWriter(tmp);
 
 			//logger.debug(header);
@@ -190,7 +191,7 @@ public class JdbcFetcher extends Fetcher {
 			IoUtils.quiteClose(tmpw);
 
 			fileData = new FileInputStreamWithFile(tmp);
-			tmp.delete(); // TODO not for delayed download
+			//tmp.delete(); // TODO not for delayed download
 
 		} finally {
 			IoUtils.quiteClose(rs.rs, rs.ps, rs.cn);

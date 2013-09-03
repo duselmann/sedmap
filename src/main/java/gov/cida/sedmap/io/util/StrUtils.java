@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 public class StrUtils {
 
 	private static final Logger logger = Logger.getLogger(StrUtils.class);
-	public static final String CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-~";
+	public static final String CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 
 	public static int occurrences(String substr, String str) {
