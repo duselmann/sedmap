@@ -142,6 +142,7 @@ var clearFilters = function(parentGroup) {
 	$.each(Filters.Instances[parentGroup], function(i,filter){
 		filter.clear()
 	})
+	applyFilters(parentGroup)
 }
 
 
