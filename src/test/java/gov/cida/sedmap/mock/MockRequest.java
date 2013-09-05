@@ -60,6 +60,11 @@ public class MockRequest implements HttpServletRequest {
 	}
 
 
+
+	// unimplemented methods //
+
+
+
 	@Override
 	public String getCharacterEncoding() {
 		throw new RuntimeException("Not mocked for testing");

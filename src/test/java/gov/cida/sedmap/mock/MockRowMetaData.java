@@ -38,6 +38,11 @@ public class MockRowMetaData implements ResultSetMetaData {
 	}
 
 
+
+	// unimplemented methods //
+
+
+
 	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {
 		throw new RuntimeException("Not mocked for testing");

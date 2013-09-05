@@ -53,19 +53,19 @@ public class CharFormatterTest {
 
 	@Test
 	public void transform_comma2pipe() throws Exception {
-		CharSepFormatter pip = new CharSepFormatter("","|","");
-		CharSepFormatter com = new CharSepFormatter("",",","");
+		CharSepFormatter pipe = new CharSepFormatter("","|","");
+		CharSepFormatter coma = new CharSepFormatter("",",","");
 		String expect = "Site_Id|Latitude|Longitude|create_date";
-		String actual = pip.transform("Site_Id,Latitude,Longitude,create_date", com);
+		String actual = pipe.transform("Site_Id,Latitude,Longitude,create_date", coma);
 		assertEquals(expect,actual);
 	}
 
 
 	@Test
 	public void transform_noChange() throws Exception {
-		CharSepFormatter pip = new CharSepFormatter("","|","");
+		CharSepFormatter pipe = new CharSepFormatter("","|","");
 		String expect = "Site_Id|Latitude|Longitude|create_date";
-		String actual = pip.transform(expect, pip);
+		String actual = pipe.transform(expect, pipe);
 		assertEquals(expect,actual);
 		assertTrue(expect==actual); // pointer check intentional
 	}
@@ -89,6 +89,7 @@ public class CharFormatterTest {
 	public void getFileHeader() throws Exception {
 		String actual = new CharSepFormatter("","|","").fileHeader(cols);
 		String expect = "Site_Id|Latitude|Longitude|create_date"+IoUtils.LINE_SEPARATOR;
+		System.out.println(actual);
 		assertEquals(expect,actual);
 	}
 
@@ -98,6 +99,7 @@ public class CharFormatterTest {
 		rs.open();
 		rs.next();
 		String actual = new CharSepFormatter("","|","").fileRow(new ResultSetColumnIterator(rs));
+		System.out.println(actual);
 		String expect = "1234567891|40.1|-90.1|1901-01-01"+IoUtils.LINE_SEPARATOR;
 		assertEquals(expect,actual);
 	}
@@ -109,6 +111,7 @@ public class CharFormatterTest {
 		rs.next(); // by pass first row
 		rs.next();
 		String actual = new CharSepFormatter("","|","").fileRow( new ResultSetColumnIterator(rs) );
+		System.out.println(actual);
 		String expect = "\"12345678|2\"|40.2|-90.2|1902-02-02"+IoUtils.LINE_SEPARATOR;
 		assertEquals(expect,actual);
 	}

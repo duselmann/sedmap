@@ -69,6 +69,16 @@ public class RdbFormatterTest {
 		assertTrue(actual.endsWith(expect));
 	}
 
+	@Test
+	public void getFileRows() throws Exception {
+		rs.open();
+		rs.next();
+		String actual = new RdbFormatter().fileRow(new ResultSetColumnIterator(rs));
+		System.out.println(actual);
+		String expect = "1234567891\t40.1\t-90.1\t1901-01-01"+IoUtils.LINE_SEPARATOR;
+		assertEquals(expect,actual);
+	}
+
 
 	@Test
 	public void constructor() throws Exception {

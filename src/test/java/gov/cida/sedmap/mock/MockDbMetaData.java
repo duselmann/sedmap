@@ -8,6 +8,12 @@ import java.sql.SQLException;
 
 public class MockDbMetaData implements DatabaseMetaData {
 
+
+
+	// unimplemented methods //
+
+
+
 	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {
 		throw new RuntimeException("Not mocked for testing");

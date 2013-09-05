@@ -1,6 +1,7 @@
 package gov.cida.sedmap.data;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import gov.cida.sedmap.io.FileDownloadHandler;
@@ -25,6 +26,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 
 import javax.naming.Context;
@@ -42,8 +44,8 @@ public class JdbcFetcherTest {
 
 	String ogc_v1_0 = "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:gml=\"http://www.opengis.net/gml\"> "
 			+ "        <ogc:PropertyIsGreaterThanOrEqualTo>"
-			+ "        <ogc:PropertyName>attName</ogc:PropertyName>"
-			+ "        <ogc:Literal>5</ogc:Literal>"
+			+ "        <ogc:PropertyName>Site_Id</ogc:PropertyName>"
+			+ "        <ogc:Literal>1234567891</ogc:Literal>"
 			+ "        </ogc:PropertyIsGreaterThanOrEqualTo>"
 			+ "        </ogc:Filter>";
 
@@ -52,6 +54,7 @@ public class JdbcFetcherTest {
 	Map<String,Object> ctxenv;
 	Map<String,String> params;
 	MockContext        ctx;
+
 	MockDataSource     ds;
 	MockResultSet      rs;
 	MockRowMetaData    md;
@@ -69,6 +72,7 @@ public class JdbcFetcherTest {
 		nwisHandlerCalled  = false;
 		localHandlerCalled = false;
 		handleCount        = 0;
+		params = new HashMap<String, String>();
 
 		rs  = new MockResultSet();
 		rs.addMockRow("1234567891",40.1,-90.1,new Date(01,1-1,1));
@@ -83,7 +87,6 @@ public class JdbcFetcherTest {
 
 		// populate env and params
 		ds  = new MockDataSource();
-		params = new HashMap<String, String>();
 		ctxenv = new HashMap<String, Object>();
 		ctxenv.put(Fetcher.SEDMAP_DS, ds);
 		// link ctx to data service for testing
@@ -148,59 +151,74 @@ public class JdbcFetcherTest {
 		};
 	}
 
-	//
-	//	@Test
-	//	public void handleLocalData_csv() throws Exception {
-	//		fetcher = new JdbcFetcher(Fetcher.SEDMAP_DS) {
-	//			@Override
-	//			protected String buildQuery(String descriptor, Filter filter)
-	//					throws FilterToSQLException {
-	//				return "select * from SM_INST_STATIONS";
-	//			}
-	//		};
-	//		InputStream in = fetcher.handleLocalData("discrete_sites", Filter.INCLUDE, new CsvFormatter());
-	//		String actual  = IoUtils.readStream(in);
-	//		//		assertTrue("", new File("discrete_sites.csv"));
-	//		//		System.out.println(actual);
-	//
-	//		assertNotNull("data should not be null", actual);
-	//		assertTrue("data should not be empty", actual.trim().length()>0);
-	//
-	//		String expect = "Site_Id,Latitude,Longitude,create_date";
-	//		System.out.println(actual);
-	//		assertTrue("file should contain header row", actual.startsWith(expect));
-	//
-	//		assertEquals("expect three rows of data", 3, StrUtils.occurrences("123456789", actual));
-	//		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567891", actual));
-	//		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567892", actual));
-	//		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567893", actual));
-	//	}
-	//
-	//	@Test
-	//	public void handleLocalData_rdb() throws Exception {
-	//		fetcher = new JdbcFetcher(Fetcher.SEDMAP_DS) {
-	//			@Override
-	//			protected String buildQuery(String descriptor, Filter filter)
-	//					throws FilterToSQLException {
-	//				return "select * from SM_INST_STATIONS";
-	//			}
-	//		};
-	//		InputStream in = fetcher.handleLocalData("discrete_sites", Filter.INCLUDE, new RdbFormatter());
-	//		String actual  = IoUtils.readStream(in);
-	//		//		assertTrue("", new File("discrete_sites.csv"));
-	//		//		System.out.println(actual);
-	//
-	//		assertNotNull("data should not be null", actual);
-	//		assertTrue("data should not be empty", actual.trim().length()>0);
-	//
-	//		String expect = "Site_Id	Latitude	Longitude	create_date";
-	//		assertEquals("file should contain header row", 1, StrUtils.occurrences(expect, actual));
-	//
-	//		assertEquals("expect three rows of data", 3, StrUtils.occurrences("123456789", actual));
-	//		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567891", actual));
-	//		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567892", actual));
-	//		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567893", actual));
-	//	}
+
+	@Test
+	public void handleLocalData_csv() throws Exception {
+		fetcher = new JdbcFetcher(Fetcher.SEDMAP_DS) {
+			@Override
+			protected String buildQuery(String descriptor, FilterWithViewParams filter)
+					throws FilterToSQLException {
+				return "select * from SM_INST_STATIONS";
+			}
+		};
+		FilterWithViewParams filter = new FilterWithViewParams(null) {
+			@Override
+			public Iterator<String> iterator() {
+				return new LinkedList<String>().iterator();
+			}
+		};
+		InputStream in = fetcher.handleSiteData("discrete_sites", filter, new CsvFormatter());
+		String actual  = IoUtils.readStream(in);
+		//		assertTrue("", new File("discrete_sites.csv"));
+		//		System.out.println(actual);
+
+		assertNotNull("data should not be null", actual);
+		assertTrue("data should not be empty", actual.trim().length()>0);
+
+		String expect = "Site_Id,Latitude,Longitude,create_date";
+		System.out.println();
+		System.out.println(actual);
+		assertTrue("file should contain header row", actual.startsWith(expect));
+
+		assertEquals("expect three rows of data", 3, StrUtils.occurrences("123456789", actual));
+		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567891", actual));
+		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567892", actual));
+		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567893", actual));
+	}
+
+	@Test
+	public void handleLocalData_rdb() throws Exception {
+		fetcher = new JdbcFetcher(Fetcher.SEDMAP_DS) {
+			@Override
+			protected String buildQuery(String descriptor, FilterWithViewParams filter)
+					throws FilterToSQLException {
+				return "select * from SM_INST_STATIONS";
+			}
+		};
+		FilterWithViewParams filter = new FilterWithViewParams(null) {
+			@Override
+			public Iterator<String> iterator() {
+				return new LinkedList<String>().iterator();
+			}
+		};
+		InputStream in = fetcher.handleSiteData("discrete_sites", filter, new RdbFormatter());
+		String actual  = IoUtils.readStream(in);
+		System.out.println();
+		System.out.println(actual);
+		//		assertTrue("", new File("discrete_sites.csv"));
+		//		System.out.println(actual);
+
+		assertNotNull("data should not be null", actual);
+		assertTrue("data should not be empty", actual.trim().length()>0);
+
+		String expect = "Site_Id	Latitude	Longitude	create_date";
+		assertEquals("file should contain header row", 1, StrUtils.occurrences(expect, actual));
+
+		assertEquals("expect three rows of data", 3, StrUtils.occurrences("123456789", actual));
+		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567891", actual));
+		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567892", actual));
+		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567893", actual));
+	}
 
 	@Test
 	public void doFetch_2Files_noNWIS() throws Exception {

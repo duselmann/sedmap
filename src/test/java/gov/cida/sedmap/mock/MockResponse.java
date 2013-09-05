@@ -66,6 +66,12 @@ public class MockResponse implements HttpServletResponse {
 		contentType = type;
 	}
 
+
+
+	// unimplemented methods //
+
+
+
 	@Override
 	public void setBufferSize(int size) {
 		throw new RuntimeException("Not mocked for testing");

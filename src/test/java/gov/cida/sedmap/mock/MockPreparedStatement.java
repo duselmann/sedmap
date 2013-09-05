@@ -34,6 +34,13 @@ public class MockPreparedStatement extends MockStatement implements PreparedStat
 		return super.executeQuery(sql);
 	}
 
+
+
+
+	// unimplemented methods //
+
+
+
 	@Override
 	public int executeUpdate() throws SQLException {
 		throw new RuntimeException("Not mocked for testing");

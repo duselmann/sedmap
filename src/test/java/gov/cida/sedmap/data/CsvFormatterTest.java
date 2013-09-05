@@ -41,7 +41,7 @@ public class CsvFormatterTest {
 		md.addMetadata(cols);
 
 		rs.addMockRow("1234567891",40.1,-90.1,new Date(01,1-1,1));
-		rs.addMockRow("1234567892",40.2,-90.2,new Date(02,2-1,2));
+		rs.addMockRow("12345678,2",40.2,-90.2,new Date(02,2-1,2));
 		rs.addMockRow("1234567893",40.3,-90.3,new Date(03,3-1,3));
 
 		sql = "select * from dual";
@@ -56,9 +56,20 @@ public class CsvFormatterTest {
 	public void getFileHeader() throws Exception {
 		String actual = new CsvFormatter().fileHeader(cols);
 		String expect = "Site_Id,Latitude,Longitude,create_date"+IoUtils.LINE_SEPARATOR;
+		System.out.println(actual);
 		assertEquals(expect,actual);
 	}
 
+	@Test
+	public void getFileRows_ensureQuoteAroundDataContainingDelimitor() throws Exception {
+		rs.open();
+		rs.next(); // by pass first row
+		rs.next();
+		String actual = new CsvFormatter().fileRow( new ResultSetColumnIterator(rs) );
+		System.out.println(actual);
+		String expect = "\"12345678,2\",40.2,-90.2,1902-02-02"+IoUtils.LINE_SEPARATOR;
+		assertEquals(expect,actual);
+	}
 
 	@Test
 	public void constructor() throws Exception {

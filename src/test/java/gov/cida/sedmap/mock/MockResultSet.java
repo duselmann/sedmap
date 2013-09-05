@@ -78,6 +78,12 @@ public class MockResultSet implements ResultSet {
 
 	}
 
+
+
+	// unimplemented methods //
+
+
+
 	@Override
 	public int getInt(int columnIndex) throws SQLException {
 		throw new RuntimeException("Not mocked for testing");

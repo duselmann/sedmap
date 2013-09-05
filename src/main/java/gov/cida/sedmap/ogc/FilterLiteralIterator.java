@@ -14,8 +14,10 @@ public class FilterLiteralIterator implements Iterable<String>, Iterator<String>
 
 
 	public FilterLiteralIterator(Filter filter) {
-		parent = new FilterWrapper(filter);
-		next   = new FilterWrapperDepthFirstIterator(filter);
+		if (filter != null) {
+			parent = new FilterWrapper(filter);
+			next   = new FilterWrapperDepthFirstIterator(filter);
+		}
 		nextFilter();
 		oneLastValue = next!=null;
 	}

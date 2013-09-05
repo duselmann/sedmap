@@ -17,6 +17,7 @@ import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Struct;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
@@ -72,6 +73,10 @@ public class MockConnection implements Connection {
 
 
 
+	// unimplemented methods //
+
+
+
 	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {
 		throw new RuntimeException("Not mocked for testing");
@@ -87,8 +92,19 @@ public class MockConnection implements Connection {
 	@Override
 	public PreparedStatement prepareStatement(String sql)
 			throws SQLException {
-		throw new RuntimeException("Not mocked for testing");
 
+		MockPreparedStatement ps = new MockPreparedStatement(sql) {
+			Map<Integer, Object> params = new HashMap<Integer, Object>();
+			@Override
+			public void setFetchSize(int rows) throws SQLException { }
+
+			@Override
+			public void setString(int index, String value) throws SQLException {
+				params.put(index,value);
+			}
+		};
+		ps.conn = this;
+		return ps;
 	}
 
 	@Override

@@ -30,6 +30,12 @@ public class MockStatement implements Statement {
 		return conn;
 	}
 
+
+
+	// unimplemented methods //
+
+
+
 	@Override
 	public void setFetchSize(int rows) throws SQLException {
 

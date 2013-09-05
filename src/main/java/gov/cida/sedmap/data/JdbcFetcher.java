@@ -35,38 +35,38 @@ public class JdbcFetcher extends Fetcher {
 	private static final Map<String,String> dataQueries  = new HashMap<String, String>();
 
 	public static final String DEFAULT_DAILY_SITE_SQL = "" // this is for consistent formatting
-			+ " select s.*, HUC_12 as HUC_8, "
+			+ " select s.*, "
 			+ "   NVL(y.sample_years,0) as sample_years "
-			+ " from SM_DAILY_STATIONS s "
+			+ " from DAILY_SITES s "
 			+ " left join ( "
-			+ "    select usgs_station_id, count(*) sample_years "
-			+ "      from sm_daily_year y "
+			+ "    select site_id, count(*) sample_years "
+			+ "      from daily_year y "
 			+ "     where y.SAMPLE_YEAR>=? " //yr1
 			+ "       and y.SAMPLE_YEAR<=? " //yr2
-			+ "     group by usgs_station_id) y "
-			+ "   on (y.usgs_station_id = s.usgs_station_id) "
+			+ "     group by site_id) y "
+			+ "   on (y.site_id = s.site_id) "
 			+ " where sample_years > 0 and ";
 
 	static final String DEFAULT_DISCRETE_SITE_SQL = ""
-			+ " select s.*, s.HUC_12 as HUC_8, "
+			+ " select s.*, "
 			+ "   NVL(y.sample_count,0) as sample_count "
-			+ " from SM_INST_STATIONS s "
+			+ " from DISCRETE_SITES s "
 			+ " left join ( "
-			+ "    select usgs_station_id, count(*) sample_count "
-			+ "      from sm_inst_sample_fact y "
+			+ "    select site_id, count(*) sample_count "
+			+ "      from discrete_sample_fact y "
 			+ "     where EXTRACT(year FROM y.datetime)>=? " // yr1
 			+ "       and EXTRACT(year FROM y.datetime)<=? " // yr2
-			+ "     group by usgs_station_id) y "
-			+ "   on (y.usgs_station_id = s.usgs_station_id) "
+			+ "     group by site_id) y "
+			+ "   on (y.site_id = s.site_id) "
 			+ " where sample_count > 0 and ";
 
 	static final String DEFAULT_DISCRETE_DATA_SQL = ""
 			+ " select * "
-			+ "   from sm_inst_sample_fact "
+			+ "   from discrete_sample_fact "
 			+ "  where EXTRACT(year FROM datetime)>=? " // yr1
 			+ "    and EXTRACT(year FROM datetime)<=? " // yr2
-			+ "    and usgs_station_id in (_siteList_) "
-			+ "  order by usgs_station_id, datetime";
+			+ "    and site_id in (_siteList_) " // replaced with list of sites
+			+ "  order by site_id, datetime";
 
 
 	protected String jndiDS;
@@ -131,7 +131,7 @@ public class JdbcFetcher extends Fetcher {
 
 			//logger.debug(header);
 			tmpw.write(header);
-			while (rs.rs.next()) {
+			while ( rs.rs.next() ) {
 				String row = formatter.fileRow(new ResultSetColumnIterator(rs.rs));
 				//logger.debug(row);
 				tmpw.write(row);
