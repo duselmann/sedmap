@@ -11,6 +11,7 @@ var agLand
 var forestLand
 var soilKfactor
 var ecoNum
+var usgsStation
 
 function setupFilters() {
 	
@@ -73,6 +74,23 @@ function setupFilters() {
                 	"Daily Sites",
                 ]
     })
+    
+    usgsStation = new Filters.Value({
+        class:"usgsStationId",
+        field:'SITE_NO', 
+        el:'USGS_STATION_ID', 
+        size:11,
+        maxlength:15,
+        parent:'#filterDiv', 
+        group:'#Site-Characteristics',
+        label:'USGS Station ID:',
+        pattern: /^\d+$/,
+        patternMsg: "Expecting a positive number",
+        layers:[    "Discrete Sites",
+                    "Daily Sites",
+                ]
+    })
+    
     
     drainArea = new Filters.Range({
         class:"drainage",
