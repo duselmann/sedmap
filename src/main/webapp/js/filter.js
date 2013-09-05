@@ -15,7 +15,7 @@ var ecoNum
 function setupFilters() {
 	
 	benchmark = new Filters.Bool({
-	    field:'REFERENCE_SITE', 
+	    field:'BENCHMARK_SITE', 
 	    trueVal:'1', 
 	    el:'refonly', 
 	    parent:'#filterDiv', 
@@ -60,7 +60,7 @@ function setupFilters() {
 	
     gageBasin = new Filters.Value({
         class:"gagebasin",
-        field:'USGS_STATION_ID', 
+        field:'SITE_BASIN_REF', 
         el:'GAGE_BASIN_ID', 
         size:11,
         maxlength:15,
@@ -76,7 +76,7 @@ function setupFilters() {
     
     drainArea = new Filters.Range({
         class:"drainage",
-        field:'DA', 
+        field:'NWISDA1', 
         el:'DRAINAGE_AREA_MI_SQ', 
         size:8,
         maxlength:11,
@@ -94,7 +94,7 @@ function setupFilters() {
     
     soilKfactor = new Filters.Range({
         class:"soilkfactor",
-        field:'SOIL_K', 
+        field:'KFACT', 
         el:'SOIL_K', 
         size:6,
         maxlength:6,
@@ -112,7 +112,7 @@ function setupFilters() {
     
     urbanLand = new Filters.Range({
         class:"urbanLand",
-        field:'PCT_URBAN', 
+        field:'URBAN', 
         el:'urbanLand', 
         size:4,
         maxlength:4,
@@ -130,7 +130,7 @@ function setupFilters() {
     
     agLand = new Filters.Range({
         class:"agLand",
-        field:'PCT_AG', 
+        field:'AGRIC', 
         el:'agLand', 
         size:4,
         maxlength:4,
@@ -148,7 +148,7 @@ function setupFilters() {
     
     forestLand = new Filters.Range({
         class:"forestLand",
-        field:'PCT_FOREST', 
+        field:'FOREST', 
         el:'forestLand', 
         size:4,
         maxlength:4,
@@ -166,7 +166,7 @@ function setupFilters() {
     
 	theYearFilter = new Filters.Range({
         class:"yearRange",
-        field:'YEAR', 
+        field:'YR', 
         el:'year', 
         size:8,
         maxlength:4,
@@ -185,7 +185,7 @@ function setupFilters() {
     
 	ecoNum = new Filters.Value({
         class:"ecoNumFilter",
-        field:'ECOREGION_NUM', 
+        field:'ECO_L3_CODE', 
         el:'ecoNum', 
         size:8,
         maxlength:12,
