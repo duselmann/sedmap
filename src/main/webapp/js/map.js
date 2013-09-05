@@ -75,7 +75,7 @@ function init(){
     })
 
     // sedmap project maps
-    addProjectLayer(map, "Soil K Factor", "sedmap:soilk", false, 1)
+//    addProjectLayer(map, "Soil K Factor", "sedmap:soilk", false, 1)
     addProjectLayer(map, "States", "sedmap:statep010", false) // add a new visible layer *new added 7/23/13 mwarren
     addProjectLayer(map, "Counties", "sedmap:countyp020", false)   // add a new invisible layer
     addProjectLayer(map, "HUC8", "sedmap:huc_8_multipart_wgs", false)
