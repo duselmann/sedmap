@@ -20,7 +20,7 @@ function setupFilters() {
 	    el:'refonly', 
 	    parent:'#filterDiv', 
         group:'#Site-Characteristics',
-	    label:'Benchmark sites only:',
+	    label:'Hydrologic Benchmark Sites:',
 	    layers:[
 	        	"Discrete Sites",
 	        	"Daily Sites",
