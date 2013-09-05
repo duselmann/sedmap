@@ -16,7 +16,7 @@
 	<include file="changelog1DiscreteTables.sql" relativeToChangelogFile="true"/>
 	<include file="changelog1FlowExceedance.sql" relativeToChangelogFile="true"/>
 	<include file="changelog1SiteBasins.sql" relativeToChangelogFile="true"/>
-	
+	<include file="changelog1BenchmarkSites.sql" relativeToChangelogFile="true"/>	
 	
 	<include file="changelog1DailyYear.sql" relativeToChangelogFile="true"/>
     <include file="changelog1Views.sql" relativeToChangelogFile="true"/>
