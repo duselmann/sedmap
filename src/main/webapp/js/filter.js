@@ -156,7 +156,7 @@ function setupFilters() {
         maxlength:6,
         parent:'#filterDiv', 
         group:'#Site-Characteristics',
-        label:'Soil R-Factor:',
+        label:'Soil Permeability:',
         min:0,
         max:1,
         pattern: /^[01]?\.\d{0,3}$/,
