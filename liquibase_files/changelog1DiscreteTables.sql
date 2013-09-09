@@ -30,7 +30,7 @@ CREATE TABLE SEDMAP.DISCRETE_SAMPLE_FACT
 (
   SITE_NO        VARCHAR2(255 BYTE),
   STATION_NM     VARCHAR2(255 BYTE),
-  DATETIME       VARCHAR2(255 BYTE),
+  DATETIME       date,
   DCOMMENT       VARCHAR2(255 BYTE),
   ICOMMENT       VARCHAR2(255 BYTE),
   SSC            VARCHAR2(255 BYTE),
@@ -87,7 +87,7 @@ insert into discrete_sample_fact
 select 
 "site_no",
   "station_nm",
-  "Datetime",
+  TO_DATE("Datetime",  'YYYY-MM-DD HH24:MI:SS'),
   "dcomment",
   "icomment",
   SSC ,
