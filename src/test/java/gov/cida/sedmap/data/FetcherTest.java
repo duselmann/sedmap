@@ -79,6 +79,16 @@ public class FetcherTest {
 		}.init();
 	}
 
+	@Test
+	public void reconditionLine() throws Exception {
+		String line = "agency_cd	site_no	datetime	06_00060_00003	06_00060_00003_cd	02_80154_00003	02_80154_00003_cd	03_80155_00003	03_80155_00003_cd";
+		String expect = "agency_cd	site_no	datetime	DAILY_FLOW	DAILY_FLOW_QUAL	DAILY_SSC	DAILY_SSC_QUAL	DAILY_SSL	DAILY_SSL_QUAL";
+		String actual = dss.reconditionLine(line);
+		System.out.println(line);
+		System.out.println(actual);
+
+		assertEquals("expect line columns headings replaced", expect, actual);
+	}
 
 
 	//	@Test
