@@ -37,36 +37,36 @@ public class JdbcFetcher extends Fetcher {
 	public static final String DEFAULT_DAILY_SITE_SQL = "" // this is for consistent formatting
 			+ " select s.*, "
 			+ "   NVL(y.sample_years,0) as sample_years "
-			+ " from DAILY_SITES s "
+			+ " from sedmap.DAILY_STATIONS s "
 			+ " left join ( "
-			+ "    select site_id, count(*) sample_years "
-			+ "      from daily_year y "
+			+ "    select site_no, count(*) sample_years "
+			+ "      from sedmap.daily_year y "
 			+ "     where y.SAMPLE_YEAR>=? " //yr1
 			+ "       and y.SAMPLE_YEAR<=? " //yr2
-			+ "     group by site_id) y "
-			+ "   on (y.site_id = s.site_id) "
+			+ "     group by site_no) y "
+			+ "   on (y.site_no = s.site_no) "
 			+ " where sample_years > 0 and ";
 
 	static final String DEFAULT_DISCRETE_SITE_SQL = ""
 			+ " select s.*, "
 			+ "   NVL(y.sample_count,0) as sample_count "
-			+ " from DISCRETE_SITES s "
+			+ " from sedmap.DISCRETE_STATIONS s "
 			+ " left join ( "
-			+ "    select site_id, count(*) sample_count "
-			+ "      from discrete_sample_fact y "
-			+ "     where EXTRACT(year FROM y.datetime)>=? " // yr1
-			+ "       and EXTRACT(year FROM y.datetime)<=? " // yr2
-			+ "     group by site_id) y "
-			+ "   on (y.site_id = s.site_id) "
+			+ "    select site_no, count(*) sample_count "
+			+ "      from sedmap.discrete_sample_fact  "
+			+ "     where EXTRACT(year FROM datetime)>=? " // yr1
+			+ "       and EXTRACT(year FROM datetime)<=? " // yr2
+			+ "     group by site_no) y "
+			+ "   on (y.site_no = s.site_no) "
 			+ " where sample_count > 0 and ";
 
 	static final String DEFAULT_DISCRETE_DATA_SQL = ""
 			+ " select * "
-			+ "   from discrete_sample_fact "
+			+ "   from sedmap.discrete_sample_fact "
 			+ "  where EXTRACT(year FROM datetime)>=? " // yr1
 			+ "    and EXTRACT(year FROM datetime)<=? " // yr2
-			+ "    and site_id in (_siteList_) " // replaced with list of sites
-			+ "  order by site_id, datetime";
+			+ "    and site_no in (_siteList_) " // replaced with list of sites
+			+ "  order by site_no, datetime";
 
 
 	protected String jndiDS;
@@ -209,7 +209,7 @@ public class JdbcFetcher extends Fetcher {
 
 		//		trans.encodeToString(filter);
 		String sql = getQuery(descriptor) + where; // + getQuery(descriptor+"_amount");
-		return sql;
+		return where.length()==2 ?sql.substring(0,sql.length()-7) :sql;
 	}
 
 

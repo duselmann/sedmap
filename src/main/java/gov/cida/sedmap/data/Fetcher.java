@@ -27,6 +27,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.geotools.filter.AbstractFilter;
+import org.opengis.filter.PropertyIsGreaterThan;
+import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
+import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 
 public abstract class Fetcher {
 
@@ -166,8 +170,10 @@ public abstract class Fetcher {
 
 			String    ogcXml = getFilter(req, site);
 			AbstractFilter aFilter = OgcUtils.ogcXmlToFilter(ogcXml);
-			String yr1 = OgcUtils.removeFilter(aFilter, "yr1");
-			String yr2 = OgcUtils.removeFilter(aFilter, "yr2");
+			@SuppressWarnings("unchecked") // suppress warning that is bug in java
+			String yr1 = OgcUtils.removeFilter(aFilter, "year", PropertyIsGreaterThanOrEqualTo.class, PropertyIsGreaterThan.class);
+			@SuppressWarnings("unchecked") // suppress warning that is bug in java
+			String yr2 = OgcUtils.removeFilter(aFilter, "year", PropertyIsLessThanOrEqualTo.class, PropertyIsLessThan.class);
 			FilterWithViewParams filter = new FilterWithViewParams(aFilter);
 			filter.putViewParam("yr1", "1900", yr1);
 			filter.putViewParam("yr2", "2100", yr2);

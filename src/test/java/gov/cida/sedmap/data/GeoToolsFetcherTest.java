@@ -123,8 +123,8 @@ public class GeoToolsFetcherTest {
 		geoToolsCtx.set(null, ctx);
 
 		// populate result sets
-		ds.put("select * from TABLENAME", rs);
-		ds.put("select * from TABLENAME", md);
+		ds.put("select * from sedmap.TABLENAME", rs);
+		ds.put("select * from sedmap.TABLENAME", md);
 
 		//		ds.put("select * from SM_INST_STATIONS", rs);
 		//		ds.put("select * from SM_INST_STATIONS", md);

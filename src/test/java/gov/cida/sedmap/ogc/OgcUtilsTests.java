@@ -1,5 +1,10 @@
 package gov.cida.sedmap.ogc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import gov.cida.sedmap.data.Fetcher;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.util.StrUtils;
@@ -8,6 +13,7 @@ import gov.cida.sedmap.mock.MockDataSource;
 import gov.cida.sedmap.mock.MockDbMetaData;
 import gov.cida.sedmap.mock.MockResultSet;
 import gov.cida.sedmap.mock.MockRowMetaData;
+
 import java.lang.reflect.Field;
 import java.sql.Date;
 import java.sql.SQLException;
@@ -31,7 +37,10 @@ import org.junit.Test;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
-import static org.junit.Assert.*;
+import org.opengis.filter.PropertyIsGreaterThan;
+import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
+import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 
 public class OgcUtilsTests {
 
@@ -44,7 +53,7 @@ public class OgcUtilsTests {
 	String sql_1_0   = "SELECT SITE_ID,LATITUDE,LONGITUDE,CREATE_DATE FROM TABLENAME";
 	String where_1_0 = "Site_Id >= ?";
 
-	String ogc_v1_1 = "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"><ogc:And><ogc:PropertyIsEqualTo matchCase=\"true\"><ogc:PropertyName>REFERENCE_SITE</ogc:PropertyName><ogc:Literal>1</ogc:Literal></ogc:PropertyIsEqualTo><ogc:PropertyIsEqualTo matchCase=\"true\"><ogc:PropertyName>SAMPLE_YEARS</ogc:PropertyName><ogc:Literal>19</ogc:Literal></ogc:PropertyIsEqualTo><ogc:PropertyIsEqualTo matchCase=\"true\"><ogc:PropertyName>GAGE_BASIN_ID</ogc:PropertyName><ogc:Literal>23534234</ogc:Literal></ogc:PropertyIsEqualTo><ogc:And><ogc:PropertyIsGreaterThanOrEqualTo><ogc:PropertyName>DA</ogc:PropertyName><ogc:Literal>40</ogc:Literal></ogc:PropertyIsGreaterThanOrEqualTo><ogc:PropertyIsLessThanOrEqualTo><ogc:PropertyName>DA</ogc:PropertyName><ogc:Literal>400</ogc:Literal></ogc:PropertyIsLessThanOrEqualTo></ogc:And><ogc:And><ogc:PropertyIsGreaterThanOrEqualTo><ogc:PropertyName>yr1</ogc:PropertyName><ogc:Literal>1900</ogc:Literal></ogc:PropertyIsGreaterThanOrEqualTo><ogc:PropertyIsLessThanOrEqualTo><ogc:PropertyName>yr2</ogc:PropertyName><ogc:Literal>1950</ogc:Literal></ogc:PropertyIsLessThanOrEqualTo></ogc:And><ogc:Or><ogc:PropertyIsEqualTo matchCase=\"true\"><ogc:PropertyName>STATE</ogc:PropertyName><ogc:Literal>WI</ogc:Literal></ogc:PropertyIsEqualTo><ogc:PropertyIsEqualTo matchCase=\"true\"><ogc:PropertyName>STATE</ogc:PropertyName><ogc:Literal>Wisconsin</ogc:Literal></ogc:PropertyIsEqualTo></ogc:Or></ogc:And></ogc:Filter>";
+	String ogc_v1_1 = "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"><ogc:And><ogc:PropertyIsEqualTo matchCase=\"true\"><ogc:PropertyName>REFERENCE_SITE</ogc:PropertyName><ogc:Literal>1</ogc:Literal></ogc:PropertyIsEqualTo><ogc:PropertyIsEqualTo matchCase=\"true\"><ogc:PropertyName>SAMPLE_YEARS</ogc:PropertyName><ogc:Literal>19</ogc:Literal></ogc:PropertyIsEqualTo><ogc:PropertyIsEqualTo matchCase=\"true\"><ogc:PropertyName>GAGE_BASIN_ID</ogc:PropertyName><ogc:Literal>23534234</ogc:Literal></ogc:PropertyIsEqualTo><ogc:And><ogc:PropertyIsGreaterThanOrEqualTo><ogc:PropertyName>DA</ogc:PropertyName><ogc:Literal>40</ogc:Literal></ogc:PropertyIsGreaterThanOrEqualTo><ogc:PropertyIsLessThanOrEqualTo><ogc:PropertyName>DA</ogc:PropertyName><ogc:Literal>400</ogc:Literal></ogc:PropertyIsLessThanOrEqualTo></ogc:And><ogc:And><ogc:PropertyIsGreaterThanOrEqualTo><ogc:PropertyName>yr1</ogc:PropertyName><ogc:Literal>1900</ogc:Literal></ogc:PropertyIsGreaterThanOrEqualTo><ogc:PropertyIsLessThanOrEqualTo><ogc:PropertyName>yr2</ogc:PropertyName><ogc:Literal>1950</ogc:Literal></ogc:PropertyIsLessThanOrEqualTo></ogc:And><ogc:And><ogc:PropertyIsGreaterThanOrEqualTo><ogc:PropertyName>YEAR</ogc:PropertyName><ogc:Literal>1900</ogc:Literal></ogc:PropertyIsGreaterThanOrEqualTo><ogc:PropertyIsLessThanOrEqualTo><ogc:PropertyName>YEAR</ogc:PropertyName><ogc:Literal>1950</ogc:Literal></ogc:PropertyIsLessThanOrEqualTo></ogc:And><ogc:Or><ogc:PropertyIsEqualTo matchCase=\"true\"><ogc:PropertyName>STATE</ogc:PropertyName><ogc:Literal>WI</ogc:Literal></ogc:PropertyIsEqualTo><ogc:PropertyIsEqualTo matchCase=\"true\"><ogc:PropertyName>STATE</ogc:PropertyName><ogc:Literal>Wisconsin</ogc:Literal></ogc:PropertyIsEqualTo></ogc:Or></ogc:And></ogc:Filter>";
 	//WHERE (REFERENCE_SITE = 1 AND SAMPLE_YEARS = 19 AND GAGE_BASIN_ID = '23534234' AND (DA >= 40 AND DA <= 400) AND (SOIL_K >= 0.5 AND SOIL_K <= 0.7) AND (STATE = 'WI' OR STATE = 'Wisconsin'))
 
 	String sql_pk_meta = "SELECT Site_Id FROM TABLENAME WHERE 0=1";
@@ -123,6 +132,7 @@ public class OgcUtilsTests {
 		String sql0   = OgcUtils.ogcXmlToParameterQueryWherClause(filter);
 		assertTrue("original filter should contain the yr1 param", sql0.contains("yr1"));
 
+		@SuppressWarnings("unchecked") // suppress warning that is bug in java
 		String value  = OgcUtils.removeFilter(filter, "yr1");
 		assertEquals("1900",value);
 
@@ -137,11 +147,13 @@ public class OgcUtilsTests {
 		assertTrue("original filter should contain the yr1 param", sql0.contains("yr1"));
 		assertTrue("original filter should contain the yr1 param", sql0.contains("yr2"));
 
-		String value  = OgcUtils.removeFilter(filter, "yr1");
-		assertEquals("1900",value);
+		@SuppressWarnings("unchecked") // suppress warning that is bug in java
+		String value1 = OgcUtils.removeFilter(filter, "yr1");
+		assertEquals("1900",value1);
 
-		value  = OgcUtils.removeFilter(filter, "yr2");
-		assertEquals("1950",value);
+		@SuppressWarnings("unchecked") // suppress warning that is bug in java
+		String value2 = OgcUtils.removeFilter(filter, "yr2");
+		assertEquals("1950",value2);
 
 		String sql1   = OgcUtils.ogcXmlToParameterQueryWherClause(filter);
 		assertFalse("removed yr1 should not be present", sql1.contains("yr1"));
@@ -165,24 +177,74 @@ public class OgcUtilsTests {
 	public void test_findFilter() throws Exception {
 		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
 
+		@SuppressWarnings("unchecked") // suppress warning that is bug in java
 		Filter year1 = OgcUtils.findFilter(filter, "yr1");
 		assertNotNull(year1);
 		assertTrue(year1.toString().contains("yr1"));
 
+		@SuppressWarnings("unchecked") // suppress warning that is bug in java
 		Filter year2 = OgcUtils.findFilter(filter, "yr2");
 		assertNotNull(year1);
 		assertTrue(year2.toString().contains("yr2"));
+	}
+	@Test
+	public void test_findFilter_notRemoved() throws Exception {
+		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
+
+		@SuppressWarnings("unchecked") // suppress warning that is bug in java
+		Filter year1 = OgcUtils.findFilter(filter, "yr1");
+		assertNotNull(year1);
+		assertTrue(year1.toString().contains("yr1"));
+
+		@SuppressWarnings("unchecked") // suppress warning that is bug in java
+		Filter year2 = OgcUtils.findFilter(filter, "yr1");
+		assertNotNull("should find the year a second time if not removed", year1);
+		assertTrue(year2.toString().contains("yr1"));
 	}
 	@Test
 	public void test_findFilterValue() throws Exception {
 
 		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
 
+		@SuppressWarnings("unchecked") // suppress warning that is bug in java
 		String yr1_actual = OgcUtils.findFilterValue(filter, "yr1");
 		assertEquals("1900", yr1_actual);
 
+		@SuppressWarnings("unchecked") // suppress warning that is bug in java
 		String yr2_actual = OgcUtils.findFilterValue(filter, "yr2");
 		assertEquals("1950", yr2_actual);
+	}
+	@Test
+	public void test_findFilter_opcodeStyle() throws Exception {
+		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
+
+		@SuppressWarnings("unchecked") // suppress warning that is bug in java
+		Filter year1 = OgcUtils.findFilter(filter, "year", PropertyIsGreaterThanOrEqualTo.class);
+		assertNotNull(year1);
+		assertTrue("year/YEAR should be found case insensitive", year1.toString().contains("YEAR"));
+		assertTrue( year1 instanceof PropertyIsGreaterThanOrEqualTo );
+
+		@SuppressWarnings("unchecked") // suppress warning that is bug in java
+		Filter year2 = OgcUtils.findFilter(filter, "year", PropertyIsLessThanOrEqualTo.class);
+		assertNotNull(year1);
+		assertTrue("year/YEAR should be found case insensitive", year1.toString().contains("YEAR"));
+		assertTrue( year2 instanceof PropertyIsLessThanOrEqualTo );
+	}
+	@Test
+	public void test_findFilter_opcodeStyle_mutliple() throws Exception {
+		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
+
+		@SuppressWarnings("unchecked") // suppress warning that is bug in java
+		Filter year1 = OgcUtils.findFilter(filter, "year", PropertyIsGreaterThan.class, PropertyIsGreaterThanOrEqualTo.class);
+		assertNotNull(year1);
+		assertTrue("year/YEAR should be found case insensitive", year1.toString().contains("YEAR"));
+		assertTrue( year1 instanceof PropertyIsGreaterThanOrEqualTo );
+
+		@SuppressWarnings("unchecked") // suppress warning that is bug in java
+		Filter year2 = OgcUtils.findFilter(filter, "year", PropertyIsLessThan.class, PropertyIsLessThanOrEqualTo.class);
+		assertNotNull(year1);
+		assertTrue("year/YEAR should be found case insensitive", year1.toString().contains("YEAR"));
+		assertTrue( year2 instanceof PropertyIsLessThanOrEqualTo );
 	}
 
 

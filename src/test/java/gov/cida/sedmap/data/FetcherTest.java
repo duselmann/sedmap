@@ -61,12 +61,12 @@ public class FetcherTest {
 		ctx = new MockContext(ctxenv);
 
 		// populate result set place holders
-		ds.put("select * from SM_INST_STATIONS", rs);
-		ds.put("select * from SM_INST_STATIONS", md);
-		ds.put("select * from SM_DAILY_STATIONS", rs);
-		ds.put("select * from SM_DAILY_STATIONS", md);
-		ds.put("select * from SM_INST_SAMPLE", rs);
-		ds.put("select * from SM_INST_SAMPLE", md);
+		ds.put("select * from sedmap.SM_INST_STATIONS", rs);
+		ds.put("select * from sedmap.SM_INST_STATIONS", md);
+		ds.put("select * from sedmap.SM_DAILY_STATIONS", rs);
+		ds.put("select * from sedmap.SM_DAILY_STATIONS", md);
+		ds.put("select * from sedmap.SM_INST_SAMPLE", rs);
+		ds.put("select * from sedmap.SM_INST_SAMPLE", md);
 
 		// link ctx to data service for testing
 		dss = new JdbcFetcher();

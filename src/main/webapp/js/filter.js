@@ -184,7 +184,7 @@ function setupFilters() {
     
 	theYearFilter = new Filters.Range({
         class:"yearRange",
-        field:'YR', 
+        field:'YEAR', 
         el:'year', 
         size:8,
         maxlength:4,

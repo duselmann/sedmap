@@ -115,6 +115,11 @@ class FilterWrapper extends AbstractFilter {
 	}
 
 
+	public boolean isInstanceOf(Class<?> clas) {
+		Filter filter = getInnerFilter();
+		return clas.isInstance(filter);
+	}
+
 
 	public void remove() {
 		if (parent == null) return;
@@ -153,10 +158,14 @@ class FilterWrapper extends AbstractFilter {
 		}
 		return null;
 	}
+
+
 	public String getExpression2() {
 		String value = null;
 		if (wrapper.isaLiteralFilter()) {
-			Literal literal = (Literal) ((BinaryComparisonAbstract)getInnerFilter()).getExpression2();
+			// TODO this presumes that the literal check ensures safe cast
+			BinaryComparisonAbstract comp = (BinaryComparisonAbstract)getInnerFilter();
+			Literal literal = (Literal) comp.getExpression2();
 			value = literal.getValue().toString();
 		}
 		return value;

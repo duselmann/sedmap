@@ -84,8 +84,8 @@ function init(){
     addProjectLayer(map, DAILY+" USGS Gage Basins", "sedmap:Alldailybasins", false)
     addProjectLayer(map, DISCRETE+" USGS Gage Basins", "sedmap:Alldiscretebasins", false)
 //    addProjectLayer(map, "All USGS Gage Basins", "sedmap:AllbasinswDVs1", false)
-    addProjectLayer(map, DAILY, "sedmap:daily", true)
-    addProjectLayer(map, DISCRETE, "sedmap:instant", true)
+    addProjectLayer(map, DAILY, "sedmap:_daily", true)
+    addProjectLayer(map, DISCRETE, "sedmap:_discrete", true)
     addProjectLayer(map, "NID", "sedmap:NID", false)
     
     // zoom and move viewport to desired location
@@ -116,7 +116,7 @@ function getSiteInfo(e) {
             BBOX: map.getExtent().toBBOX(),
             SERVICE: "WMS",
             INFO_FORMAT: 'application/json',
-            QUERY_LAYERS: 'sedmap:SiteInfo',//layer.params.LAYERS,
+            QUERY_LAYERS: 'sedmap:_siteInfo',//layer.params.LAYERS,
             FEATURE_COUNT: 50,
             Layers: 'sedmap:SiteInfo',
             WIDTH: map.size.w,

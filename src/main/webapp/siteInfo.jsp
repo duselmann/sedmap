@@ -6,10 +6,10 @@
 <body>
     <div id="singleSiteInfo" class="singleSiteInfo">
       <div class="siteDatum">
-        <div class="siteInfoLabel">Station</div>              <div class="siteInfoData" id="STATION_NAME"></div>
+        <div class="siteInfoLabel">Site Name</div>              <div class="siteInfoData" id="SITE_NAME"></div>
       </div>
       <div class="siteDatum">
-        <div class="siteInfoLabel">USGS Stream Gage ID</div>                   <div class="siteInfoData" id="USGS_STATION_ID"></div>
+        <div class="siteInfoLabel">USGS Stream Gage ID</div>                   <div class="siteInfoData" id="SITE_NO"></div>
       </div>
       <div class="siteDatum">
         <div class="siteInfoLabel">Drainage Area (mi<sup>2</sup>)</div>        <div class="siteInfoData" id="DA"></div>

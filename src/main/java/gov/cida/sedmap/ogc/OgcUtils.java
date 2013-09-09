@@ -19,8 +19,6 @@ import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.data.oracle.OracleDialect;
 import org.geotools.data.oracle.OracleFilterToSQL;
 import org.geotools.filter.AbstractFilter;
-import org.geotools.filter.BinaryComparisonAbstract;
-import org.geotools.filter.BinaryLogicAbstract;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.JDBCFeatureReader;
@@ -29,8 +27,8 @@ import org.geotools.jdbc.NonIncrementingPrimaryKeyColumn;
 import org.geotools.jdbc.PrimaryKey;
 import org.geotools.jdbc.PrimaryKeyColumn;
 import org.geotools.xml.Parser;
+import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Filter;
-import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 
 public class OgcUtils {
@@ -162,93 +160,88 @@ public class OgcUtils {
 		return reader;
 	}
 
-	public static String findFilterValue(Filter filter, String param) {
-		filter = findFilter(filter, param);
-
-		String value = null;
-
-		if (filter instanceof BinaryComparisonAbstract) {
-			BinaryComparisonAbstract comp = (BinaryComparisonAbstract) filter;
-			Literal literal = (Literal) comp.getExpression2();
-			value = literal.getValue().toString();
-		}
-
-		return value;
+	@SafeVarargs
+	public static String findFilterValue(Filter filter, String param, Class<? extends BinaryComparisonOperator> ... opcodes) {
+		return findFilterValue(new FilterWrapper(filter), param, opcodes);
 	}
-
+	@SafeVarargs
+	public static String findFilterValue(FilterWrapper filter, String param, Class<? extends BinaryComparisonOperator> ... opcodes) {
+		Filter found = findFilter(false, filter, param, opcodes);
+		return getValue(found);
+	}
 
 	// TODO this will likely need some work to be more robust
 	// used to find the literal value of the parameter.
 	// this might not be used in favor of the removeFilter method
-	public static Filter findFilter(Filter filter, String param) {
-		Filter found = null;
-
-		FilterWrapper wrapper = new FilterWrapper( filter );
-
-		if ( wrapper.isaLogicFilter() ) {
-			BinaryLogicAbstract logical = (BinaryLogicAbstract) filter;
-			for (Filter child : logical.getChildren() ) {
-				found = findFilter(child, param);
-				if (found != null) {
-					return found;
-				}
-			}
-		} else { // TODO this will fail on geometry filters and will need attention when that is incorporated
-			BinaryComparisonAbstract comp = (BinaryComparisonAbstract) filter;
-			// expression1 is the parameter name while experssion2 is the literal value
-			PropertyName property = (PropertyName) comp.getExpression1();
-			if ( property.getPropertyName().equals(param) ) {
-				return filter;
-			}
-		}
-
-		return found;
+	@SafeVarargs
+	public static Filter findFilter(Filter filter, String param, Class<? extends BinaryComparisonOperator> ... opcodes) {
+		return findFilter(false, new FilterWrapper(filter), param, opcodes);
 	}
 
 	// TODO this will likely need some work to be more robust
 	// removes a filter and returns is litter value
 	// used to remove parameter query values not associated with columns in the table
 	// for example: yearStart and yearEnd would not match up to a column
-	public static String removeFilter(Filter filter, String param) {
-		return removeFilter(new FilterWrapper(filter), param);
+	@SafeVarargs
+	public static String removeFilter(Filter filter, String param, Class<? extends BinaryComparisonOperator> ... opcodes) {
+		return removeFilter(new FilterWrapper(filter), param, opcodes);
+	}
+	@SafeVarargs
+	public static String removeFilter(FilterWrapper filter, String param, Class<? extends BinaryComparisonOperator> ... opcodes) {
+		Filter removed = findFilter(true, filter, param, opcodes);
+		return getValue(removed);
 	}
 
-	public static String removeFilter(FilterWrapper filter, String param) {
-		String value = null;
+	@SafeVarargs
+	protected static Filter findFilter(boolean remove, FilterWrapper filter, String param, Class<? extends BinaryComparisonOperator> ... opcodes) {
+		Filter found = null;
 
 		if ( filter.isaLogicFilter() ) {
 			for (Filter child : filter.getChildren() ) {
 				FilterWrapper wrapped = new FilterWrapper(child, filter);
-				value = removeFilter(wrapped, param);
-				if (value != null) {
-					return value;
+				found = findFilter(remove, wrapped, param, opcodes);
+				if (found != null) {
+					return found;
 				}
 			}
 		} else { // TODO this will fail on geometry filters and will need attention when that is incorporated
 			// expression1 is the parameter name while experssion2 is the literal value
 			PropertyName property = filter.getExpression1();
-			if ( property.getPropertyName().equals(param) ) {
-
-				filter.remove();
-				return filter.getExpression2();
+			if ( property.getPropertyName().equalsIgnoreCase(param) ) {
+				boolean isOpcode  =  opcodes.length == 0; // no given opcode means accept parameter name match
+				for (Class<?> opcode : opcodes) {
+					// assignment is desired behavior, the additional parenthesis prevent the compile error.
+					if ( (isOpcode = filter.isInstanceOf(opcode)) ) {
+						break;
+					}
+				}
+				if (isOpcode) {
+					if (remove) {
+						filter.remove();
+					}
+					return filter.getInnerFilter();
+				}
 			}
 		}
 
-		return value;
+		return found;
 	}
 
 
 	// gets the value from a the literal portion of a filter
 	// returns null if the filter is not a literal
-	public static String getValue(Filter filter) {
-		FilterWrapper fw = new FilterWrapper(filter);
+	protected static String getValue(Filter filter) {
+		String value = ""; // TODO do we want null?
+		if (filter == null) return value;
+
+		FilterWrapper fw;
 		if ( filter instanceof FilterWrapper ) {
 			fw = (FilterWrapper)filter;
+		} else {
+			fw = new FilterWrapper(filter);
 		}
-		if ( fw.isaLiteralFilter() ) {
-			return fw.getExpression2();
-		}
-		return null;
+
+		return fw.getExpression2();
 	}
 
 	//	StringBuilder buf = new StringBuilder();

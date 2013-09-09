@@ -28,7 +28,7 @@ public class FetcherConfig {
 	Map<String, Object>       DATA_STORE_ENV;
 	Map<String, List<Column>> TABLE_METADATA;
 	Map<String, String>       DATA_TABLES;
-	// TODO create this view "select d.* from sm_inst_sample_fact d join sm_inst_stations s on s.USGS_STATION_ID = d.USGS_STATION_ID "
+	// TODO create this view "select d.* from sedmap.discrete_sample_fact d join sedmap.discrete_stations s on s.site_no = d.site_no "
 
 	Map<String, Class<? extends Formatter>> FILE_FORMATS;
 	Map<String, String>       FIELD_TRANSLATIONS;
@@ -144,7 +144,7 @@ public class FetcherConfig {
 			ResultSet rs = null;
 			for (String tableName : DATA_TABLES.values()) {
 				try {
-					rs = st.executeQuery("select * from " +tableName+ " where 0=1");
+					rs = st.executeQuery("select * from sedmap." +tableName+ " where 0=1");
 					List<Column> columnData = getTableColumns(rs);
 					tableData.put(tableName, Collections.unmodifiableList(columnData));
 					logger.info("Collected " +columnData.size()+ " columns metadata for table " +tableName);
@@ -179,7 +179,7 @@ public class FetcherConfig {
 			DataSource ds = (DataSource) ctx.lookup(jndiDS);
 			cn = ds.getConnection();
 			st = cn.createStatement();
-			rs = st.executeQuery("select * from " +tableName+ " where 0=1");
+			rs = st.executeQuery("select * from sedmap." +tableName+ " where 0=1");
 			List<Column> columnData = getTableColumns(rs);
 			logger.info("Collected " +columnData.size()+ " columns metadata for table " +tableName);
 			return columnData;
