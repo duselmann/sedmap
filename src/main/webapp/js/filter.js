@@ -10,6 +10,7 @@ var urbanLand
 var agLand
 var forestLand
 var soilKfactor
+var soilRfactor
 var ecoNum
 var usgsStation
 
@@ -123,8 +124,26 @@ function setupFilters() {
         max:1,
         pattern: /^[01]?\.\d{0,3}$/,
         patternMsg: "Expecting number between 0 and 1",
-        layers:[	"Discrete Sites",
-                	"Daily Sites",
+        layers:[    "Discrete Sites",
+                    "Daily Sites",
+                ]
+    })
+    
+    soilRfactor = new Filters.Range({
+        class:"soilRfactor",
+        field:'RFACT', 
+        el:'SOIL_R', 
+        size:6,
+        maxlength:6,
+        parent:'#filterDiv', 
+        group:'#Site-Characteristics',
+        label:'Soil R-Factor:',
+        min:0,
+        max:1,
+        pattern: /^[01]?\.\d{0,3}$/,
+        patternMsg: "Expecting number between 0 and 1",
+        layers:[    "Discrete Sites",
+                    "Daily Sites",
                 ]
     })
     
