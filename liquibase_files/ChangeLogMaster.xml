@@ -17,10 +17,11 @@
 	<include file="changelog1FlowExceedance.sql" relativeToChangelogFile="true"/>
 	<include file="changelog1SiteBasins.sql" relativeToChangelogFile="true"/>
 	<include file="changelog1BenchmarkSites.sql" relativeToChangelogFile="true"/>	
-	
-	<include file="changelog1DailyYear.sql" relativeToChangelogFile="true"/>
-    <include file="changelog1Views.sql" relativeToChangelogFile="true"/>
-    <include file="changelog1SiteRefNewColumns.sql" relativeToChangelogFile="true"/>
 
-
+    <include file="changelog2_DailyYear.sql" relativeToChangelogFile="true"/>
+    <include file="changelog2_SiteBasin.sql" relativeToChangelogFile="true"/>
+    <include file="changelog2_DataFixes.sql" relativeToChangelogFile="true"/>
+    <include file="changelog2_Views.sql" relativeToChangelogFile="true"/>
+    <include file="changelog2_Indexes.sql" relativeToChangelogFile="true"/>	
+		
 </databaseChangeLog>
