@@ -11,11 +11,11 @@
     </preConditions>
 
 
-    <include file="changelog1SiteRef.sql" relativeToChangelogFile="true"/>
-    <include file="changelog1DailyTables.sql" relativeToChangelogFile="true"/>
+    <include file="changelog1SiteRef.sql"        relativeToChangelogFile="true"/>
+    <include file="changelog1DailyTables.sql"    relativeToChangelogFile="true"/>
     <include file="changelog1DiscreteTables.sql" relativeToChangelogFile="true"/>
     <include file="changelog1FlowExceedance.sql" relativeToChangelogFile="true"/>
-    <include file="changelog1SiteBasins.sql" relativeToChangelogFile="true"/>
+    <include file="changelog1SiteBasins.sql"     relativeToChangelogFile="true"/>
     <include file="changelog1BenchmarkSites.sql" relativeToChangelogFile="true"/>
 
     <include file="changelog2_DailyYear.sql" relativeToChangelogFile="true"/>
