@@ -6,7 +6,7 @@
 --changeset duselman:CreateDiscreteStationsView
 CREATE OR REPLACE FORCE VIEW "SEDMAP"."DISCRETE_STATIONS" AS 
 select s.*, NVL2(b.SITE_NO, '1','0') as BENCHMARK_SITE
-from sedmap.site_ref s 
+from sedmap.site_ref_basin s 
 left outer join sedmap.BENCHMARK_SITES b 
             on s.SITE_NO = b.SITE_NO
 where exists (select 1 
@@ -19,7 +19,7 @@ grant select on DISCRETE_STATIONS to seduser;
 --changeset duselman:CreateDailyStationsView
 create or replace view sedmap.daily_stations as
 select s.*, NVL2(b.SITE_NO, '1','0') as BENCHMARK_SITE
-from sedmap.site_ref s 
+from sedmap.site_ref_basin s 
 left join (select SITE_NO, count(*) sample_years 
             from sedmap.daily_year y 
             group by SITE_NO) y 
@@ -45,8 +45,9 @@ select s.SITE_NO,SNAME,LATITUDE,LONGITUDE,GEOM_LL,HUC_8,NWISDA1,"STATE",
       NVL(y.sample_years,0) as daily_years,
       NVL(y.sample_years,0) as sample_years,
       NVL(f.sample_count,0) as discrete_samples,
-      NVL(f.sample_count,0) as sample_count
-  from sedmap.site_ref s 
+      NVL(f.sample_count,0) as sample_count,
+      s.basin_ids
+  from sedmap.site_ref_basin s 
   left outer join sedmap.BENCHMARK_SITES b on s.SITE_NO = b.SITE_NO
   left outer join (
     select SITE_NO, count(*) sample_years, min(sample_year) minyr, max(sample_year) maxyr 
@@ -82,5 +83,15 @@ select distinct ECO_L3_NAME ECO_NAME from sedmap.site_ref
 where ECO_L3_NAME is not null order by 1;
 grant select on ECO3NAMES to seduser;
 --  drop view ECO3NAMES;
+
+
+--changeset duselman:siteRefBasinView
+create or replace view sedmap.SITE_REF_BASIN as
+select s.*, b.basin_ids
+from sedmap.site_ref s
+left outer join sedmap.site_basin b on s.site_no=b.site_no;
+grant select on SITE_REF_BASIN to seduser;
+--  drop view SITE_REF_BASIN;
+
 
 

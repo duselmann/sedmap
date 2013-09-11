@@ -154,7 +154,6 @@ ALTER TABLE SEDMAP.DAILY_YEARS ADD (
   FOREIGN KEY (SITE_NO) 
   REFERENCES SEDMAP.DAILY_SITES (SITE_NO));
   
- GRANT SELECT ON SEDMAP.DAILY_YEARS TO SEDUSER; 
  
  insert into daily_years
 select "site_no",
@@ -275,5 +274,3 @@ select "site_no",
    from SRC_DAILYSSL_INVENTORY_8_15_13;
  --rollback Drop table daily_years;    
   
-
-
