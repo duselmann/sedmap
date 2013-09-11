@@ -12,8 +12,8 @@ left outer join sedmap.BENCHMARK_SITES b
 where exists (select 1 
             from sedmap.discrete_sites i 
             where s.SITE_NO=i.SITE_NO);
-grant select on DISCRETE_SITES to seduser;
---  drop view DISCRETE_SITES;
+grant select on DISCRETE_STATIONS to seduser;
+--  drop view DISCRETE_STATIONS;
 
 
 --changeset duselman:CreateDailyStationsView
@@ -29,8 +29,8 @@ left outer join sedmap.BENCHMARK_SITES b
 where exists (select 1 
             from sedmap.daily_sites i 
             where s.SITE_NO=i.SITE_NO);
-grant select on daily_sites to seduser;
---  drop view daily_sites;
+grant select on daily_stations to seduser;
+--  drop view daily_stations;
 
             
             
@@ -82,4 +82,5 @@ select distinct ECO_L3_NAME ECO_NAME from sedmap.site_ref
 where ECO_L3_NAME is not null order by 1;
 grant select on ECO3NAMES to seduser;
 --  drop view ECO3NAMES;
+
 
