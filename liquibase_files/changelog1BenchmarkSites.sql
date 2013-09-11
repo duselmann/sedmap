@@ -21,4 +21,7 @@ ALTER TABLE SEDMAP.BENCHMARK_SITES ADD (
 insert into benchmark_sites
 select * from src_benchmark_sites;
 
+GRANT SELECT ON SEDMAP.BENCHMARK_SITES TO SEDUSER;
+
+
 --rollback Drop table benchmark_sites;  
