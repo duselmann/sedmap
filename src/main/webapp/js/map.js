@@ -81,9 +81,11 @@ function init(){
     addProjectLayer(map, "HUC8", "sedmap:huc_8_multipart_wgs", false)
     addFlowLinesLayer(map);
     addProjectLayer(map, "Ecoregion Level 2", "sedmap:NA_CEC_Eco_Level2", false)
-    addProjectLayer(map, DAILY+" USGS Gage Basins", "sedmap:Alldailybasins", false)
-    addProjectLayer(map, DISCRETE+" USGS Gage Basins", "sedmap:Alldiscretebasins", false)
-//    addProjectLayer(map, "All USGS Gage Basins", "sedmap:AllbasinswDVs1", false)
+//    addProjectLayer(map, DAILY+" USGS Gage Basins", "sedmap:Alldailybasins", false)
+//    addProjectLayer(map, DISCRETE+" USGS Gage Basins", "sedmap:Alldiscretebasins", false)
+    addProjectLayer(map, "USGS Basins Boundaries", "sedmap:Allbasinsupdate", false)
+
+
     addProjectLayer(map, DAILY, "sedmap:_daily", true)
     addProjectLayer(map, DISCRETE, "sedmap:_discrete", true)
     addProjectLayer(map, "NID", "sedmap:NID", false)
@@ -118,7 +120,7 @@ function getSiteInfo(e) {
             INFO_FORMAT: 'application/json',
             QUERY_LAYERS: 'sedmap:_siteInfo',//layer.params.LAYERS,
             FEATURE_COUNT: 50,
-            Layers: 'sedmap:SiteInfo',
+            Layers: 'sedmap:_siteInfo',
             WIDTH: map.size.w,
             HEIGHT: map.size.h,
             format: format,
@@ -184,7 +186,7 @@ function clearSiteInfo(e) {
 function renderSiteInfo(response) {
     var json  = $.parseJSON( response.responseText )
     
-    var fields = ['STATION_NAME', 'USGS_STATION_ID', 'DA', 'DAILY_YEARS', 'DAILY_PERIOD', 'DISCRETE_PERIOD', 'DISCRETE_SAMPLES']
+    var fields = ['SNAME', 'SITE_NO', 'NWISDA1', 'DAILY_YEARS', 'DAILY_PERIOD', 'DISCRETE_PERIOD', 'DISCRETE_SAMPLES']
     
     // TODO this is daily only - need inst also
     

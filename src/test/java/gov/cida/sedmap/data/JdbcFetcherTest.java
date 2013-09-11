@@ -96,13 +96,13 @@ public class JdbcFetcherTest {
 		geoToolsCtx.set(null, ctx);
 
 		// populate result sets
-		ds.put("select * from sedmap.SM_INST_STATIONS", rs);
-		ds.put("select * from sedmap.SM_INST_STATIONS", md);
-		ds.put("select * from sedmap.SM_DAILY_STATIONS", rs);
-		ds.put("select * from sedmap.SM_DAILY_STATIONS", md);
+		ds.put("select * from sedmap.DISCRETE_STATIONS", rs);
+		ds.put("select * from sedmap.DISCRETE_STATIONS", md);
+		ds.put("select * from sedmap.DAILY_STATIONS", rs);
+		ds.put("select * from sedmap.DAILY_STATIONS", md);
 		// populate result set place holders
-		ds.put("select * from sedmap.SM_INST_SAMPLE_FACT", new MockResultSet());
-		ds.put("select * from sedmap.SM_INST_SAMPLE_FACT", new MockRowMetaData());
+		ds.put("select * from sedmap.DISCRETE_SAMPLE_FACT", new MockResultSet());
+		ds.put("select * from sedmap.DISCRETE_SAMPLE_FACT", new MockRowMetaData());
 
 		Fetcher.conf = new FetcherConfig() {
 			@Override
@@ -158,7 +158,7 @@ public class JdbcFetcherTest {
 			@Override
 			protected String buildQuery(String descriptor, FilterWithViewParams filter)
 					throws FilterToSQLException {
-				return "select * from sedmap.SM_INST_STATIONS";
+				return "select * from sedmap.DISCRETE_STATIONS";
 			}
 		};
 		FilterWithViewParams filter = new FilterWithViewParams(null) {
@@ -192,7 +192,7 @@ public class JdbcFetcherTest {
 			@Override
 			protected String buildQuery(String descriptor, FilterWithViewParams filter)
 					throws FilterToSQLException {
-				return "select * from sedmap.SM_INST_STATIONS";
+				return "select * from sedmap.DISCRETE_STATIONS";
 			}
 		};
 		FilterWithViewParams filter = new FilterWithViewParams(null) {

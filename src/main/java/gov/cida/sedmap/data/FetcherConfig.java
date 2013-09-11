@@ -100,9 +100,9 @@ public class FetcherConfig {
 	protected Map<String, String> configTables() {
 		logger.info("Static Fetcher configDataTypes.");
 		Map<String,String> tables = new HashMap<String,String>();
-		tables.put("daily_sites",    "SM_DAILY_STATIONS");
-		tables.put("discrete_sites", "SM_INST_STATIONS");
-		tables.put("discrete_data",  "SM_INST_SAMPLE_FACT");
+		tables.put("daily_sites",    "DAILY_STATIONS");
+		tables.put("discrete_sites", "DISCRETE_STATIONS");
+		tables.put("discrete_data",  "DISCRETE_SAMPLE_FACT");
 		return Collections.unmodifiableMap(tables);
 	}
 

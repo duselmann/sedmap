@@ -61,12 +61,12 @@ public class FetcherTest {
 		ctx = new MockContext(ctxenv);
 
 		// populate result set place holders
-		ds.put("select * from sedmap.SM_INST_STATIONS", rs);
-		ds.put("select * from sedmap.SM_INST_STATIONS", md);
-		ds.put("select * from sedmap.SM_DAILY_STATIONS", rs);
-		ds.put("select * from sedmap.SM_DAILY_STATIONS", md);
-		ds.put("select * from sedmap.SM_INST_SAMPLE", rs);
-		ds.put("select * from sedmap.SM_INST_SAMPLE", md);
+		ds.put("select * from sedmap.DISCRETE_STATIONS", rs);
+		ds.put("select * from sedmap.DISCRETE_STATIONS", md);
+		ds.put("select * from sedmap.DAILY_STATIONS", rs);
+		ds.put("select * from sedmap.DAILY_STATIONS", md);
+		ds.put("select * from sedmap.DISCRETE_SAMPLE", rs);
+		ds.put("select * from sedmap.DISCRETE_SAMPLE", md);
 
 		// link ctx to data service for testing
 		dss = new JdbcFetcher();
@@ -81,7 +81,7 @@ public class FetcherTest {
 
 	@Test
 	public void reconditionLine() throws Exception {
-		String line = "agency_cd	site_no	datetime	06_00060_00003	06_00060_00003_cd	02_80154_00003	02_80154_00003_cd	03_80155_00003	03_80155_00003_cd";
+		String line = "agency_cd	site_no	datetime	16_00060_00003	06_00060_00003_cd	02_80154_00003	02_80154_00003_cd	03_80155_00003	03_80155_00003_cd";
 		String expect = "agency_cd	site_no	datetime	DAILY_FLOW	DAILY_FLOW_QUAL	DAILY_SSC	DAILY_SSC_QUAL	DAILY_SSL	DAILY_SSL_QUAL";
 		String actual = dss.reconditionLine(line);
 		System.out.println(line);

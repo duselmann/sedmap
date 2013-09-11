@@ -106,7 +106,7 @@
                             <span id="nlcdthumb">NLCD Legend</span>
                             <a href="http://www.mrlc.gov/nlcd06_leg.php" target="_tab"><img id="nlcdimg" src="images/nlcdlegend.png"></a>
                         </div>
-				        <div id="filterDiv" class="filter">
+				        <div id="filterDiv" class="filter filterScroll">
 				            <div class="floatLeft" style="height:28px;">
 					            <span class="label">Filter By:</span>
 					            <input type="button" class="clearFilter" value="Clear">
@@ -151,6 +151,17 @@
             </div>
             <div class="modal-footer"></div>
         </div>
+        
+<div id="waitSpinner" class="spinner circles" style="left:-400px;top:150px;display:none;">
+     <div></div>
+     <div></div>
+     <div></div>
+     <div></div>
+     <div></div>
+     <div></div>
+     <div></div>
+     <div></div>
+</div>        
         
     </body>
     

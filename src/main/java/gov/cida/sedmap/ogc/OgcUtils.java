@@ -76,8 +76,8 @@ public class OgcUtils {
 			OracleFilterToSQL osql = new OracleFilterToSQL(new OracleDialect(ds));
 
 			List<PrimaryKeyColumn> columns = new ArrayList<PrimaryKeyColumn>();
-			columns.add(new NonIncrementingPrimaryKeyColumn("USGS_STATION_ID", String.class));
-			PrimaryKey pk = new PrimaryKey("SM_DIALY_STATION", columns);
+			columns.add(new NonIncrementingPrimaryKeyColumn("SITE_NO", String.class));
+			PrimaryKey pk = new PrimaryKey("DIALY_STATION", columns);
 			osql.setPrimaryKey(pk);
 			osql.setInline(true); // prevent addition of WHERE key word in clause
 			StringWriter buf = new StringWriter();
