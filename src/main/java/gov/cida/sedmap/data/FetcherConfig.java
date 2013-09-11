@@ -111,7 +111,7 @@ public class FetcherConfig {
 	protected Map<String, Object> configDataStore() {
 		logger.info("Static Fetcher configDataTypes.");
 		Map<String, Object> env = new HashMap<String, Object>();
-		// dataStoreEnv.put( JDBCDataStoreFactory.SCHEMA.getName(), "sedmap"); // OPTIONAL
+		env.put( JDBCDataStoreFactory.SCHEMA.getName(), "sedmap"); // OPTIONAL
 		env.put( JDBCDataStoreFactory.DBTYPE.getName(), "oracle");
 		env.put( JDBCDataStoreFactory.EXPOSE_PK.getName(), true);
 		env.put( JDBCJNDIDataStoreFactory.JNDI_REFNAME.getName(), jndiDS);
