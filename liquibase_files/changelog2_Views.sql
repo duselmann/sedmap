@@ -43,7 +43,9 @@ select s.SITE_NO,SNAME,LATITUDE,LONGITUDE,GEOM_LL,HUC_8,NWISDA1,"STATE",
       NVL( (select 1 from sedmap.daily_sites d where s.SITE_NO=d.SITE_NO) ,0) as daily_site,
       NVL( (select 1 from sedmap.discrete_sites  d where s.SITE_NO=d.SITE_NO) ,0) as discrete_site,
       NVL(y.sample_years,0) as daily_years,
-      NVL(f.discrete_samples,0) as discrete_samples
+      NVL(y.sample_years,0) as sample_years,
+      NVL(f.sample_count,0) as discrete_samples,
+      NVL(f.sample_count,0) as sample_count
   from sedmap.site_ref s 
   left outer join sedmap.BENCHMARK_SITES b on s.SITE_NO = b.SITE_NO
   left outer join (
@@ -52,7 +54,7 @@ select s.SITE_NO,SNAME,LATITUDE,LONGITUDE,GEOM_LL,HUC_8,NWISDA1,"STATE",
      group by SITE_NO) y 
   on (y.SITE_NO = s.SITE_NO)
   left outer join (
-    select SITE_NO, count(*) discrete_samples, EXTRACT(year FROM min(datetime)) minyr, EXTRACT(year FROM max(datetime)) maxyr 
+    select SITE_NO, count(*) sample_count, EXTRACT(year FROM min(datetime)) minyr, EXTRACT(year FROM max(datetime)) maxyr 
       from sedmap.discrete_sample_fact f 
      group by SITE_NO) f 
   on (f.SITE_NO = s.SITE_NO);
