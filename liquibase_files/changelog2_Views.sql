@@ -2,6 +2,14 @@
 
 --This is for the sedmap schema
  
+--changeset duselman:siteRefBasinView
+create or replace view sedmap.SITE_REF_BASIN as
+select s.*, b.basin_ids basin_no
+from sedmap.site_ref s
+left outer join sedmap.site_basin b on s.site_no=b.site_no;
+grant select on SITE_REF_BASIN to seduser;
+--  drop view SITE_REF_BASIN;
+
 
 --changeset duselman:CreateDiscreteStationsView
 CREATE OR REPLACE FORCE VIEW "SEDMAP"."DISCRETE_STATIONS" AS 
@@ -46,7 +54,7 @@ select s.SITE_NO,SNAME,LATITUDE,LONGITUDE,GEOM_LL,HUC_8,NWISDA1,"STATE",
       NVL(y.sample_years,0) as sample_years,
       NVL(f.sample_count,0) as discrete_samples,
       NVL(f.sample_count,0) as sample_count,
-      s.basin_ids
+      s.basin_no
   from sedmap.site_ref_basin s 
   left outer join sedmap.BENCHMARK_SITES b on s.SITE_NO = b.SITE_NO
   left outer join (
@@ -85,13 +93,6 @@ grant select on ECO3NAMES to seduser;
 --  drop view ECO3NAMES;
 
 
---changeset duselman:siteRefBasinView
-create or replace view sedmap.SITE_REF_BASIN as
-select s.*, b.basin_ids
-from sedmap.site_ref s
-left outer join sedmap.site_basin b on s.site_no=b.site_no;
-grant select on SITE_REF_BASIN to seduser;
---  drop view SITE_REF_BASIN;
 
 
 
