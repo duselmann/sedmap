@@ -18,3 +18,7 @@ where ECO_L3_NAME<>trim(ECO_L3_NAME);
 update site_ref set HUC_8='0'||huc_8
 where length(huc_8)=7;
 -- we could write a rollback that removes the leading 0
+
+
+--changeset duselman:upperCaseSiteName
+update site_ref set sname = upper(sname);
