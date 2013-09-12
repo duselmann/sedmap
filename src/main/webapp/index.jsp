@@ -116,7 +116,9 @@
                                 Please address errors.
                             </div>
 				            <br class="floatClear">
-                            <input type="button" class="download" value="Download Data"> <input type="checkbox" id="sitesOnly"> Sites Only 
+                            <input type="button" class="download" value="Download Data"> 
+                            Format: <select id="downloadFormat"><option>csv</option><option selected="true">rdb</option></select>
+                            <input type="checkbox" id="sitesOnly"> Sites Only
 				        </div>
                         <div id="siteInfo">
                             <jsp:include page="siteInfo.jsp"/>

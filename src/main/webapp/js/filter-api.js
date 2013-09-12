@@ -220,7 +220,9 @@ var Filters = Class.extend({
 				var isData  = $('#sitesOnly:checkbox:checked').length == 0
 				var urlPart = []
 				var p = 0
-				urlPart[p++] = "/sediment/data?format=csv&dataTypes=sites_" // always include site info
+				urlPart[p++] = "/sediment/data?format="
+				urlPart[p++] = $('#downloadFormat').val()
+				urlPart[p++] = "&dataTypes=sites_" // always include site info
 				urlPart[p++] = isData  ?"data_"     :""
 				urlPart[p++] = isDaily ?"daily_"    :""
 				urlPart[p++] = isDiscr ?"discrete_" :""
