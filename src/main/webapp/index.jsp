@@ -134,7 +134,7 @@
                     <jsp:param name="relPath" value="" />
                     <jsp:param name="header-class" value="" />
                     <jsp:param name="site-url" value="<script type='text/javascript'>document.write(document.location.href);</script>" />
-                    <jsp:param name="contact-info" value="<a href='mailto:cjlee@usgs.gov?Subject=Coastal%20Hazards%20Feedback'>Casey Lee</a>" />
+                    <jsp:param name="contact-info" value="<a href='mailto:SedimentPortal_HELP@usgs.gov?Subject=Sediment%20Portal%20Feedback'>Sediment Portal Help</a>" />
                 </jsp:include>
             </div>
         
