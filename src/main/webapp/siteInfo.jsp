@@ -6,7 +6,7 @@
 <body>
     <div id="singleSiteInfo" class="singleSiteInfo">
       <div class="siteDatum">
-        <div class="siteInfoLabel">Site Name</div>              <div class="siteInfoData" id="SITE_NAME"></div>
+        <div class="siteInfoLabel">Site Name</div>              <div class="siteInfoData" id="SNAME"></div>
       </div>
       <div class="siteDatum">
         <div class="siteInfoLabel">USGS Stream Gage ID</div>                   <div class="siteInfoData" id="SITE_NO"></div>

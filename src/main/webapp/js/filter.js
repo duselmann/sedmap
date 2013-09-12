@@ -14,6 +14,7 @@ var soilRfactor
 var soilPerm
 var ecoNum
 var usgsStation
+var stationName 
 
 function setupFilters() {
 	
@@ -96,6 +97,26 @@ function setupFilters() {
         label:'USGS Station ID:',
         pattern: /^\d+\*?$/,
         patternMsg: "Expecting a HUC number with possible wild card, '*'",
+        layers:[    "Discrete Sites",
+                    "Daily Sites",
+                ]
+    })
+
+    stationName = new Filters.Value({
+        class:"usgsStationName",
+        field:'SNAME', 
+        el:'USGS_STATION_NAME', 
+        size:11,
+        maxlength:50,
+        parent:'#filterDiv', 
+        group:'#Site-Characteristics',
+        label:'USGS Station Name:',
+        pattern: /^[\w\. ]+$/,
+        valueDecorator: function(value) {
+            value = defaultValue(value,"") // prevent undefined issues
+            return "*"+value.toUpperCase()+"*"
+        },
+        patternMsg: "Expecting any part of a station name.",
         layers:[    "Discrete Sites",
                     "Daily Sites",
                 ]
