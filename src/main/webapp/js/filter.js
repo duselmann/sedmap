@@ -165,9 +165,9 @@ function setupFilters() {
         el:'SOIL_R', 
         size:6,
         maxlength:6,
-        parent:'#filterDiv', 
+        parent:'#filterDiv',
         group:'#Site-Characteristics',
-        label:'Soil R-Factor:',
+        label:'R-Factor:',
         min:10,
         max:100,
         pattern: /^\d{0,3}(\.\d{0,3})?$/,
@@ -281,6 +281,7 @@ function setupFilters() {
         patternMsg: "Eco Region number have the format ##.##.## with possible wild card, '*'",
         layers:[	"Discrete Sites",
                 	"Daily Sites",
+                	"Ecoregion Level 2"
                 ]
     })
 	
