@@ -19,6 +19,21 @@ update site_ref set HUC_8='0'||huc_8
 where length(huc_8)=7;
 -- we could write a rollback that removes the leading 0
 
+--changeset duselman:prefixHuc6With0
+update site_ref set HUC_6='0'||huc_6
+where length(huc_6)=5;
+-- we could write a rollback that removes the leading 0
+
+--changeset duselman:prefixHuc4With0
+update site_ref set HUC_4='0'||huc_4
+where length(huc_4)=3;
+-- we could write a rollback that removes the leading 0
+
+--changeset duselman:prefixHuc2With0
+update site_ref set HUC_2='0'||huc_2
+where length(huc_2)=1;
+-- we could write a rollback that removes the leading 0
+
 
 --changeset duselman:upperCaseSiteName
 update site_ref set sname = upper(sname);
