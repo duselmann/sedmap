@@ -17,19 +17,20 @@ var usgsStation
 
 function setupFilters() {
 	
-	benchmark = new Filters.Bool({
-	    field:'BENCHMARK_SITE', 
-	    trueVal:'1', 
-	    el:'refonly', 
-	    parent:'#filterDiv', 
+    benchmark = new Filters.Bool({
+        field:'BENCHMARK_SITE', 
+        trueVal:'1', 
+        el:'refonly', 
+        parent:'#filterDiv', 
         group:'#Site-Characteristics',
-	    label:'Hydrologic Benchmark Sites:',
-	    layers:[
-	        	"Discrete Sites",
-	        	"Daily Sites",
-	        	]
-	})
-	
+        label:'Hydrologic Benchmark Sites:',
+        layers:[
+                "Discrete Sites",
+                "Daily Sites",
+                ]
+    })
+    
+
     minYears = new Filters.Value({
         class:"minyrs",
         field:'SAMPLE_YEARS', 
@@ -61,21 +62,28 @@ function setupFilters() {
         layers:["Discrete Sites"]
     })
 	
+
     gageBasin = new Filters.Value({
-        class:"gagebasin",
-        field:'SITE_BASIN_REF', 
-        el:'GAGE_BASIN_ID', 
+        class:"usgsBasinNo",
+        field:'BASIN_NO', 
+        el:'BASIN_ID', 
         size:11,
         maxlength:15,
         parent:'#filterDiv', 
         group:'#Boundaries',
         label:'Gage Basin ID:',
-        pattern: /^\d+$/,
-        patternMsg: "Expecting a positive number",
-        layers:[	"Discrete Sites",
-                	"Daily Sites",
+        pattern: /^\d{8,15}$/,
+        valueDecorator: function(value) {
+            return "*"+value+"*"
+        },
+        patternMsg: "Expecting a full 8-15 digit basin ID.",
+        layers:[    "Discrete Sites",
+                    "Daily Sites",
+                    "USGS Basin Boundaries"
                 ]
     })
+    
+
     
     usgsStation = new Filters.Value({
         class:"usgsStationId",

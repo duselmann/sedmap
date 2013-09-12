@@ -83,7 +83,7 @@ function init(){
     addProjectLayer(map, "Ecoregion Level 2", "sedmap:NA_CEC_Eco_Level2", false)
 //    addProjectLayer(map, DAILY+" USGS Gage Basins", "sedmap:Alldailybasins", false)
 //    addProjectLayer(map, DISCRETE+" USGS Gage Basins", "sedmap:Alldiscretebasins", false)
-    addProjectLayer(map, "USGS Basins Boundaries", "sedmap:Allbasinsupdate", false)
+    addProjectLayer(map, "USGS Basin Boundaries", "sedmap:Allbasinsupdate", false)
 
 
     addProjectLayer(map, DAILY, "sedmap:_daily", true)
