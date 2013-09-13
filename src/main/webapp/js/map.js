@@ -32,6 +32,9 @@ var flowUrl    = '/sediment/flow/'; // url to the flow proxy point
 
 var layers = {}
 
+var layerSwitcher;
+var lastControls   = false;
+var lastSiteLegend = false;
 
 function init(){
     
@@ -44,6 +47,7 @@ function init(){
         new OpenLayers.Control.LayerSwitcher(),
         new OpenLayers.Control.ScaleLine(),
     ]
+    layerSwitcher = controls[4]
     var bounds = new OpenLayers.Bounds(-173*111000, 18*111000, -60*111000, 70*111000);
     
     var options = {
@@ -103,6 +107,7 @@ function init(){
     $('#nlcdthumb').click(nlcdLegendToggle)
     $('#nlcdimg').appendTo('#map:first-child')
     $('#siteInfo').click(clearSiteInfo)
+    $('#sitethumb').click(siteLegendToggle)
 }
 
 function getSiteInfo(e) {
@@ -233,8 +238,25 @@ function renderSiteInfo(response) {
 function nlcdLegendToggle() {
     if ($('#nlcdimg').css('display') == 'none') {
         $('#nlcdimg').fadeIn("slow")
+        $('#siteLegend').fadeOut("slow")
+        lastControls  =$('.olControlLayerSwitcher').width()>0;
+        lastSiteLegend=$('#siteLegend').css('display') != 'none'
+		layerSwitcher.minimizeControl()
     } else {
         $('#nlcdimg').fadeOut("slow")
+        if (lastControls) {
+			layerSwitcher.maximizeControl()
+        }
+        if (lastSiteLegend) {
+        $('#siteLegend').fadeIn("slow")
+        }
+    }
+}
+function siteLegendToggle() {
+    if ($('#siteLegend').css('display') == 'none') {
+        $('#siteLegend').fadeIn("slow")
+    } else {
+        $('#siteLegend').fadeOut("slow")
     }
 }
 function nlcdThumbToggle() {

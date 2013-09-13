@@ -153,6 +153,7 @@
             </div>
             <div class="modal-footer"></div>
         </div>
+        <jsp:include page="siteLegend.jsp"/>
         
 <div id="waitSpinner" class="spinner circles" style="left:-400px;top:150px;display:none;">
      <div></div>

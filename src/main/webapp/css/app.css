@@ -27,21 +27,19 @@ div.olMap {
     height: 400px;
 	position: absolute;
 	left: 757px;
-	top: 151px;
+	top: 150px;
 	z-index: 1000;
 }
 #nlcdlegend span {
 	z-index: 10;
-	top: 634px;
+	top: 613px;
 	left: 899px;
 	background-color: #345280;
 	font-weight: bold;
 	color: white;
 	width: 98px;
-	height: 18px;
-	padding-left: 4px;
-    padding-top: 2px;
-    padding-bottom: 2px;
+	height: 15px;
+	padding: 3px 0px 3px 4px;
     position: absolute;
 	cursor: pointer;
 }
@@ -50,6 +48,57 @@ div.olMap {
 }
 #nlcdthumb {
     display:none;
+}
+.siteLegend {
+    background-color: #FFFFFF;
+    color: #345280;
+    font-family: inherit;
+    font-weight: bold;
+    left: 750px;
+    position: absolute;
+    top: 514px;
+    width: 250px;
+    z-index: 9;
+    border-left: solid 1px black;
+}
+.siteLegend .discrete {
+}
+.siteLegend .daily {
+}
+.siteLegend .legendEntry {
+    border-top: solid 1px black;
+    height: 70px;
+}
+.siteLegend .legendDesc {
+    font-size:9px;
+}
+.siteLegend .legendIcon {
+    display:inline-block;
+    float:left;
+}
+.siteLegend .legendIcon img {
+    opacity:0.5;
+}
+.siteLegend .legendLabel {
+    height:51px;
+    margin-left:17px;
+    display:inline-block;
+}
+.siteLegend .legendLabel div {
+    height:33%;
+}
+.sitethumb {
+    background-color: #345280;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-weight: bold;
+    height: 15px;
+    left: 899px;
+    padding: 3px 3px 3px 10px;
+    position: absolute;
+    top: 634.5px;
+    width: 89px;
+    z-index: 10;
 }
 
 .olControlLayerSwitcher .layersDiv {
