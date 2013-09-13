@@ -37,7 +37,7 @@ public class JdbcFetcher extends Fetcher {
 	public static final String DEFAULT_DAILY_SITE_SQL = "" // this is for consistent formatting
 			+ " select s.*, "
 			+ "   NVL(y.sample_years,0) as sample_years "
-			+ " from sedmap.DAILY_STATIONS s "
+			+ " from sedmap.DAILY_STATIONS_DL s "
 			+ " left join ( "
 			+ "    select site_no, count(*) sample_years "
 			+ "      from sedmap.daily_year y "
@@ -50,7 +50,7 @@ public class JdbcFetcher extends Fetcher {
 	static final String DEFAULT_DISCRETE_SITE_SQL = ""
 			+ " select s.*, "
 			+ "   NVL(y.sample_count,0) as sample_count "
-			+ " from sedmap.DISCRETE_STATIONS s "
+			+ " from sedmap.DISCRETE_STATIONS_DL s "
 			+ " left join ( "
 			+ "    select site_no, count(*) sample_count "
 			+ "      from sedmap.discrete_sample_fact  "
@@ -256,7 +256,6 @@ public class JdbcFetcher extends Fetcher {
 		return r;
 	}
 	protected Results getData(Results r, FilterWithViewParams filter, boolean doFilterValues) throws NamingException, SQLException {
-		//select s.*,    NVL(y.sample_years,0) as sample_years  from sedmap.DAILY_STATIONS s  left join (     select site_no, count(*) sample_years       from sedmap.daily_year y      where y.SAMPLE_YEAR>=?        and y.SAMPLE_YEAR<=?      group by site_no) y    on (y.site_no = s.site_no)  where sample_years > 0 and ("SITE_NO" LIKE '123%' )
 		try {
 			int index = 1;
 			for (String value : filter) {

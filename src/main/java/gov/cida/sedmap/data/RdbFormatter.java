@@ -7,6 +7,7 @@ import gov.cida.sedmap.io.IoUtils;
 
 public class RdbFormatter extends CharSepFormatter {
 
+	// TODO this file is currently empty
 	public static final String RDB_FILE_HEADER = "/rdb-header.txt";
 
 

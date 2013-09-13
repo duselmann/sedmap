@@ -301,7 +301,7 @@ public abstract class Fetcher {
 
 	protected Formatter getFormatter(HttpServletRequest req) {
 		String format = req.getParameter("format");
-		format = conf.FILE_FORMATS.containsKey(format) ?format :"rdb";
+		format = conf.FILE_FORMATS.containsKey(format) ?format :"tsv";
 
 		Formatter formatter = null;
 		try {

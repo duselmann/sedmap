@@ -61,10 +61,10 @@ public class FetcherTest {
 		ctx = new MockContext(ctxenv);
 
 		// populate result set place holders
-		ds.put("select * from sedmap.DISCRETE_STATIONS", rs);
-		ds.put("select * from sedmap.DISCRETE_STATIONS", md);
-		ds.put("select * from sedmap.DAILY_STATIONS", rs);
-		ds.put("select * from sedmap.DAILY_STATIONS", md);
+		ds.put("select * from sedmap.DISCRETE_STATIONS_DL", rs);
+		ds.put("select * from sedmap.DISCRETE_STATIONS_DL", md);
+		ds.put("select * from sedmap.DAILY_STATIONS_DL", rs);
+		ds.put("select * from sedmap.DAILY_STATIONS_DL", md);
 		ds.put("select * from sedmap.DISCRETE_SAMPLE", rs);
 		ds.put("select * from sedmap.DISCRETE_SAMPLE", md);
 
@@ -257,8 +257,8 @@ public class FetcherTest {
 		params.put("format", "");
 		HttpServletRequest req = new MockRequest(params);
 		String actual = dss.getFormatter(req).getClass().getName();
-		String expect = "gov.cida.sedmap.data.RdbFormatter";
-		assertEquals("getFormatter default should return a RDB formatter", expect, actual);
+		String expect = "gov.cida.sedmap.data.TsvFormatter";
+		assertEquals("getFormatter default should return a tsv formatter", expect, actual);
 	}
 
 

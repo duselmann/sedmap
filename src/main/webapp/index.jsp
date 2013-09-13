@@ -117,7 +117,7 @@
                             </div>
 				            <br class="floatClear">
                             <input type="button" class="download" value="Download Data"> 
-                            Format: <select id="downloadFormat"><option>csv</option><option selected="true">rdb</option></select>
+                            Format: <select id="downloadFormat"><option>csv</option><option selected="true">tsv</option></select>
                             <input type="checkbox" id="sitesOnly"> Sites Only
 				        </div>
                         <div id="siteInfo">
