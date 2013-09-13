@@ -11,7 +11,7 @@
         <div class="discrete legendLabel"><div></div><div>Discrete Sites</div><div></div></div>
       </div>
       <div class="daily legendEntry">
-        <div class="daily legendDesc">(Dot size is proportional to years in service.)</div>
+        <div class="daily legendDesc">(Size reflects years of suspended sediment data.)</div>
         <div class="daily legendIcon"><img src="./images/dailylegend.png"></div>
         <div class="daily legendLabel"><div></div><div>Daily Sites</div><div></div></div>
       </div>
