@@ -11,7 +11,7 @@ CREATE TABLE SEDMAP.SITE_REF
   LONGITUDE           VARCHAR2(255 BYTE),
   GEOM_LL             MDSYS.SDO_GEOMETRY,
   NWISDA1             VARCHAR2(255 BYTE),
-  STATE              VARCHAR2(255 BYTE),
+  STATE               VARCHAR2(255 BYTE),
   COUNTY_NAME         VARCHAR2(255 BYTE),
   ECO_L3_CODE         VARCHAR2(255 BYTE),
   ECO_L3_NAME         VARCHAR2(255 BYTE),
@@ -23,23 +23,23 @@ CREATE TABLE SEDMAP.SITE_REF
   HUC_SUBREGION_NAME  VARCHAR2(255 BYTE),
   HUC_BASIN_NAME      VARCHAR2(255 BYTE),
   HUC_SUBBASIN_NAME   VARCHAR2(255 BYTE),
-  HUC_2                VARCHAR2(255 BYTE),
-  HUC_4                VARCHAR2(255 BYTE),
-  HUC_6                VARCHAR2(255 BYTE),
-  HUC_8                VARCHAR2(255 BYTE),
-  PERM                VARCHAR2(255 BYTE),
-  BFI                 VARCHAR2(255 BYTE),
-  KFACT               VARCHAR2(255 BYTE),
-  RFACT               VARCHAR2(255 BYTE),
-  PPT30               VARCHAR2(255 BYTE),
-  URBAN               VARCHAR2(255 BYTE),
-  FOREST              VARCHAR2(255 BYTE),
-  AGRIC               VARCHAR2(255 BYTE),
-  MAJ_DAMS            VARCHAR2(255 BYTE),
-  NID_STOR            VARCHAR2(255 BYTE),
-  CLAY                VARCHAR2(255 BYTE),
-  SAND                VARCHAR2(255 BYTE),
-  SILT                VARCHAR2(255 BYTE)
+  HUC_2               VARCHAR2(255 BYTE),
+  HUC_4               VARCHAR2(255 BYTE),
+  HUC_6               VARCHAR2(255 BYTE),
+  HUC_8               VARCHAR2(255 BYTE),
+  PERM                number( 6,4),
+  BFI                 number( 6,4),
+  KFACT               number( 5,4),
+  RFACT               number( 8,5),
+  PPT30               number( 7,4),
+  URBAN               number(12,9),
+  FOREST              number(12,9),
+  AGRIC               number(12,9),
+  MAJ_DAMS            number( 7,4),
+  NID_STOR            number(13,4),
+  CLAY                number( 6,4),
+  SAND                number( 6,4),
+  SILT                number( 6,4)
 );
 
 ALTER TABLE SEDMAP.SITE_REF ADD (
@@ -134,23 +134,19 @@ select "site_no",
   HUC8,
   PERM ,
   BFI  ,
-  KFACT,
-  RFACT,
-  PPT30,
-  URBAN,
-  FOREST,
-  AGRIC,
-  MAJ_DAMS,
-  NID_STOR,
-  CLAY,
-  SAND,
-  SILT    
+  to_number(KFACT),
+  to_number(RFACT) ,
+  to_number(PPT30) ,
+  to_number(URBAN) ,
+  to_number(FOREST),
+  to_number(AGRIC) ,
+  to_number(MAJ_DAMS),
+  to_number(NID_STOR) ,
+  to_number(CLAY)  ,
+  to_number(SAND) ,
+  to_number(SILT)
    from SRC_SSC_SITE_INFO_8_27_13;
 
 update site_ref set GEOM_LL = mdsys.sdo_geometry(2001,8307,mdsys.sdo_point_type
 (longitude,latitude,null),null,null); 
 --rollback truncate table site_ref;
-
-
-
-
