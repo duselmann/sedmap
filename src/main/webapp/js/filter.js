@@ -320,7 +320,7 @@ function setupFilters() {
         options: {
             "AK":"Alaska","AL":"Alabama","AZ":"Arizona","AR":"Arkansas",
             "CA":"California","CO":"Colorado","CT":"Connecticut",
-            "DE":"Delaware",
+            "DE":"Delaware","DC":"District of Columbia",
             "FL":"Florida",
             "GA":"Georgia","GU":"Guam",
             "HI":"Hawaii",
@@ -339,7 +339,7 @@ function setupFilters() {
             "SC":"South Carolina","SD":"South Dakota",
             "TN":"Tennessee","TX":"Texas",
             "UT":"Utah",
-            "VT":"Vermont","VA":"Virginia",
+            "VT":"Vermont","VA":"Virginia","VI":"Virgin Islands",
             "WA":"Washington","WV":"West Virginia",
             "WI":"Wisconsin","WY":"Wyoming",
         }
