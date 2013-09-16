@@ -9,6 +9,7 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.BinaryComparisonAbstract;
 import org.geotools.filter.BinaryLogicAbstract;
+import org.geotools.filter.LikeFilterImpl;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterVisitor;
@@ -153,16 +154,28 @@ class FilterWrapper extends AbstractFilter {
 		return new ArrayList<Filter>();
 	}
 	public PropertyName getExpression1() {
-		if (wrapper.isaLiteralFilter()) {
-			return (PropertyName) ((BinaryComparisonAbstract) getInnerFilter()).getExpression1();
+		PropertyName property = null;
+
+		if (getInnerFilter() instanceof LikeFilterImpl) {
+			LikeFilterImpl likeFilter = (LikeFilterImpl) getInnerFilter();
+			String name = likeFilter.getExpression().toString();
+			property = new SimplePropertyName(name);
+
+		} else if (wrapper.isaLiteralFilter()) {
+			property = (PropertyName) ((BinaryComparisonAbstract) getInnerFilter()).getExpression1();
 		}
-		return null;
+		return property;
 	}
 
 
 	public String getExpression2() {
 		String value = null;
-		if (wrapper.isaLiteralFilter()) {
+
+		if (getInnerFilter() instanceof org.geotools.filter.LikeFilterImpl) {
+			org.geotools.filter.LikeFilterImpl likeFilter = (org.geotools.filter.LikeFilterImpl)getInnerFilter();
+			value = likeFilter.getSQL92LikePattern();
+
+		} else if (wrapper.isaLiteralFilter()) {
 			// TODO this presumes that the literal check ensures safe cast
 			BinaryComparisonAbstract comp = (BinaryComparisonAbstract)getInnerFilter();
 			Literal literal = (Literal) comp.getExpression2();

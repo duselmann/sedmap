@@ -92,6 +92,7 @@ public class FetcherConfig {
 		Map<String, Class<? extends Formatter>> formats = new HashMap<String, Class<? extends Formatter>>();
 		formats.put("csv", CsvFormatter.class);
 		formats.put("rdb", RdbFormatter.class);
+		formats.put("tsv", TsvFormatter.class);
 		return Collections.unmodifiableMap(formats);
 	}
 
@@ -100,9 +101,9 @@ public class FetcherConfig {
 	protected Map<String, String> configTables() {
 		logger.info("Static Fetcher configDataTypes.");
 		Map<String,String> tables = new HashMap<String,String>();
-		tables.put("daily_sites",    "SM_DAILY_STATIONS");
-		tables.put("discrete_sites", "SM_INST_STATIONS");
-		tables.put("discrete_data",  "SM_INST_SAMPLE_FACT");
+		tables.put("daily_sites",    "DAILY_STATIONS_DL");
+		tables.put("discrete_sites", "DISCRETE_STATIONS_DL");
+		tables.put("discrete_data",  "DISCRETE_SAMPLE_FACT");
 		return Collections.unmodifiableMap(tables);
 	}
 
@@ -111,7 +112,7 @@ public class FetcherConfig {
 	protected Map<String, Object> configDataStore() {
 		logger.info("Static Fetcher configDataTypes.");
 		Map<String, Object> env = new HashMap<String, Object>();
-		// dataStoreEnv.put( JDBCDataStoreFactory.SCHEMA.getName(), "sedmap"); // OPTIONAL
+		env.put( JDBCDataStoreFactory.SCHEMA.getName(), "sedmap"); // OPTIONAL
 		env.put( JDBCDataStoreFactory.DBTYPE.getName(), "oracle");
 		env.put( JDBCDataStoreFactory.EXPOSE_PK.getName(), true);
 		env.put( JDBCJNDIDataStoreFactory.JNDI_REFNAME.getName(), jndiDS);

@@ -37,7 +37,7 @@ public class JdbcFetcher extends Fetcher {
 	public static final String DEFAULT_DAILY_SITE_SQL = "" // this is for consistent formatting
 			+ " select s.*, "
 			+ "   NVL(y.sample_years,0) as sample_years "
-			+ " from sedmap.DAILY_STATIONS s "
+			+ " from sedmap.DAILY_STATIONS_DL s "
 			+ " left join ( "
 			+ "    select site_no, count(*) sample_years "
 			+ "      from sedmap.daily_year y "
@@ -50,7 +50,7 @@ public class JdbcFetcher extends Fetcher {
 	static final String DEFAULT_DISCRETE_SITE_SQL = ""
 			+ " select s.*, "
 			+ "   NVL(y.sample_count,0) as sample_count "
-			+ " from sedmap.DISCRETE_STATIONS s "
+			+ " from sedmap.DISCRETE_STATIONS_DL s "
 			+ " left join ( "
 			+ "    select site_no, count(*) sample_count "
 			+ "      from sedmap.discrete_sample_fact  "
@@ -206,6 +206,7 @@ public class JdbcFetcher extends Fetcher {
 		//		trans.setInline(true);
 
 		String where = OgcUtils.ogcXmlToParameterQueryWherClause(filter.getFilter());
+		where = where.replaceAll("\"?SITE_NO\"?", "s.site_no"); // TODO this is a hack
 
 		//		trans.encodeToString(filter);
 		String sql = getQuery(descriptor) + where; // + getQuery(descriptor+"_amount");
@@ -255,7 +256,6 @@ public class JdbcFetcher extends Fetcher {
 		return r;
 	}
 	protected Results getData(Results r, FilterWithViewParams filter, boolean doFilterValues) throws NamingException, SQLException {
-
 		try {
 			int index = 1;
 			for (String value : filter) {
@@ -267,8 +267,12 @@ public class JdbcFetcher extends Fetcher {
 			if (doFilterValues) {
 				FilterLiteralIterator values = new FilterLiteralIterator(filter.getFilter());
 				for (String value : values) {
-					logger.debug("setting value " + value);
-					r.ps.setString(index++, value);
+					if ( ! value.endsWith("%") ) { // TODO this compensates for geoTools inconsistency
+						logger.debug("setting value " + value);
+						r.ps.setString(index++, value);
+					} else {
+						logger.debug("skipping like " + value);
+					}
 				}
 			}
 			r.rs = r.ps.executeQuery();

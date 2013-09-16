@@ -220,7 +220,9 @@ var Filters = Class.extend({
 				var isData  = $('#sitesOnly:checkbox:checked').length == 0
 				var urlPart = []
 				var p = 0
-				urlPart[p++] = "/sediment/data?format=csv&dataTypes=sites_" // always include site info
+				urlPart[p++] = "/sediment/data?format="
+				urlPart[p++] = $('#downloadFormat').val()
+				urlPart[p++] = "&dataTypes=sites_" // always include site info
 				urlPart[p++] = isData  ?"data_"     :""
 				urlPart[p++] = isDaily ?"daily_"    :""
 				urlPart[p++] = isDiscr ?"discrete_" :""
@@ -330,6 +332,7 @@ var Filters = Class.extend({
 	}
 })
 
+
 // storage of the filter obj instances
 Filters.Instances = {}
 // storage of the unique filter names
@@ -339,6 +342,9 @@ Filters.Map = undefined
 
 Filters.OddClass  = 'filterOdd'
 Filters.EvenClass = 'filterEven'
+
+Filters.defaultDecor = function(value){return value};
+
 
 // general validation
 Filters.Validate = {
@@ -413,6 +419,8 @@ Filters.Validate = {
 	}	
 }
 
+
+
 //simple boolean checkbox filter
 Filters.Bool   = Filters.extend({
 	init: function(params) {
@@ -455,6 +463,8 @@ Filters.Bool   = Filters.extend({
 	}
 })
 
+
+
 // simple single value filter
 Filters.Value  = Filters.extend({
 	init : function(params) {
@@ -466,6 +476,7 @@ Filters.Value  = Filters.extend({
 		this.compare    = defaultValue(params.compare, Ogc.Comp.EQUAL_TO)
 		this.pattern    = params.pattern
 		this.patternMsg = params.patternMsg
+		this.valueDecor = defaultValue(params.valueDecorator, Filters.defaultDecor)
 		
 		params.class = defaultValue(params.class,'') + ' filterValue'
 		this._super(params)
@@ -481,11 +492,12 @@ Filters.Value  = Filters.extend({
 	},
 	
 	makeFilter : function(val) {
+	    val = this.valueDecor(val)
 		var params = {
 				property:this.field,
 				value:val
 			}
-		if ( val.endsWith('*') ) {
+		if (  val.indexOf('*') != -1 ) {
 			params.type=Ogc.Comp.LIKE
 		} else {
 			params.type=this.compare

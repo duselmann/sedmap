@@ -106,7 +106,7 @@
                             <span id="nlcdthumb">NLCD Legend</span>
                             <a href="http://www.mrlc.gov/nlcd06_leg.php" target="_tab"><img id="nlcdimg" src="images/nlcdlegend.png"></a>
                         </div>
-				        <div id="filterDiv" class="filter">
+				        <div id="filterDiv" class="filter filterScroll">
 				            <div class="floatLeft" style="height:28px;">
 					            <span class="label">Filter By:</span>
 					            <input type="button" class="clearFilter" value="Clear">
@@ -116,7 +116,9 @@
                                 Please address errors.
                             </div>
 				            <br class="floatClear">
-                            <input type="button" class="download" value="Download Data"> <input type="checkbox" id="sitesOnly"> Sites Only 
+                            <input type="button" class="download" value="Download Data"> 
+                            Format: <select id="downloadFormat"><option>csv</option><option selected="true">tsv</option></select>
+                            <input type="checkbox" id="sitesOnly"> Sites Only
 				        </div>
                         <div id="siteInfo">
                             <jsp:include page="siteInfo.jsp"/>
@@ -134,7 +136,7 @@
                     <jsp:param name="relPath" value="" />
                     <jsp:param name="header-class" value="" />
                     <jsp:param name="site-url" value="<script type='text/javascript'>document.write(document.location.href);</script>" />
-                    <jsp:param name="contact-info" value="<a href='mailto:cjlee@usgs.gov?Subject=Coastal%20Hazards%20Feedback'>Casey Lee</a>" />
+                    <jsp:param name="contact-info" value="<a href='mailto:SedimentPortal_HELP@usgs.gov?Subject=Sediment%20Portal%20Feedback'>Sediment Portal Help</a>" />
                 </jsp:include>
             </div>
         
@@ -151,6 +153,18 @@
             </div>
             <div class="modal-footer"></div>
         </div>
+        <jsp:include page="siteLegend.jsp"/>
+        
+<div id="waitSpinner" class="spinner circles" style="left:-400px;top:150px;display:none;">
+     <div></div>
+     <div></div>
+     <div></div>
+     <div></div>
+     <div></div>
+     <div></div>
+     <div></div>
+     <div></div>
+</div>        
         
     </body>
     

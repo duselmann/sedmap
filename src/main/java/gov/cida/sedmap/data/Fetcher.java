@@ -147,12 +147,12 @@ public abstract class Fetcher {
 
 
 	protected String reconditionLine(String line) {
-		line = line.replaceAll("0\\d_00060_00003_cd", "DAILY_FLOW_QUAL");
-		line = line.replaceAll("0\\d_00060_00003",    "DAILY_FLOW");
-		line = line.replaceAll("0\\d_80155_00003_cd", "DAILY_SSL_QUAL");
-		line = line.replaceAll("0\\d_80155_00003",    "DAILY_SSL");
-		line = line.replaceAll("0\\d_80154_00003_cd", "DAILY_SSC_QUAL");
-		line = line.replaceAll("0\\d_80154_00003",    "DAILY_SSC");
+		line = line.replaceAll("\\d\\d_00060_00003_cd", "DAILY_FLOW_QUAL");
+		line = line.replaceAll("\\d\\d_00060_00003",    "DAILY_FLOW");
+		line = line.replaceAll("\\d\\d_80155_00003_cd", "DAILY_SSL_QUAL");
+		line = line.replaceAll("\\d\\d_80155_00003",    "DAILY_SSL");
+		line = line.replaceAll("\\d\\d_80154_00003_cd", "DAILY_SSC_QUAL");
+		line = line.replaceAll("\\d\\d_80154_00003",    "DAILY_SSC");
 		return line;
 	}
 
@@ -301,7 +301,7 @@ public abstract class Fetcher {
 
 	protected Formatter getFormatter(HttpServletRequest req) {
 		String format = req.getParameter("format");
-		format = conf.FILE_FORMATS.containsKey(format) ?format :"rdb";
+		format = conf.FILE_FORMATS.containsKey(format) ?format :"tsv";
 
 		Formatter formatter = null;
 		try {

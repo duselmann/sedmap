@@ -32,6 +32,9 @@ var flowUrl    = '/sediment/flow/'; // url to the flow proxy point
 
 var layers = {}
 
+var layerSwitcher;
+var lastControls   = false;
+var lastSiteLegend = false;
 
 function init(){
     
@@ -44,6 +47,7 @@ function init(){
         new OpenLayers.Control.LayerSwitcher(),
         new OpenLayers.Control.ScaleLine(),
     ]
+    layerSwitcher = controls[4]
     var bounds = new OpenLayers.Bounds(-173*111000, 18*111000, -60*111000, 70*111000);
     
     var options = {
@@ -81,9 +85,11 @@ function init(){
     addProjectLayer(map, "HUC8", "sedmap:huc_8_multipart_wgs", false)
     addFlowLinesLayer(map);
     addProjectLayer(map, "Ecoregion Level 2", "sedmap:NA_CEC_Eco_Level2", false)
-    addProjectLayer(map, DAILY+" USGS Gage Basins", "sedmap:Alldailybasins", false)
-    addProjectLayer(map, DISCRETE+" USGS Gage Basins", "sedmap:Alldiscretebasins", false)
-//    addProjectLayer(map, "All USGS Gage Basins", "sedmap:AllbasinswDVs1", false)
+//    addProjectLayer(map, DAILY+" USGS Gage Basins", "sedmap:Alldailybasins", false)
+//    addProjectLayer(map, DISCRETE+" USGS Gage Basins", "sedmap:Alldiscretebasins", false)
+    addProjectLayer(map, "USGS Basin Boundaries", "sedmap:Allbasinsupdate", false)
+
+
     addProjectLayer(map, DAILY, "sedmap:_daily", true)
     addProjectLayer(map, DISCRETE, "sedmap:_discrete", true)
     addProjectLayer(map, "NID", "sedmap:NID", false)
@@ -101,6 +107,7 @@ function init(){
     $('#nlcdthumb').click(nlcdLegendToggle)
     $('#nlcdimg').appendTo('#map:first-child')
     $('#siteInfo').click(clearSiteInfo)
+    $('#sitethumb').click(siteLegendToggle)
 }
 
 function getSiteInfo(e) {
@@ -118,7 +125,7 @@ function getSiteInfo(e) {
             INFO_FORMAT: 'application/json',
             QUERY_LAYERS: 'sedmap:_siteInfo',//layer.params.LAYERS,
             FEATURE_COUNT: 50,
-            Layers: 'sedmap:SiteInfo',
+            Layers: 'sedmap:_siteInfo',
             WIDTH: map.size.w,
             HEIGHT: map.size.h,
             format: format,
@@ -184,7 +191,7 @@ function clearSiteInfo(e) {
 function renderSiteInfo(response) {
     var json  = $.parseJSON( response.responseText )
     
-    var fields = ['STATION_NAME', 'USGS_STATION_ID', 'DA', 'DAILY_YEARS', 'DAILY_PERIOD', 'DISCRETE_PERIOD', 'DISCRETE_SAMPLES']
+    var fields = ['SNAME', 'SITE_NO', 'NWISDA1', 'DAILY_YEARS', 'DAILY_PERIOD', 'DISCRETE_PERIOD', 'DISCRETE_SAMPLES']
     
     // TODO this is daily only - need inst also
     
@@ -231,8 +238,25 @@ function renderSiteInfo(response) {
 function nlcdLegendToggle() {
     if ($('#nlcdimg').css('display') == 'none') {
         $('#nlcdimg').fadeIn("slow")
+        $('#siteLegend').fadeOut("slow")
+        lastControls  =$('.olControlLayerSwitcher').width()>0;
+        lastSiteLegend=$('#siteLegend').css('display') != 'none'
+		layerSwitcher.minimizeControl()
     } else {
         $('#nlcdimg').fadeOut("slow")
+        if (lastControls) {
+			layerSwitcher.maximizeControl()
+        }
+        if (lastSiteLegend) {
+        $('#siteLegend').fadeIn("slow")
+        }
+    }
+}
+function siteLegendToggle() {
+    if ($('#siteLegend').css('display') == 'none') {
+        $('#siteLegend').fadeIn("slow")
+    } else {
+        $('#siteLegend').fadeOut("slow")
     }
 }
 function nlcdThumbToggle() {

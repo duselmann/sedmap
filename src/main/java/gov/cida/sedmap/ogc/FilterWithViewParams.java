@@ -1,5 +1,7 @@
 package gov.cida.sedmap.ogc;
 
+import gov.cida.sedmap.io.util.StrUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,7 +31,7 @@ public class FilterWithViewParams  extends AbstractFilter implements Iterable<St
 
 	public void putViewParam(String name, String defaultValue, String value) {
 		viewParamNames.add(name);
-		viewParams.put(name, value==null ?defaultValue :value);
+		viewParams.put(name, StrUtils.isEmpty(value) ?defaultValue :value);
 	}
 
 

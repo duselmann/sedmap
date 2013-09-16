@@ -14,22 +14,24 @@ var soilRfactor
 var soilPerm
 var ecoNum
 var usgsStation
+var stationName 
 
 function setupFilters() {
 	
-	benchmark = new Filters.Bool({
-	    field:'BENCHMARK_SITE', 
-	    trueVal:'1', 
-	    el:'refonly', 
-	    parent:'#filterDiv', 
+    benchmark = new Filters.Bool({
+        field:'BENCHMARK_SITE', 
+        trueVal:'1', 
+        el:'refonly', 
+        parent:'#filterDiv', 
         group:'#Site-Characteristics',
-	    label:'Hydrologic Benchmark Sites:',
-	    layers:[
-	        	"Discrete Sites",
-	        	"Daily Sites",
-	        	]
-	})
-	
+        label:'Hydrologic Benchmark Sites:',
+        layers:[
+                "Discrete Sites",
+                "Daily Sites",
+                ]
+    })
+    
+
     minYears = new Filters.Value({
         class:"minyrs",
         field:'SAMPLE_YEARS', 
@@ -61,21 +63,28 @@ function setupFilters() {
         layers:["Discrete Sites"]
     })
 	
+
     gageBasin = new Filters.Value({
-        class:"gagebasin",
-        field:'SITE_BASIN_REF', 
-        el:'GAGE_BASIN_ID', 
+        class:"usgsBasinNo",
+        field:'BASIN_NO', 
+        el:'BASIN_ID', 
         size:11,
         maxlength:15,
         parent:'#filterDiv', 
         group:'#Boundaries',
         label:'Gage Basin ID:',
-        pattern: /^\d+$/,
-        patternMsg: "Expecting a positive number",
-        layers:[	"Discrete Sites",
-                	"Daily Sites",
+        pattern: /^\d{8,15}$/,
+        valueDecorator: function(value) {
+            return "*"+value+"*"
+        },
+        patternMsg: "Expecting a full 8-15 digit basin ID.",
+        layers:[    "Discrete Sites",
+                    "Daily Sites",
+                    "USGS Basin Boundaries"
                 ]
     })
+    
+
     
     usgsStation = new Filters.Value({
         class:"usgsStationId",
@@ -86,8 +95,28 @@ function setupFilters() {
         parent:'#filterDiv', 
         group:'#Site-Characteristics',
         label:'USGS Station ID:',
-        pattern: /^\d+$/,
-        patternMsg: "Expecting a positive number",
+        pattern: /^\d+\*?$/,
+        patternMsg: "Expecting a HUC number with possible wild card, '*'",
+        layers:[    "Discrete Sites",
+                    "Daily Sites",
+                ]
+    })
+
+    stationName = new Filters.Value({
+        class:"usgsStationName",
+        field:'SNAME', 
+        el:'USGS_STATION_NAME', 
+        size:11,
+        maxlength:50,
+        parent:'#filterDiv', 
+        group:'#Site-Characteristics',
+        label:'USGS Station Name:',
+        pattern: /^[\w\. ]+$/,
+        valueDecorator: function(value) {
+            value = defaultValue(value,"") // prevent undefined issues
+            return "*"+value.toUpperCase()+"*"
+        },
+        patternMsg: "Expecting any part of a station name.",
         layers:[    "Discrete Sites",
                     "Daily Sites",
                 ]
@@ -136,13 +165,13 @@ function setupFilters() {
         el:'SOIL_R', 
         size:6,
         maxlength:6,
-        parent:'#filterDiv', 
+        parent:'#filterDiv',
         group:'#Site-Characteristics',
-        label:'Soil R-Factor:',
-        min:0,
-        max:1,
-        pattern: /^[01]?\.\d{0,3}$/,
-        patternMsg: "Expecting number between 0 and 1",
+        label:'R-Factor:',
+        min:10,
+        max:100,
+        pattern: /^\d{0,3}(\.\d{0,3})?$/,
+        patternMsg: "Expecting number between 10 and 100",
         layers:[    "Discrete Sites",
                     "Daily Sites",
                 ]
@@ -158,9 +187,9 @@ function setupFilters() {
         group:'#Site-Characteristics',
         label:'Soil Permeability:',
         min:0,
-        max:1,
-        pattern: /^[01]?\.\d{0,3}$/,
-        patternMsg: "Expecting number between 0 and 1",
+        max:10,
+        pattern: /^\d{0,2}(\.\d{0,3})?$/,
+        patternMsg: "Expecting number between 0 and 10",
         layers:[    "Discrete Sites",
                     "Daily Sites",
                 ]
@@ -252,6 +281,7 @@ function setupFilters() {
         patternMsg: "Eco Region number have the format ##.##.## with possible wild card, '*'",
         layers:[	"Discrete Sites",
                 	"Daily Sites",
+                	"Ecoregion Level 2"
                 ]
     })
 	
@@ -290,7 +320,7 @@ function setupFilters() {
         options: {
             "AK":"Alaska","AL":"Alabama","AZ":"Arizona","AR":"Arkansas",
             "CA":"California","CO":"Colorado","CT":"Connecticut",
-            "DE":"Delaware",
+            "DE":"Delaware","DC":"District of Columbia",
             "FL":"Florida",
             "GA":"Georgia","GU":"Guam",
             "HI":"Hawaii",
@@ -309,7 +339,7 @@ function setupFilters() {
             "SC":"South Carolina","SD":"South Dakota",
             "TN":"Tennessee","TX":"Texas",
             "UT":"Utah",
-            "VT":"Vermont","VA":"Virginia",
+            "VT":"Vermont","VA":"Virginia","VI":"Virgin Islands",
             "WA":"Washington","WV":"West Virginia",
             "WI":"Wisconsin","WY":"Wyoming",
         }

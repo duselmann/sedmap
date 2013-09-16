@@ -126,10 +126,10 @@ public class GeoToolsFetcherTest {
 		ds.put("select * from sedmap.TABLENAME", rs);
 		ds.put("select * from sedmap.TABLENAME", md);
 
-		//		ds.put("select * from SM_INST_STATIONS", rs);
-		//		ds.put("select * from SM_INST_STATIONS", md);
-		//		ds.put("select * from SM_DAILY_STATIONS", rs);
-		//		ds.put("select * from SM_DAILY_STATIONS", md);
+		//		ds.put("select * from SM_INST_STATIONS_DL", rs);
+		//		ds.put("select * from SM_INST_STATIONS_DL", md);
+		//		ds.put("select * from SM_DAILY_STATIONS_DL", rs);
+		//		ds.put("select * from SM_DAILY_STATIONS_DL", md);
 		//		// populate result set place holders
 		//		ds.put("select * from SM_INST_SAMPLE_FACT", new MockResultSet());
 		//		ds.put("select * from SM_INST_SAMPLE_FACT", new MockRowMetaData());
