@@ -270,7 +270,7 @@ function setupFilters() {
     
 	ecoNum = new Filters.Value({
         class:"ecoNumFilter",
-        field:'ECO_L3_CODE', 
+        field:'ECO_L3_COD', 
         el:'ecoNum', 
         size:8,
         maxlength:12,
