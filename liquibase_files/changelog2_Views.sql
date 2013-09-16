@@ -3,8 +3,9 @@
 --This is for the sedmap schema
  
 --changeset duselman:siteRefBasinView
+--s.eco_l3_code as eco_l3_cod is because of shape file 10 char field name limit
 create or replace view sedmap.SITE_REF_BASIN as
-select s.*, b.basin_ids basin_no
+select s.*, b.basin_ids basin_no, s.eco_l3_code eco_l3_cod
 from sedmap.site_ref s
 left outer join sedmap.site_basin b on s.site_no=b.site_no;
 grant select on SITE_REF_BASIN to seduser;
