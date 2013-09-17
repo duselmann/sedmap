@@ -644,7 +644,7 @@ Filters.Option = Filters.extend({
 		this.setOldVal(el, el)
 	},
 	addFilter: function(e) {
-		var el  = e.originalEvent.srcElement
+		var el  = e.target
 	    var opt = getOptionValues(el)
 
 		if ( isUndefined(this.filter)) {

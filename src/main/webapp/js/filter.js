@@ -320,7 +320,7 @@ function setupFilters() {
         options: {
             "AK":"Alaska","AL":"Alabama","AZ":"Arizona","AR":"Arkansas",
             "CA":"California","CO":"Colorado","CT":"Connecticut",
-            "DE":"Delaware","DC":"District of Columbia",
+            "DE":"Delaware",
             "FL":"Florida",
             "GA":"Georgia","GU":"Guam",
             "HI":"Hawaii",
