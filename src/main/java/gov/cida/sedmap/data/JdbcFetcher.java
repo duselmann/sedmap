@@ -2,6 +2,7 @@ package gov.cida.sedmap.data;
 
 import gov.cida.sedmap.io.FileInputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.WriterWithFile;
 import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.ogc.FilterLiteralIterator;
 import gov.cida.sedmap.ogc.FilterWithViewParams;
@@ -153,51 +154,58 @@ public class JdbcFetcher extends Fetcher {
 	protected InputStream handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
 			throws IOException, SQLException, NamingException {
 
-		FileInputStreamWithFile fileData = null;
-		Results rs = new Results();
+		Results         rs = new Results();
+		WriterWithFile tmp = null;
+		String  descriptor = "discrete_data";
 
 		try {
-			String    descriptor = "discrete_data";
 			String     tableName = getDataTable(descriptor);
 			List<Column> columns = getTableMetadata(tableName);
 			String header = formatter.fileHeader(columns);
 
-			StringBuilder sitesClause = new StringBuilder();
-			String join="";
-			while ( sites.hasNext() ) {
-				sitesClause.append(join).append("'").append(sites.next()).append("'");
-				join=",";
-			}
-			logger.debug(sitesClause.toString());
-
-			String sql = getQuery(descriptor);
-			sql=sql.replace("_siteList_", sitesClause.toString() );
-			logger.debug(sql);
-			rs = initData(sql);
-			getData(rs, filter, false);
-
 			// TODO use IoUtils tmp file creator
-			File   tmp = File.createTempFile(descriptor + StrUtils.uniqueName(12), formatter.getFileType());
-			logger.debug(tmp.getAbsolutePath());
-			FileWriter tmpw = new FileWriter(tmp);
+			//			File   tmpFile = File.createTempFile(descriptor + StrUtils.uniqueName(12), formatter.getFileType());
+			//			logger.debug(tmpFile.getAbsolutePath());
+			//			tmp = new FileWriter(tmpFile);
+			tmp = IoUtils.createTmpZipWriter(descriptor, formatter.getFileType());
 
-			//logger.debug(header);
-			tmpw.write(header);
-			while (rs.rs.next()) {
-				String row = formatter.fileRow(new ResultSetColumnIterator(rs.rs));
-				//logger.debug(row);
-				tmpw.write(row);
+			// open temp file
+			while (sites.hasNext()) {
+				try {
+					int batch = 0;
+					StringBuilder sitesClause = new StringBuilder();
+					String join="";
+					while (++batch<999 && sites.hasNext() ) {
+						sitesClause.append(join).append("'").append(sites.next()).append("'");
+						join=",";
+					}
+					logger.debug(sitesClause.toString());
+
+					String sql = getQuery(descriptor);
+					sql=sql.replace("_siteList_", sitesClause.toString() );
+					logger.debug(sql);
+					rs = initData(sql);
+					getData(rs, filter, false);
+
+
+					//logger.debug(header);
+					tmp.write(header);
+					while (rs.rs.next()) {
+						String row = formatter.fileRow(new ResultSetColumnIterator(rs.rs));
+						//logger.debug(row);
+						tmp.write(row);
+					}
+
+				} finally {
+					IoUtils.quiteClose(rs.rs, rs.ps, rs.cn);
+				}
 			}
-			IoUtils.quiteClose(tmpw);
-
-			fileData = new FileInputStreamWithFile(tmp);
-			//tmp.delete(); // TODO not for delayed download
-
 		} finally {
-			IoUtils.quiteClose(rs.rs, rs.ps, rs.cn);
+			//tmp.delete(); // TODO not for delayed download
+			IoUtils.quiteClose(tmp);
 		}
 
-		return fileData;
+		return IoUtils.createTmpZipStream( tmp.getFile() );
 	}
 
 
@@ -209,7 +217,7 @@ public class JdbcFetcher extends Fetcher {
 		where = where.replaceAll("\"?SITE_NO\"?", "s.site_no"); // TODO this is a hack
 
 		//		trans.encodeToString(filter);
-		String sql = getQuery(descriptor) + where; // + getQuery(descriptor+"_amount");
+		String sql = getQuery(descriptor) + where + " order by s.site_no "; // + getQuery(descriptor+"_amount");
 		return where.length()==2 ?sql.substring(0,sql.length()-7) :sql;
 	}
 
