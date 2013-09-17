@@ -45,17 +45,15 @@ grant select on daily_stations to seduser;
             
 --changeset duselman:CreateSiteInfoView
 create or replace view sedmap.SITE_INFO as
-select s.SITE_NO,SNAME,LATITUDE,LONGITUDE,GEOM_LL,HUC_8,NWISDA1,"STATE",
+select s.*,
     y.minyr as daily_min, y.maxyr as daily_max, y.minyr ||'-'|| y.maxyr as Daily_Period,
     f.minyr as discrete_min, f.maxyr as discrete_max, f.minyr ||'-'|| f.maxyr as Discrete_Period,
-    NVL2(b.SITE_NO, '1','0') as BENCHMARK_SITE,
       NVL( (select 1 from sedmap.daily_sites d where s.SITE_NO=d.SITE_NO) ,0) as daily_site,
       NVL( (select 1 from sedmap.discrete_sites  d where s.SITE_NO=d.SITE_NO) ,0) as discrete_site,
       NVL(y.sample_years,0) as daily_years,
       NVL(y.sample_years,0) as sample_years,
       NVL(f.sample_count,0) as discrete_samples,
-      NVL(f.sample_count,0) as sample_count,
-      s.basin_no
+      NVL(f.sample_count,0) as sample_count
   from sedmap.site_ref_basin s 
   left outer join sedmap.BENCHMARK_SITES b on s.SITE_NO = b.SITE_NO
   left outer join (
