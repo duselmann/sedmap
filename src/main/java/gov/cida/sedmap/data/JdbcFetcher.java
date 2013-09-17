@@ -205,7 +205,7 @@ public class JdbcFetcher extends Fetcher {
 		//		FilterToSQL trans = new FilterToSQL();
 		//		trans.setInline(true);
 
-		String where = OgcUtils.ogcXmlToParameterQueryWherClause(filter.getFilter());
+		String where = OgcUtils.ogcXmlToParameterQueryWhereClause(filter.getFilter());
 		where = where.replaceAll("\"?SITE_NO\"?", "s.site_no"); // TODO this is a hack
 
 		//		trans.encodeToString(filter);
