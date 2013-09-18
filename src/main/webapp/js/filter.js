@@ -160,18 +160,18 @@ function setupFilters() {
     })
     
     soilRfactor = new Filters.Range({
-        class:"soilRfactor",
+        class:"rfactor",
         field:'RFACT', 
-        el:'SOIL_R', 
+        el:'rfact', 
         size:6,
         maxlength:6,
         parent:'#filterDiv',
         group:'#Site-Characteristics',
         label:'R-Factor:',
         min:10,
-        max:100,
+        max:700,
         pattern: /^\d{0,3}(\.\d{0,3})?$/,
-        patternMsg: "Expecting number between 10 and 100",
+        patternMsg: "Expecting number between 10 and 700",
         layers:[    "Discrete Sites",
                     "Daily Sites",
                 ]
