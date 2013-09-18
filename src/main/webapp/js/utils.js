@@ -229,3 +229,9 @@ function getStyle(className) {
     return Class;
   };
 })();
+
+
+function openUrlInNewTab(url) {
+  var win=window.open(url, '_blank');
+  win.focus();
+}
