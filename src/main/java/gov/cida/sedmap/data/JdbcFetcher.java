@@ -217,8 +217,9 @@ public class JdbcFetcher extends Fetcher {
 		where = where.replaceAll("\"?SITE_NO\"?", "s.site_no"); // TODO this is a hack
 
 		//		trans.encodeToString(filter);
-		String sql = getQuery(descriptor) + where + " order by s.site_no "; // + getQuery(descriptor+"_amount");
-		return where.length()==2 ?sql.substring(0,sql.length()-7) :sql;
+		String sql = getQuery(descriptor) + where; // + getQuery(descriptor+"_amount");
+		sql = where.length()==2 ?sql.substring(0,sql.length()-7) :sql;
+		return sql + " order by s.site_no ";
 	}
 
 
