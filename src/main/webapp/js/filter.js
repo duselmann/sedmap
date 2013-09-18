@@ -270,15 +270,15 @@ function setupFilters() {
     
 	ecoNum = new Filters.Value({
         class:"ecoNumFilter",
-        field:'ECO_L3_COD', 
+        field:'ECO_L2_COD', 
         el:'ecoNum', 
         size:8,
         maxlength:12,
         parent:'#filterDiv', 
         group:'#Boundaries',
-        label:'Ecoregion Number:',
-        pattern: /^(\d?(\d\.))+\d?\*?$/,
-        patternMsg: "Eco Region number have the format ##.##.## with possible wild card, '*'",
+        label:'Ecoregion L2 Number:',
+        pattern: /^(\d?(\d\.))?\d?\*?$/,
+        patternMsg: "Eco Region number have the format ##.## with possible wild card, '*'",
         layers:[	"Discrete Sites",
                 	"Daily Sites",
                 	"Ecoregion Level 2"
@@ -316,6 +316,7 @@ function setupFilters() {
                 	"States",
                 	"Counties",
                 	"NID",
+                    "USGS Basin Boundaries"
                 ],
         options: {
             "AK":"Alaska","AL":"Alabama","AZ":"Arizona","AR":"Arkansas",
