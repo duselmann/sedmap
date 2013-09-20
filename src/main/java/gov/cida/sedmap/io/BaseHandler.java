@@ -27,6 +27,11 @@ public class BaseHandler implements FileDownloadHandler {
 	}
 
 	@Override
+	public void close() throws IOException {
+		out.close();
+	}
+
+	@Override
 	public void write(byte[] data) throws IOException {
 		out.write(data);
 	}

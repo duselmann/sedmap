@@ -4,7 +4,10 @@ import gov.cida.sedmap.data.Fetcher;
 import gov.cida.sedmap.data.FetcherConfig;
 import gov.cida.sedmap.data.JdbcFetcher;
 import gov.cida.sedmap.io.FileDownloadHandler;
+import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.ZipHandler;
+import gov.cida.sedmap.io.util.ErrUtils;
+
 import java.io.IOException;
 
 import javax.servlet.ServletConfig;
@@ -12,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 
 
@@ -42,24 +46,29 @@ public class DataService extends HttpServlet {
 
 
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+	protected void doGet(HttpServletRequest req, HttpServletResponse res)
 			throws ServletException, IOException {
 		logger.debug("doGet - delegating to doPost");
-		doPost(req, resp);
+		doPost(req, res);
 	}
 
 
 
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+	protected void doPost(HttpServletRequest req, HttpServletResponse res)
 			throws ServletException, IOException {
 		logger.debug("doPost");
 
-		// TODO catch and return empty file
-		Fetcher fetcher = new JdbcFetcher(jndiDS);
+		FileDownloadHandler handler = null;
+		try {
+			Fetcher fetcher = new JdbcFetcher(jndiDS);
 
-		FileDownloadHandler handler = new ZipHandler(resp, resp.getOutputStream());
-		fetcher.doFetch(req, handler);
+			handler = new ZipHandler(res, res.getOutputStream());
+			fetcher.doFetch(req, handler);
+		} catch (Exception e) {
+			IoUtils.quiteClose(handler);
+			ErrUtils.handleExceptionResponse(req,res,e);
+		}
 	}
 
 }
