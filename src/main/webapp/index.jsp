@@ -42,8 +42,8 @@
         <![endif]-->
         <jsp:include page="template/USGSHead.jsp">
             <jsp:param name="relPath" value="" />
-            <jsp:param name="shortName" value="USGS Sediment Mapper" />
-            <jsp:param name="title" value="USGS Sediment Mapper" />
+            <jsp:param name="shortName" value="USGS Sediment Data Portal" />
+            <jsp:param name="title" value="USGS Sediment Data Portal" />
             <jsp:param name="description" value="" />
             <jsp:param name="author" value="David Uselmann" />
             <jsp:param name="keywords" value="" />
