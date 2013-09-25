@@ -69,7 +69,7 @@
                 <jsp:include page="template/USGSHeader.jsp">
                     <jsp:param name="relPath" value="" />
                     <jsp:param name="header-class" value="" />
-                    <jsp:param name="site-title" value="USGS Sediment Mapper" />
+                    <jsp:param name="site-title" value="USGS Sediment Data Portal" />
                 </jsp:include>
 				<jsp:include page="components/app-navbar.jsp"></jsp:include>
             </div>
