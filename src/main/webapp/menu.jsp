@@ -69,7 +69,8 @@ div.menu a:before {
 <div class="menubar">
     <div class="menu">
         <div class="header">HELP</div>
-        <div class="item"><a onclick="openUrlInNewTab('faqpage.hmtl')" href="#">FAQ</a></div>
+        <div class="item"><a onclick="openUrlInNewTab('quickStart.hmtl')" href="#">Quick Reference</a></div>
+        <div class="item"><a onclick="openUrlInNewTab('documentation.hmtl')" href="#">Documentation</a></div>
     </div>
 </div>
 </body>
