@@ -36,6 +36,7 @@
         <link rel="stylesheet" type="text/css" href="css/openlayers/basic.css">
         <link type="text/css" rel="stylesheet" href="css/custom.css" />
         <link type="text/css" rel="stylesheet" href="css/app.css" />
+        <link type="text/css" rel="stylesheet" href="css/app-ie.css" />
         <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
         <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -56,8 +57,6 @@
         <script type="text/javascript" src="js/jquery/jquery-1.10.2.min.js"></script>
         <script type="text/javascript" src="js/openlayers/OpenLayers.js"></script>
         <script type="text/javascript" src="js/utils.js"></script>
-	    <script type="text/javascript" src="js/filter-api.js"></script>
-	    <script type="text/javascript" src="js/filter.js"></script>
     </head>
     
     <body onload="init()">
@@ -71,7 +70,6 @@
                     <jsp:param name="header-class" value="" />
                     <jsp:param name="site-title" value="USGS Sediment Data Portal" />
                 </jsp:include>
-				<jsp:include page="components/app-navbar.jsp"></jsp:include>
             </div>
             
             <div class="row-fluid" id="content-row">
@@ -103,22 +101,13 @@
                     <div id="map-well" class="well well-small tab-content">
                         <div class="olMap" id="map"></div>
                         <div id="nlcdlegend">
-                            <span id="nlcdthumb">NLCD Legend</span>
+                            <span id="nlcdthumb" class="nlcdThumb legendThumb">NLCD Legend</span>
                             <a href="http://www.mrlc.gov/nlcd06_leg.php" target="_tab"><img id="nlcdimg" src="images/nlcdlegend.png"></a>
                         </div>
+                        <div id="applyFilter-warn" class="hidden filterWarn inputFilterWarnOn pleaseFix">
+                            Please address errors.
+                        </div>
 				        <div id="filterDiv" class="filter filterScroll">
-				            <div class="floatLeft" style="height:28px;">
-					            <span class="label">Filter By:</span>
-					            <input type="button" class="clearFilter" value="Clear">
-					            <input type="button" class="applyFilter" value="Apply"> 
-				            </div>
-                            <div id="applyFilter-warn" class="hidden filterWarn inputFilterWarnOn floatLeft" style="margin-left: 5px;" >
-                                Please address errors.
-                            </div>
-				            <br class="floatClear">
-                            <input type="button" class="download" value="Download Data"> 
-                            Format: <select id="downloadFormat"><option>csv</option><option selected="true">tsv</option></select>
-                            <input type="checkbox" id="sitesOnly"> Sites Only
 				        </div>
                         <div id="siteInfo">
                             <jsp:include page="siteInfo.jsp"/>
@@ -154,9 +143,10 @@
             <div class="modal-footer"></div>
         </div>
         <jsp:include page="siteLegend.jsp"/>
+        <jsp:include page="download.jsp"/>
         <jsp:include page="menu.jsp"/>
         
-<div id="waitSpinner" class="spinner circles" style="left:-400px;top:150px;display:none;">
+<div id="waitSpinner" class="spinner circles hidden" style="left:-400px;top:150px;">
      <div></div>
      <div></div>
      <div></div>
@@ -167,11 +157,7 @@
      <div></div>
 </div>        
         
-    </body>
     
-    <jsp:include page="js/dygraphs/dygraphs.jsp">
-        <jsp:param name="debug-qualifier" value="true" />
-    </jsp:include>
     
     <script type="text/javascript" src="js/jquery-ui/jquery-ui-1.10.0.custom.min.js"></script>
     <script type="text/javascript" src="js/ui/ui.js"></script>
@@ -182,6 +168,8 @@
     <script src="js/openlayers/extension/Raster/Operation.js"></script>
     <script src="js/openlayers/extension/Layer/Raster.js"></script>    
     <script type="text/javascript" src="js/map.js" defer="defer" ></script>
-    <!-- script type="text/javascript" src="js/onReady.js"></script -->
-    <jsp:include page="components/config.jsp"></jsp:include>
+    <script type="text/javascript" src="js/filter-api.js"></script>
+    <script type="text/javascript" src="js/filter.js"></script>
+    
+</body>
 </html>

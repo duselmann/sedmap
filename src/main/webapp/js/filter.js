@@ -276,7 +276,7 @@ function setupFilters() {
         maxlength:12,
         parent:'#filterDiv', 
         group:'#Boundaries',
-        label:'Ecoregion L2 Number:',
+        label:'Ecoregion Level 2 Number:',
         pattern: /^(\d?(\d\.?))?\d?\*?$/,
         patternMsg: "Eco Region number have the format ##.## with possible wild card, '*'",
         layers:[	"Discrete Sites",
@@ -345,6 +345,30 @@ function setupFilters() {
             "WI":"Wisconsin","WY":"Wyoming",
         }
     })
+
+
+$("div.downloadWindow .closeWindow").click(function(){
+    $("#DL-cancel").click();
+    })
+$("#DL-cancel").click(function(){
+    $(".blackoverlay").fadeOut("slow");
+    })
+$("#DL-open").click(function(){
+    $(".blackoverlay").fadeIn("slow");
+    })
 }
 
 $().ready(setupFilters)
+
+
+
+function downloadShow() {
+    var isDaily = layers[DAILY].visibility
+    var isDiscr = layers[DISCRETE].visibility
+
+    $("#DL-daily").prop('checked', isDaily)
+    $("#DL-discrete").prop('checked', isDiscr)
+    $("#DL-discreteFlow").prop('checked', isDiscr)
+
+    $(".blackoverlay").fadeIn("slow")
+}

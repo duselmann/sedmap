@@ -1,9 +1,4 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-
-<html lang="en">
-        
-<body>
     <div id="singleSiteInfo" class="singleSiteInfo">
       <div class="siteDatum">
         <div class="siteInfoLabel">Site Name</div>              <div class="siteInfoData" id="SNAME"></div>
@@ -29,6 +24,3 @@
       </div>
     
     </div>
-</body>
-    
-</html>
