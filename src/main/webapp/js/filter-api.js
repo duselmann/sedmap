@@ -215,7 +215,7 @@ var Filters = Class.extend({
 			$('.applyFilter').click(function(){applyFilters(_this.parent)})
 			$('.clearFilter').click(function(){clearFilters(_this.parent)})
 			
-			$(_this.parent + ' .download').click(function(){
+			$('#DL-download').click(function(){
 				// TODO re-factor to a callback of some fashion
 				var isDaily = $('#DL-daily:checkbox:checked').length != 0
 				var isDiscr = $('#DL-discrete:checkbox:checked').length != 0
