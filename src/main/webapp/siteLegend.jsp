@@ -1,9 +1,4 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-
-<html lang="en">
-        
-<body>
     <div id="siteLegend" class="siteLegend">
       <div class="discrete legendEntry">
         <div class="discrete legendDesc">(Dot size is proportional to available samples.)</div>
@@ -16,7 +11,4 @@
         <div class="daily legendLabel"><div></div><div>Daily Sites</div><div></div></div>
       </div>
     </div>
-    <span id="sitethumb" class="sitethumb">Site Legend</span>
-</body>
-    
-</html>
+    <span id="sitethumb" class="siteThumb legendThumb">Site Legend</span>

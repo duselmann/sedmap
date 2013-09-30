@@ -14,6 +14,9 @@ public class FilterLiteralIterator implements Iterable<String>, Iterator<String>
 
 
 	public FilterLiteralIterator(Filter filter) {
+		if (OgcUtils.isAllFilter(filter)) {
+			filter = null;
+		}
 		if (filter != null) {
 			parent = new FilterWrapper(filter);
 			next   = new FilterWrapperDepthFirstIterator(filter);

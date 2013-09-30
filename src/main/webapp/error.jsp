@@ -36,7 +36,6 @@
         <link rel="stylesheet" type="text/css" href="css/openlayers/basic.css">
         <link type="text/css" rel="stylesheet" href="css/custom.css" />
         <link type="text/css" rel="stylesheet" href="css/app.css" />
-        <link type="text/css" rel="stylesheet" href="css/app-ie.css" />
         <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
         <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -55,7 +54,6 @@
             <jsp:param name="development" value="<%= development %>" />
         </jsp:include>
         <script type="text/javascript" src="js/jquery/jquery-1.10.2.min.js"></script>
-        <script type="text/javascript" src="js/openlayers/OpenLayers.js"></script>
         <script type="text/javascript" src="js/utils.js"></script>
     </head>
     
@@ -68,51 +66,24 @@
                 <jsp:include page="template/USGSHeader.jsp">
                     <jsp:param name="relPath" value="" />
                     <jsp:param name="header-class" value="" />
-                    <jsp:param name="site-title" value="USGS Sediment Data Portal" />
+                    <jsp:param name="site-title" value="USGS Sediment Mapper" />
                 </jsp:include>
+				<jsp:include page="components/app-navbar.jsp"></jsp:include>
             </div>
             
-            <div class="row-fluid" id="content-row">
-                <!-- NAV -->
-                <div class="span1" id='nav-list'>
-                    <ul id="stage-select-tablist" class="nav nav-pills nav-stacked">
-                    <!-- 
-                        <li class="active"><a href="#shorelines" data-toggle="tab"><img id="shorelines_img" src="images/workflow_figures/shorelines.png" title="Display Shorelines"/></a></li>
-                        <li><a href="#baseline" data-toggle="tab"><img id="baseline_img" src="images/workflow_figures/baseline_future.png" title="Display Baseline"/></a></li>
-                        <li><a href="#transects" data-toggle="tab"><img id="transects_img" src="images/workflow_figures/transects_future.png" title="Calculate Transects"/></a></li>
-                        <li><a href="#calculation" data-toggle="tab"><img id="calculation_img" src="images/workflow_figures/calculation_future.png" title="Show Calculation"/></a></li>
-                        <li><a href="#results" data-toggle="tab"><img id="results_img" src="images/workflow_figures/results_future.png" title="Display Results"/></a></li>
-                     -->
-                    </ul>
-                    <div id="application-spinner"><img src="images/spinner/spinner2.gif" /></div>
-                </div>
+            <div style="height:200px;" id="content-row">
 
-                <!-- Toolbox -->
-                <div class="span4" id="toolbox-span">
-                    <div id="toolbox-well" class="well well-small tab-content">
-
-
-                    </div>
-
-                </div>
-
-                <!-- MAP -->
-                <div class="span7" id="map-span">
-                    <div id="map-well" class="well well-small tab-content">
-                        <div class="olMap" id="map"></div>
-                        <div id="nlcdlegend">
-                            <span id="nlcdthumb" class="nlcdThumb legendThumb">NLCD Legend</span>
-                            <a href="http://www.mrlc.gov/nlcd06_leg.php" target="_tab"><img id="nlcdimg" src="images/nlcdlegend.png"></a>
-                        </div>
-                        <div id="applyFilter-warn" class="hidden filterWarn inputFilterWarnOn pleaseFix">
-                            Please address errors.
-                        </div>
-				        <div id="filterDiv" class="filter filterScroll">
-				        </div>
-                        <div id="siteInfo">
-                            <jsp:include page="siteInfo.jsp"/>
-                        </div>
-                    </div>
+                <div style="margin:100px">
+                    We are sorry, the application encountered an unexpected result. You may try again. 
+                    <br><br>
+                    If you reach this a second time (or if you prefer, your first time)
+                    <br>
+                    please contact 
+                    <a href='mailto:SedimentPortal_HELP@usgs.gov?Subject=Sediment%20Portal%20Ticket%20<%= null==session.getAttribute("errorid") ?"sdp123" :session.getAttribute("errorid") %>'>
+                    Sediment Portal Help</a>
+                    with this ticket ID.
+                    <br><br>
+                    Ticket ID: <%= null==session.getAttribute("errorid") ?"sdp123" :session.getAttribute("errorid") %>
                 </div>
 
             </div>
@@ -120,11 +91,12 @@
                 <div id="application-alert-container" class="span11 offset1"></div>
             </div>
 
+			<style>#footer-url-info {display:none;}</style>
+
             <div class="row-fluid" id="footer-row">
                 <jsp:include page="template/USGSFooter.jsp">
                     <jsp:param name="relPath" value="" />
                     <jsp:param name="header-class" value="" />
-                    <jsp:param name="site-url" value="<script type='text/javascript'>document.write(document.location.href);</script>" />
                     <jsp:param name="contact-info" value="<a href='mailto:SedimentPortal_HELP@usgs.gov?Subject=Sediment%20Portal%20Feedback'>Sediment Portal Help</a>" />
                 </jsp:include>
             </div>
@@ -142,34 +114,12 @@
             </div>
             <div class="modal-footer"></div>
         </div>
-        <jsp:include page="siteLegend.jsp"/>
-        <jsp:include page="download.jsp"/>
         <jsp:include page="menu.jsp"/>
         
-<div id="waitSpinner" class="spinner circles hidden" style="left:-400px;top:150px;">
-     <div></div>
-     <div></div>
-     <div></div>
-     <div></div>
-     <div></div>
-     <div></div>
-     <div></div>
-     <div></div>
-</div>        
         
-    
+    </body>
     
     <script type="text/javascript" src="js/jquery-ui/jquery-ui-1.10.0.custom.min.js"></script>
     <script type="text/javascript" src="js/ui/ui.js"></script>
     <script type="text/javascript" src="js/util/util.js"></script>
-    <script src="js/openlayers/extension/Raster.js"></script>
-    <script src="js/openlayers/extension/Raster/Grid.js"></script>
-    <script src="js/openlayers/extension/Raster/Composite.js"></script>
-    <script src="js/openlayers/extension/Raster/Operation.js"></script>
-    <script src="js/openlayers/extension/Layer/Raster.js"></script>    
-    <script type="text/javascript" src="js/map.js" defer="defer" ></script>
-    <script type="text/javascript" src="js/filter-api.js"></script>
-    <script type="text/javascript" src="js/filter.js"></script>
-    
-</body>
 </html>

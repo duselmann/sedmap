@@ -160,18 +160,18 @@ function setupFilters() {
     })
     
     soilRfactor = new Filters.Range({
-        class:"soilRfactor",
+        class:"rfactor",
         field:'RFACT', 
-        el:'SOIL_R', 
+        el:'rfact', 
         size:6,
         maxlength:6,
         parent:'#filterDiv',
         group:'#Site-Characteristics',
         label:'R-Factor:',
         min:10,
-        max:100,
+        max:700,
         pattern: /^\d{0,3}(\.\d{0,3})?$/,
-        patternMsg: "Expecting number between 10 and 100",
+        patternMsg: "Expecting number between 10 and 700",
         layers:[    "Discrete Sites",
                     "Daily Sites",
                 ]
@@ -270,15 +270,15 @@ function setupFilters() {
     
 	ecoNum = new Filters.Value({
         class:"ecoNumFilter",
-        field:'ECO_L3_COD', 
+        field:'ECO_L2_COD', 
         el:'ecoNum', 
         size:8,
         maxlength:12,
         parent:'#filterDiv', 
         group:'#Boundaries',
-        label:'Ecoregion Number:',
-        pattern: /^(\d?(\d\.))+\d?\*?$/,
-        patternMsg: "Eco Region number have the format ##.##.## with possible wild card, '*'",
+        label:'Ecoregion Level 2 Number:',
+        pattern: /^(\d?(\d\.?))?\d?\*?$/,
+        patternMsg: "Eco Region number have the format ##.## with possible wild card, '*'",
         layers:[	"Discrete Sites",
                 	"Daily Sites",
                 	"Ecoregion Level 2"
@@ -316,11 +316,12 @@ function setupFilters() {
                 	"States",
                 	"Counties",
                 	"NID",
+                    "USGS Basin Boundaries"
                 ],
         options: {
             "AK":"Alaska","AL":"Alabama","AZ":"Arizona","AR":"Arkansas",
             "CA":"California","CO":"Colorado","CT":"Connecticut",
-            "DE":"Delaware","DC":"District of Columbia",
+            "DE":"Delaware",
             "FL":"Florida",
             "GA":"Georgia","GU":"Guam",
             "HI":"Hawaii",
@@ -344,6 +345,30 @@ function setupFilters() {
             "WI":"Wisconsin","WY":"Wyoming",
         }
     })
+
+
+$("div.downloadWindow .closeWindow").click(function(){
+    $("#DL-cancel").click();
+    })
+$("#DL-cancel").click(function(){
+    $(".blackoverlay").fadeOut("slow");
+    })
+$("#DL-open").click(function(){
+    $(".blackoverlay").fadeIn("slow");
+    })
 }
 
 $().ready(setupFilters)
+
+
+
+function downloadShow() {
+    var isDaily = layers[DAILY].visibility
+    var isDiscr = layers[DISCRETE].visibility
+
+    $("#DL-daily").prop('checked', isDaily)
+    $("#DL-discrete").prop('checked', isDiscr)
+    $("#DL-discreteFlow").prop('checked', isDiscr)
+
+    $(".blackoverlay").fadeIn("slow")
+}

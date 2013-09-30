@@ -30,19 +30,26 @@ div.olMap {
 	top: 150px;
 	z-index: 1000;
 }
-#nlcdlegend span {
-	z-index: 10;
-	top: 613px;
-	left: 899px;
-	background-color: #345280;
-	font-weight: bold;
-	color: white;
-	width: 98px;
-	height: 15px;
-	padding: 3px 0px 3px 4px;
-    position: absolute;
-	cursor: pointer;
+.nlcdThumb {
+    top: 613px;
 }
+
+.legendThumb {
+    background-color: #345280;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-weight: bold;
+    height: 19px;
+    left: 895px;
+    padding-top: 3px;
+    position: absolute;
+    width: 106px;
+    z-index: 10;
+    text-align: center;
+}
+
+
+
 #nlcdimg {
 	display:none;
 }
@@ -87,18 +94,8 @@ div.olMap {
 .siteLegend .legendLabel div {
     height:33%;
 }
-.sitethumb {
-    background-color: #345280;
-    color: #FFFFFF;
-    cursor: pointer;
-    font-weight: bold;
-    height: 15px;
-    left: 899px;
-    padding: 3px 3px 3px 10px;
-    position: absolute;
+.siteThumb {
     top: 634.5px;
-    width: 89px;
-    z-index: 10;
 }
 
 .olControlLayerSwitcher .layersDiv {
@@ -213,6 +210,14 @@ div.filter div.inputFilterWarnOn {
     padding: 1px 5px 1px 5px;
     border: 1px solid #990000;
 }
+.pleaseFix {
+    margin-left: 5px;
+    position: absolute;
+    z-index: 9999;
+    border: 1px solid;
+    left: 900px;
+    top: 80px;
+}
 div.filter div.inputFilterWarn input {
 	border: 1px solid #990000;
 }
@@ -231,7 +236,7 @@ div.filter div.filterOdd {
 	position:relative;
 }
 .stateFilterLabel {
-	width:180px !important;
+	width:170px !important;
 	position:absolute;
 	top:1px;
 }
@@ -371,4 +376,172 @@ div.filter div.filterOdd {
      -moz-transform: rotate(315deg) translate(0, -35px) scale(0.1);
      transform: rotate(315deg) translate(0, -35px) scale(0.1);
      opacity:0.1;
+}
+
+
+div.blackoverlay {
+    margin:0;
+    padding:0;
+    position:absolute;
+    top:0px;
+    left:0px;
+    width:100%;
+    height:100%;
+    z-index:998;
+    background-color: rgba(0,0,0,0.8);
+}
+div.downloadWindow {
+    margin:0;
+    padding:0;
+    position:absolute;
+    top:200px;
+    left:500px;
+    width:300px;
+    height:auto;
+    z-index:999;
+    font-weight:bold;
+    border: 5px solid #345280;
+    background-color: #bdf;
+}
+div.downloadWindow .center {
+    text-align: center;
+}
+div.downloadWindow .buttons {
+    padding-bottom:5px;
+}
+div.downloadWindow .subitem {
+    padding-left:20px;
+}
+div.downloadWindow .title {
+    color:white;
+    font-weight:bold;
+    background-color:#345280;
+    border-bottom: 1px solid #345280;
+}
+div.downloadWindow .closeWindow {
+    color:white;
+    text-align: center;
+    position:relative;
+    left:280px;
+    top:-20px;
+    width:20px;
+    border-left: 1px solid white;
+    cursor:pointer;
+}
+div.downloadWindow ul {
+    list-style-type: none;
+}
+div.downloadWindow li {
+    padding-bottom: 5px;
+    clear:both;
+}
+
+div.downloadWindow input {
+    border: 1px solid #345280;
+    border-radius: 5px;
+    padding: 0 4px 0 4px;
+    margin: 1px 0 1px 0;
+    background-color: #ddeeff;
+}
+
+div.downloadWindow input[type=button] {
+    color: #113355;
+    font-weight:bold;
+    box-shadow: 2px 2px #335577;
+}
+
+div.downloadWindow input[type=button]:hover {
+    color: #557799;
+}
+
+div.downloadWindow input[type=button]:active {
+    box-shadow: 0px 0px;
+    top: 2px;
+    left: 2px;
+    position: relative;
+}
+
+div.downloadWindow
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="color"]:focus,
+input[type="button"]:hover,
+.uneditable-input:focus {
+  border-color: rgba(0, 0, 100, 0.8);
+  outline: 0;
+  outline: thin dotted \9;
+  /* IE6-9 */
+
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(0, 0, 100, 0.6);
+     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(0, 0, 100, 0.6);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(0, 0, 100, 0.6);
+}
+
+
+
+div.menubar {
+    margin:0;
+    padding:0;
+    position:absolute;
+    top:74px;
+    left:1100px;
+    z-index:100;
+    font-weight:bold;
+}
+div.menubar div.menu {
+    float: left;
+    width: 100px;
+    height: 20px;
+    overflow-y: hidden;
+    color: white;
+    background: #345280;
+    padding: 4px;
+    border: 1px solid #345280;
+    overflow: hidden;
+}
+div.menubar div.menu:hover {
+    float: left;
+    height: auto;
+    color: #345280;
+    background: white;
+    padding: 4px;
+    padding-bottom: 0px;
+}
+div.menu div.header {
+    height:30px;
+    display:inline-block;
+}
+div.menu div.item {
+    background: white;
+    color: #345280;
+    display:inline-block;
+    width:110px;
+    border: 1px solid #345280;
+    border-bottom:0px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+div.menu div.item:hover {
+    color: white;
+    background: #345280;
+}
+div.menu a {
+    display:block;
+    background-color:inherit;
+    color:inherit;
+    text-decoration: none;
+}
+div.menu a:before {
+    content: '\0000a0\0000a0';
 }

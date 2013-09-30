@@ -91,15 +91,17 @@ public abstract class Fetcher {
 		int headerLines = formatter instanceof RdbFormatter ?2 :1;
 
 		// open temp file
-		WriterWithFile tmp = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());
+		WriterWithFile tmp = null;
 		try {
+			tmp = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());
+
 			while (sites.hasNext()) {
 				int batch = 0;
 				String sep = "";
 				StringBuilder siteList = new StringBuilder();
 
 				// site list should be in batches of 99 site IDs
-				while (batch++<99 && sites.hasNext()) {
+				while (++batch<99 && sites.hasNext()) {
 					siteList.append(sep).append(sites.next());
 					sep=",";
 				}

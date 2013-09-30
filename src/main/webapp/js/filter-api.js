@@ -210,14 +210,17 @@ var Filters = Class.extend({
 					applyFilters(_this.parent)
 				}
 			})
-			$(_this.parent + ' .applyFilter').click(function(){applyFilters(_this.parent)})
-			$(_this.parent + ' .clearFilter').click(function(){clearFilters(_this.parent)})
+			// I would have like this to be related to the filter parent
+			// but now that it is a menu we have to rethink how - no time
+			$('.applyFilter').click(function(){applyFilters(_this.parent)})
+			$('.clearFilter').click(function(){clearFilters(_this.parent)})
 			
 			$(_this.parent + ' .download').click(function(){
-				// TODO re-factor to use map.layers in some fashion
-				var isDaily = layers[DAILY].visibility
-				var isDiscr = layers[DISCRETE].visibility
-				var isData  = $('#sitesOnly:checkbox:checked').length == 0
+				// TODO re-factor to a callback of some fashion
+				var isDaily = $('#DL-daily:checkbox:checked').length != 0
+				var isDiscr = $('#DL-discrete:checkbox:checked').length != 0
+                var isData  = $('#DL-sitesOnly:checkbox:checked').length == 0
+                var isFlow  = $('#DL-discreteFlow:checkbox:checked').length != 0
 				var urlPart = []
 				var p = 0
 				urlPart[p++] = "/sediment/data?format="
@@ -225,7 +228,9 @@ var Filters = Class.extend({
 				urlPart[p++] = "&dataTypes=sites_" // always include site info
 				urlPart[p++] = isData  ?"data_"     :""
 				urlPart[p++] = isDaily ?"daily_"    :""
-				urlPart[p++] = isDiscr ?"discrete_" :""
+                urlPart[p++] = isDiscr ?"discrete_" :""
+                urlPart[p++] = isFlow  ?"flow_" :""
+                urlPart[p++] = "email="+$("#DL-email").val()
 				urlPart[p++] = isDaily ?"&dailyFilter="   +getFilters(_this.parent, DAILY)    :""
 				urlPart[p++] = isDiscr ?"&discreteFilter="+getFilters(_this.parent, DISCRETE) :""
 				var url = urlPart.join("")
@@ -644,7 +649,7 @@ Filters.Option = Filters.extend({
 		this.setOldVal(el, el)
 	},
 	addFilter: function(e) {
-		var el  = e.originalEvent.srcElement
+		var el  = e.target
 	    var opt = getOptionValues(el)
 
 		if ( isUndefined(this.filter)) {
@@ -696,8 +701,8 @@ Filters.Option = Filters.extend({
 		var dom = '<div id="'+this.el+'" '
 		if (this.classEl) dom += 'class="'+this.classEl+' '+this.oddEvenClass()+'" style="padding-bottom:15px" ' 
 		dom += '><div id="a" style="display:inline-block">' + this.createLabel()
-		dom += '<div  id="b" style="display:inline-block;position:absolute;top:1px;left:185px;">'
-		dom += this.createOptionDom() + '</div></div><div id="'+this.optDiv+'" style="left: 185px;position: relative;top: 10px;">'
+		dom += '<div  id="b" style="display:inline-block;position:absolute;top:1px;left:175px;">'
+		dom += this.createOptionDom() + '</div></div><div id="'+this.optDiv+'" style="left: 175px;position: relative;top: 10px;">'
 		return dom
 	},
 	

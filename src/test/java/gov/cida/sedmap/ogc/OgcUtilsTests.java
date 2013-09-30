@@ -129,21 +129,21 @@ public class OgcUtilsTests {
 	@Test
 	public void test_removeFilter_yr1() throws Exception {
 		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
-		String sql0   = OgcUtils.ogcXmlToParameterQueryWherClause(filter);
+		String sql0   = OgcUtils.ogcXmlToParameterQueryWhereClause(filter);
 		assertTrue("original filter should contain the yr1 param", sql0.contains("yr1"));
 
 		@SuppressWarnings("unchecked") // suppress warning that is bug in java
 		String value  = OgcUtils.removeFilter(filter, "yr1");
 		assertEquals("1900",value);
 
-		String sql1   = OgcUtils.ogcXmlToParameterQueryWherClause(filter);
+		String sql1   = OgcUtils.ogcXmlToParameterQueryWhereClause(filter);
 		assertFalse("removed yr1 should not be present", sql1.contains("yr1"));
 	}
 
 	@Test
 	public void test_removeFilter_yr1_yr2() throws Exception {
 		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
-		String sql0   = OgcUtils.ogcXmlToParameterQueryWherClause(filter);
+		String sql0   = OgcUtils.ogcXmlToParameterQueryWhereClause(filter);
 		assertTrue("original filter should contain the yr1 param", sql0.contains("yr1"));
 		assertTrue("original filter should contain the yr1 param", sql0.contains("yr2"));
 
@@ -155,7 +155,7 @@ public class OgcUtilsTests {
 		String value2 = OgcUtils.removeFilter(filter, "yr2");
 		assertEquals("1950",value2);
 
-		String sql1   = OgcUtils.ogcXmlToParameterQueryWherClause(filter);
+		String sql1   = OgcUtils.ogcXmlToParameterQueryWhereClause(filter);
 		assertFalse("removed yr1 should not be present", sql1.contains("yr1"));
 		assertFalse("removed yr2 should not be present", sql1.contains("yr2"));
 		assertFalse("removed yr1 and yr2 should not leave an empty clause", sql1.contains("AND []"));

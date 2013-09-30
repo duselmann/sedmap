@@ -1,9 +1,10 @@
 package gov.cida.sedmap.io;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 
-public interface FileDownloadHandler {
+public interface FileDownloadHandler extends Closeable {
 
 	String getContentType();
 	void beginWritingFiles() throws IOException;

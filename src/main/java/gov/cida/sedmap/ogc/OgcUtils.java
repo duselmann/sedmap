@@ -1,6 +1,8 @@
 package gov.cida.sedmap.ogc;
 
 
+import gov.cida.sedmap.io.util.StrUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -37,6 +39,25 @@ public class OgcUtils {
 	private static final Logger logger = Logger.getLogger(OgcUtils.class);
 	private static final char INVALID_CHARS[] = new char[]{ '\'',';','(',')' };
 	private static final Map<String, String> SQL_TRANSLATIONS = new HashMap<String, String>();
+	@SuppressWarnings("deprecation")
+	private static final AbstractFilter ALL_FILTER = new AbstractFilter(null) {
+		@Override
+		public boolean evaluate(Object object) {
+			return Filter.INCLUDE.evaluate(object);
+		}
+		@Override
+		public org.geotools.filter.Filter or(Filter filter) {
+			return null;
+		}
+		@Override
+		public org.geotools.filter.Filter not() {
+			return null;
+		}
+		@Override
+		public org.geotools.filter.Filter and(Filter filter) {
+			return null;
+		}
+	};
 
 	// TODO if the translation becomes too much more complex - look into Sql Filter geotools API
 	static {
@@ -48,6 +69,10 @@ public class OgcUtils {
 
 
 	public static AbstractFilter ogcXmlToFilter(String ogcXml) {
+		if (StrUtils.isEmpty(ogcXml)) {
+			return OgcUtils.ALL_FILTER;
+		}
+
 		try {
 			logger.debug("ogcXml2Filter");
 			// parse the OGC filter
@@ -66,11 +91,15 @@ public class OgcUtils {
 		logger.debug("ogcXml2Sql");
 		// parse the OGC filter
 		Filter filter = ogcXmlToFilter(ogcXml);
-		return ogcXmlToParameterQueryWherClause(filter);
+		return ogcXmlToParameterQueryWhereClause(filter);
 	}
-	public static String ogcXmlToParameterQueryWherClause(Filter filter) {
+	public static String ogcXmlToParameterQueryWhereClause(Filter filter) {
 		// convert to SQL
 		String sql="";
+		if (isAllFilter(filter)) {
+			return " 1=1 ";
+		}
+
 		try {
 			JDBCDataStore ds = new JDBCDataStore();
 			OracleFilterToSQL osql = new OracleFilterToSQL(new OracleDialect(ds));
@@ -195,6 +224,9 @@ public class OgcUtils {
 	@SafeVarargs
 	protected static Filter findFilter(boolean remove, FilterWrapper filter, String param, Class<? extends BinaryComparisonOperator> ... opcodes) {
 		Filter found = null;
+		if ( isAllFilter(filter) ) {
+			return found;
+		}
 
 		if ( filter.isaLogicFilter() ) {
 			for (Filter child : filter.getChildren() ) {
@@ -242,6 +274,13 @@ public class OgcUtils {
 		}
 
 		return fw.getExpression2();
+	}
+
+	public static boolean isAllFilter(Filter filter) {
+		if (filter instanceof FilterWrapper) {
+			filter = ((FilterWrapper)filter).getInnerFilter();
+		}
+		return filter==ALL_FILTER;
 	}
 
 	//	StringBuilder buf = new StringBuilder();

@@ -92,7 +92,7 @@ function init(){
 
     addProjectLayer(map, DAILY, "sedmap:_daily", true)
     addProjectLayer(map, DISCRETE, "sedmap:_discrete", true)
-    addProjectLayer(map, "NID", "sedmap:NID", false)
+    addProjectLayer(map, "National Inventory of Dams", "sedmap:NID", false)
     
     // zoom and move viewport to desired location
     //map.zoomToMaxExtent();
@@ -163,7 +163,7 @@ function getSiteInfo(e) {
 }
 
 function onSiteInfoResponseFail(response) {
-    clearSiteInfo()
+    clearSiteInfo({})
     alert('Failed to request site information.')
 }
 
