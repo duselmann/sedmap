@@ -16,7 +16,7 @@ public class JavaMail {
 
 	private static final Logger logger = Logger.getLogger(JavaMail.class);
 
-	private static final String MAIL_HOST_ENV_KEY   = "sedmap/mail/host";
+	private static final String MAIL_HOST_ENV_KEY   = "sedmap/email/host";
 	private static final String MAIL_HOST_DEFAULT   = "localhost";
 	private static final String MAIL_HOST;
 

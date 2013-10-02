@@ -7,23 +7,23 @@ import gov.cida.sedmap.io.util.SessionUtil;
 public class SedmapDataMail {
 	private static final Logger logger = Logger.getLogger(SedmapDataMail.class);
 
-	protected static final String MSG_ENV_KEY = "sedmap/email/body";
-	protected static final String MSG_DEFAULT = "\nYour data file is ready for download.\n\nClick on the link below to commence download.\n\nYour file will be retained for 7 days.\n\n";
+	protected static final String MSG_ENV_KEY         = "sedmap/email/body";
+	protected static final String MSG_DEFAULT         = "\nYour data file is ready for download.\n\nClick on the link below to commence download.\n\nYour file will be retained for 7 days.\n\n";
 	protected static final String MSG_BODY;
 
-	protected static final String LINK_ENV_KEY = "sedmap/email/link";
-	protected static final String LINK_DEFAULT = "http://localhost:8080/sediment/download?file=";
+	protected static final String LINK_ENV_KEY        = "sedmap/email/link";
+	protected static final String LINK_DEFAULT        = "http://localhost:8080/sediment/download?file=";
 	protected static final String LINK_STUB;
 
-	protected static final String SENDER_ADDR_ENV_KEY = "sedmap/sender/addr";
+	protected static final String SENDER_ADDR_ENV_KEY = "sedmap/email/address";
 	protected static final String SENDER_ADDR_DEFAULT = "SedimentPortal_HELP@usgs.gov";
 	protected static final String SENDER_ADDR;
 
-	protected static final String SENDER_NAME_ENV_KEY = "sedmap/sender/name";
+	protected static final String SENDER_NAME_ENV_KEY = "sedmap/email/name";
 	protected static final String SENDER_NAME_DEFAULT = "Sediment Data Portal";
 	protected static final String SENDER_NAME;
 
-	protected static final String SUBJECT_ENV_KEY     = "sedmap/sender/subject";
+	protected static final String SUBJECT_ENV_KEY     = "sedmap/email/subject";
 	protected static final String SUBJECT_DEFAULT     = "Sediment Data Portal - File Ready";
 	protected static final String SUBJECT;
 

@@ -15,8 +15,8 @@ public class SessionUtil {
 			String value = (String) ctx.lookup("java:comp/env/"+property);
 			return value;
 		} catch (Exception e) {
-			logger.warn("Using default value, "+ defaultValue +", for " + property);
 			logger.warn(e.getMessage());
+			logger.warn("Using default value, "+ defaultValue +", for " + property);
 			return defaultValue;
 		}
 	}
@@ -35,7 +35,8 @@ public class SessionUtil {
 		try {
 			value = Integer.parseInt(propertyValue);
 		} catch (Exception e) {
-			logger.warn("Failed to parse integer for property. " +property+":"+propertyValue+ "  Using default:"+defaultValue, e);
+			logger.warn(e.getMessage());
+			logger.warn("Failed to parse integer for property. " +property+":"+propertyValue+ "  Using default:"+defaultValue);
 		}
 		return value;
 	}

@@ -78,6 +78,7 @@ public class DataService extends HttpServlet {
 				handler = new ZipHandler(res, res.getOutputStream());
 			} else {
 				File   tmp = File.createTempFile("data_" + StrUtils.uniqueName(12), ".zip");
+				logger.debug(tmp.getAbsolutePath());
 				handler = new EmailLinkHandler(res, tmp, email);
 			}
 
