@@ -348,19 +348,23 @@ function setupFilters() {
 
 
 $("div.downloadWindow .closeWindow").click(function(){
-    $("#DL-cancel").click();
+    $("#DL-cancel").click()
     })
 $("#DL-cancel").click(function(){
-    $(".blackoverlay").fadeOut("slow");
+    $(".blackoverlay").fadeOut("slow")
     })
 $("#DL-open").click(function(){
-    $(".blackoverlay").fadeIn("slow");
+    clearDelay('#DL-msg',0)
+    $(".blackoverlay").fadeIn("slow")
     })
 }
 
 $().ready(setupFilters)
 
 
+function closeDL() {
+    setTimeout(function(){$(".blackoverlay").fadeOut("slow")},5000)
+}
 
 function downloadShow() {
     var isDaily = layers[DAILY].visibility

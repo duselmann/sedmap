@@ -1,6 +1,6 @@
 package gov.cida.sedmap.data;
 
-import gov.cida.sedmap.io.FileInputStreamWithFile;
+import gov.cida.sedmap.io.InputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.WriterWithFile;
 import gov.cida.sedmap.io.util.StrUtils;
@@ -11,7 +11,6 @@ import gov.cida.sedmap.ogc.OgcUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -110,10 +109,10 @@ public class JdbcFetcher extends Fetcher {
 
 
 	@Override
-	protected InputStream handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
+	protected InputStreamWithFile handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
 			throws IOException, SQLException, NamingException {
 
-		FileInputStreamWithFile fileData = null;
+		InputStreamWithFile fileData = null;
 		Results rs = new Results();
 
 		try {
@@ -126,7 +125,7 @@ public class JdbcFetcher extends Fetcher {
 			rs = initData(sql);
 			getData(rs, filter, true);
 
-			File   tmp = File.createTempFile(descriptor + StrUtils.uniqueName(12), formatter.getFileType());
+			File   tmp = File.createTempFile(descriptor +'_'+  StrUtils.uniqueName(12), formatter.getFileType());
 			logger.debug(tmp.getAbsolutePath());
 			FileWriter tmpw = new FileWriter(tmp);
 
@@ -139,7 +138,7 @@ public class JdbcFetcher extends Fetcher {
 			}
 			IoUtils.quiteClose(tmpw);
 
-			fileData = new FileInputStreamWithFile(tmp);
+			fileData = new InputStreamWithFile(tmp);
 			//tmp.delete(); // TODO not for delayed download
 
 		} catch (FilterToSQLException e) {
@@ -151,7 +150,7 @@ public class JdbcFetcher extends Fetcher {
 		return fileData;
 	}
 	@Override
-	protected InputStream handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
+	protected InputStreamWithFile handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
 			throws IOException, SQLException, NamingException {
 
 		Results         rs = new Results();

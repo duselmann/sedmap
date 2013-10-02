@@ -4,20 +4,20 @@
     <div class="downloadWindow">
         <div class="title center">Sediment Data Download</div><div class="closeWindow">X</div>
         <ul>
-        <li><input type="checkbox" id="DL-daily"> Daily Flow Data
+        <li><label><input type="checkbox" id="DL-daily"> Daily Flow Data</label>
             <span title="Download daily average flow, SSC, and SSL sensor data from NWIS."> (?)</span>
         </li>
-        <li><input type="checkbox" id="DL-discrete"> Discrete Sample Data
+        <li><label><input type="checkbox" id="DL-discrete"> Discrete Sample Data</label>
             <span title="Download QA/QC Discrete samples from Sediment Data Portal."> (?)</span>
         </li>
         <li><div class="subitem">
-                <input type="checkbox" id="DL-discreteFlow" style="float:left;margin-right:3px;">
-                <div style="float:left;">Include daily flow</div>
+                <label><input type="checkbox" id="DL-discreteFlow" style="float:left;margin-right:3px;">
+                <div style="float:left;">Include daily flow</div></label>
                 <span title="Include daily flow data for discrete sample sites.">&nbsp;(?)</span>
             </div>
         </li>
-        <li><input type="checkbox" id="DL-sitesOnly"> Sites Only
-            <span title="Check this option if you do not want sensor data."> (?)</span>
+        <li><label><input type="checkbox" id="DL-sitesOnly"> Sites Only</label>
+            <span title="Check this option if you only want site characteristics."> (?)</span>
         </li>
         <li>File Format: 
             <select id="DL-format"><option>csv</option><option selected="true">tsv</option></select>
@@ -28,6 +28,7 @@
             <input style="width:220px" type="text" id="DL-email" />
         </li>
         </ul>
+        <div id="DL-msg" style="height:20px;text-align:center;"></div>
         <div class="buttons center">
             <input id="DL-download" type="button" class="download" value="Download Data">
             &nbsp;&nbsp;

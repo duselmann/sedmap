@@ -22,26 +22,29 @@ public class ZipHandler extends BaseHandler {
 
 
 	@Override
-	public void beginWritingFiles() throws IOException {
+	public FileDownloadHandler beginWritingFiles() throws IOException {
 		super.beginWritingFiles();
 		resp.addHeader("Content-Disposition", "attachment; filename=data.zip");
+		return this; //chain
 	}
 	@Override
-	public void startNewFile(String contentType, String filename) throws IOException {
+	public FileDownloadHandler startNewFile(String contentType, String filename) throws IOException {
 		super.startNewFile(contentType, filename);
 		ZipEntry entry = new ZipEntry(filename);
 		out.putNextEntry(entry);
+		return this; //chain
 	}
 	@Override
-	public void endNewFile() throws IOException {
+	public FileDownloadHandler endNewFile() throws IOException {
 		out.closeEntry();
 		super.endNewFile();
+		return this; //chain
 	}
 	@Override
-	public void finishWritingFiles() throws IOException {
+	public FileDownloadHandler finishWritingFiles() throws IOException {
 		// if the container handles this then it does not have to be in a finally block
 		out.finish();
 		super.finishWritingFiles();
+		return this; //chain
 	}
-
 }

@@ -114,10 +114,10 @@ public class IoUtils {
 
 
 
-	public static FileInputStreamWithFile createTmpZipStream(File file) throws IOException {
+	public static InputStreamWithFile createTmpZipStream(File file) throws IOException {
 		FileInputStream fis = new FileInputStream(file);
 		ZipInputStream  zip = new ZipInputStream(fis);
-		FileInputStreamWithFile fisf = new FileInputStreamWithFile(zip, file);
+		InputStreamWithFile fisf = new InputStreamWithFile(zip, file);
 
 		zip.getNextEntry();
 

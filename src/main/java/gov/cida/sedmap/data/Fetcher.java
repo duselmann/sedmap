@@ -1,7 +1,7 @@
 package gov.cida.sedmap.data;
 
 import gov.cida.sedmap.io.FileDownloadHandler;
-import gov.cida.sedmap.io.FileInputStreamWithFile;
+import gov.cida.sedmap.io.InputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.WriterWithFile;
 import gov.cida.sedmap.io.util.StringValueIterator;
@@ -56,18 +56,18 @@ public abstract class Fetcher {
 
 	public abstract Fetcher initJndiJdbcStore(String jndiJdbc) throws IOException;
 
-	protected abstract InputStream handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
+	protected abstract InputStreamWithFile handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
 			throws IOException, SQLException, NamingException;
-	protected abstract InputStream handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
+	protected abstract InputStreamWithFile handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
 			throws IOException, SQLException, NamingException;
 
-	protected InputStream handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
+	protected InputStreamWithFile handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
 			throws IOException, SQLException, NamingException {
 		String url = NWIS_URL;
 
 		if ( !sites.hasNext() ) {
 			// return nothing if there are no sites
-			return new ByteArrayInputStream("".getBytes());
+			return new InputStreamWithFile( new ByteArrayInputStream("".getBytes()), null);
 		}
 
 		// NWIS offers RDB only
@@ -137,14 +137,11 @@ public abstract class Fetcher {
 					IoUtils.quiteClose(nwis);
 				}
 			}
-			// TODO
-			// } catch (Exception e) {
-			//     tmp.deleteFile();
 		} finally {
 			IoUtils.quiteClose(tmp);
 		}
 
-		return IoUtils.createTmpZipStream( tmp.getFile() );
+		return new InputStreamWithFile( IoUtils.createTmpZipStream( tmp.getFile() ), tmp.getFile());
 	}
 
 
@@ -199,7 +196,7 @@ public abstract class Fetcher {
 				String    descriptor = name.append(site).append('_').append(value).toString();
 				String      filename = descriptor + formatter.getFileType();
 
-				InputStream fileData = null;
+				InputStreamWithFile fileData = null;
 				try {
 					if ( "daily_data".equals(descriptor) ) {
 						fileData = handleNwisData(sites, filter, formatter);
@@ -220,6 +217,9 @@ public abstract class Fetcher {
 					return;
 				} finally {
 					IoUtils.quiteClose(fileData);
+					if (fileData != null && fileData.getFile() != null) {
+						fileData.getFile().delete(); // TODO these files are not deleting. it must still be open?
+					}
 				}
 			}
 		}
@@ -236,8 +236,9 @@ public abstract class Fetcher {
 
 		LinkedList<String> sites = new LinkedList<String>();
 
-		if (fileData instanceof FileInputStreamWithFile) {
-			File file = ((FileInputStreamWithFile) fileData).getFile(); // TODO change to zip for temp files
+		if (fileData instanceof InputStreamWithFile) {
+			File file = ((InputStreamWithFile) fileData).getFile(); // TODO change to zip for temp files
+			if (file==null) return StringValueIterator.EMPTY.iterator();
 			InputStream       fin = null;// IoUtils.createTmpZipStream(file) );
 			InputStreamReader rin = null;
 			BufferedReader reader = null;

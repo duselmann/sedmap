@@ -16,7 +16,7 @@ public class MultiPartHandler extends BaseHandler {
 	}
 
 	@Override
-	public void startNewFile(String contentType, String filename) throws IOException {
+	public FileDownloadHandler startNewFile(String contentType, String filename) throws IOException {
 		super.startNewFile(contentType, filename);
 
 		out.write(BOUNDARY_TAG.getBytes());
@@ -27,16 +27,18 @@ public class MultiPartHandler extends BaseHandler {
 		filename = "Content-Disposition: attachment; filename=" +filename;
 		out.write(filename.getBytes());
 		out.write(IoUtils.LINE_SEPARATOR.getBytes());
+		return this; //chain
 	}
 
 	@Override
-	public void finishWritingFiles() throws IOException {
+	public FileDownloadHandler finishWritingFiles() throws IOException {
 		out.write(BOUNDARY_TAG.getBytes());
 		String endBndry = BOUNDARY_TAG + "--";
 		out.write(IoUtils.LINE_SEPARATOR.getBytes());
 		out.write(endBndry.getBytes());  // write the ending boundary
 
 		super.finishWritingFiles();
+		return this; //chain
 	}
 
 }

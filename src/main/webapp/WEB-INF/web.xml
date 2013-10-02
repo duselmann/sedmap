@@ -37,6 +37,15 @@
         <url-pattern>/data/*</url-pattern> 
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>DownloadService</servlet-name>
+        <servlet-class>gov.cida.sedmap.web.DownloadService</servlet-class>
+    </servlet>
+    <servlet-mapping> 
+        <servlet-name>DownloadService</servlet-name> 
+        <url-pattern>/download/*</url-pattern> 
+    </servlet-mapping>
+
 
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>

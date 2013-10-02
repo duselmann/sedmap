@@ -22,7 +22,8 @@ public class MultiPartFileTest {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		HttpServletResponse   res = new MockResponse(out);
 
-		new MultiPartHandler(res, out).beginWritingFiles();
+		@SuppressWarnings({ "resource", "unused" })
+		FileDownloadHandler handler = new MultiPartHandler(res, out).beginWritingFiles();
 		assertEquals(MultiPartHandler.MULTI_PART_CONTENT_TYPE, res.getContentType());
 
 		res.getWriter().flush();
@@ -37,6 +38,7 @@ public class MultiPartFileTest {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		HttpServletResponse   res = new MockResponse(out);
 
+		@SuppressWarnings("resource")
 		FileDownloadHandler handler = new MultiPartHandler(res, out);
 
 		handler.startNewFile("text/csv", "foo.csv");
@@ -58,6 +60,7 @@ public class MultiPartFileTest {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		HttpServletResponse   res = new MockResponse(out);
 
+		@SuppressWarnings("resource")
 		FileDownloadHandler handler = new MultiPartHandler(res, out);
 
 		handler.endNewFile();
@@ -73,6 +76,7 @@ public class MultiPartFileTest {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		HttpServletResponse   res = new MockResponse(out);
 
+		@SuppressWarnings("resource")
 		FileDownloadHandler handler = new MultiPartHandler(res, out);
 
 		handler.finishWritingFiles();

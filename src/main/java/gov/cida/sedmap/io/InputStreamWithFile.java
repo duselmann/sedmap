@@ -6,17 +6,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class FileInputStreamWithFile extends InputStream {
+public class InputStreamWithFile extends InputStream {
 
 	protected InputStream in;
 	protected File file;
 
 
-	public FileInputStreamWithFile(File file) throws FileNotFoundException {
+	public InputStreamWithFile(File file) throws FileNotFoundException {
 		in   = new FileInputStream(file);
 		this.file = file;
 	}
-	public FileInputStreamWithFile(InputStream in, File file) throws FileNotFoundException {
+	public InputStreamWithFile(InputStream in, File file) throws FileNotFoundException {
 		this.in = in;
 		this.file = file;
 	}

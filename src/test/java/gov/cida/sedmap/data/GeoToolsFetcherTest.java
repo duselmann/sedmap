@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import gov.cida.sedmap.io.FileDownloadHandler;
+import gov.cida.sedmap.io.InputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.MultiPartHandler;
 import gov.cida.sedmap.io.util.StrUtils;
@@ -176,19 +177,19 @@ public class GeoToolsFetcherTest {
 	protected void initGeoToolsFetcherForDoFetchTesting() {
 		fetcher = new GeoToolsFetcher() {
 			@Override
-			protected InputStream handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
+			protected InputStreamWithFile handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
 					throws IOException, SQLException, NamingException {
 				nwisHandlerCalled = true;
 				return handleData("NWIS", filter, formatter);
 			}
 			@Override
-			protected InputStream handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
+			protected InputStreamWithFile handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
 					throws IOException, SQLException, NamingException {
 				localHandlerCalled = true;
 				return handleData(descriptor, filter, formatter);
 			}
 
-			protected InputStream handleData(String descriptor, FilterWithViewParams filter, Formatter formatter)
+			protected InputStreamWithFile handleData(String descriptor, FilterWithViewParams filter, Formatter formatter)
 					throws IOException, SQLException, NamingException {
 				handleCount++;
 
@@ -201,8 +202,10 @@ public class GeoToolsFetcherTest {
 						throw new SQLException("Failed to convert filter to sql where clause.",e);
 					}
 				}
-				return new ByteArrayInputStream(("Test data for descriptor:'" +descriptor
-						+"' and where clause:'" +where +"' file format:'" +formatter.getContentType() +"'").getBytes());
+				return new InputStreamWithFile(
+						new ByteArrayInputStream(("Test data for descriptor:'" +descriptor
+								+"' and where clause:'" +where +"' file format:'" +formatter.getContentType() +"'").getBytes()),
+								null);
 			}
 		};
 	}

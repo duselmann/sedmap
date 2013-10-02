@@ -204,16 +204,16 @@ var Filters = Class.extend({
 		var _this = this
 		
 		$().ready(function(){
-			$(_this.parent).on('keypress',function(e){
-				if (e.keyCode === 13) {
-				    // on enter
+			$(_this.parent).keypress(function(e){
+                var keycode = (event.keyCode ? event.keyCode : event.which);
+                if(keycode == '13' || keyCode === 13) { // on enter
 					applyFilters(_this.parent)
 				}
 			})
 			// I would have like this to be related to the filter parent
 			// but now that it is a menu we have to rethink how - no time
+            $('.clearFilter').click(function(){clearFilters(_this.parent)})
 			$('.applyFilter').click(function(){applyFilters(_this.parent)})
-			$('.clearFilter').click(function(){clearFilters(_this.parent)})
 			
 			$('#DL-download').click(function(){
 				// TODO re-factor to a callback of some fashion
@@ -221,21 +221,38 @@ var Filters = Class.extend({
 				var isDiscr = $('#DL-discrete:checkbox:checked').length != 0
                 var isData  = $('#DL-sitesOnly:checkbox:checked').length == 0
                 var isFlow  = $('#DL-discreteFlow:checkbox:checked').length != 0
+                var email   = $("#DL-email").val()
 				var urlPart = []
 				var p = 0
 				urlPart[p++] = "/sediment/data?format="
 				urlPart[p++] = $('#downloadFormat').val()
+                urlPart[p++] = "&email="+ email
 				urlPart[p++] = "&dataTypes=sites_" // always include site info
 				urlPart[p++] = isData  ?"data_"     :""
 				urlPart[p++] = isDaily ?"daily_"    :""
                 urlPart[p++] = isDiscr ?"discrete_" :""
                 urlPart[p++] = isFlow  ?"flow_" :""
-                urlPart[p++] = "email="+$("#DL-email").val()
 				urlPart[p++] = isDaily ?"&dailyFilter="   +getFilters(_this.parent, DAILY)    :""
 				urlPart[p++] = isDiscr ?"&discreteFilter="+getFilters(_this.parent, DISCRETE) :""
 				var url = urlPart.join("")
-				console.log(url)
-				window.location.href = url
+				//console.log(url)
+                $('#DL-msg').html("request sent")
+				if (email.indexOf('@') === -1) {
+					window.location.href = url
+                    closeDL();
+				} else {
+				    $.get(url, function(data) {
+				        $('#DL-msg').html(data)
+				        clearDelay('#DL-msg')
+				        closeDL();
+ 				    }).done(function(data){
+				    	$('#DL-msg').html(data)
+                        clearDelay('#DL-msg')
+                        closeDL();
+				    }).fail(function(data){
+				    	$('#DL-msg').html(data)
+				    });
+				}
 			})
 			
 			$(_this.parent).on('childchange',updateFilterScroll)
@@ -502,10 +519,10 @@ Filters.Value  = Filters.extend({
 				property:this.field,
 				value:val
 			}
-		if (  val.indexOf('*') != -1 ) {
-			params.type=Ogc.Comp.LIKE
+		if (  val.indexOf('*') === -1 ) {
+            params.type=this.compare
 		} else {
-			params.type=this.compare
+            params.type=Ogc.Comp.LIKE
 		}
 		this.filter = new Ogc.Comp(params)
 		return this.filter

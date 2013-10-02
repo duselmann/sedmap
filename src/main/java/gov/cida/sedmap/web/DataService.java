@@ -1,13 +1,17 @@
 package gov.cida.sedmap.web;
 
+import gov.cida.sedmap.data.DataFileMgr;
 import gov.cida.sedmap.data.Fetcher;
 import gov.cida.sedmap.data.FetcherConfig;
 import gov.cida.sedmap.data.JdbcFetcher;
+import gov.cida.sedmap.io.EmailLinkHandler;
 import gov.cida.sedmap.io.FileDownloadHandler;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.ZipHandler;
 import gov.cida.sedmap.io.util.ErrUtils;
+import gov.cida.sedmap.io.util.StrUtils;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.ServletConfig;
@@ -59,11 +63,24 @@ public class DataService extends HttpServlet {
 			throws ServletException, IOException {
 		logger.debug("doPost");
 
+		try {
+			new DataFileMgr().deleteOldFiles();
+		} catch (Exception e) {
+			logger.error("Error deleting old data files", e);
+		}
+
 		FileDownloadHandler handler = null;
 		try {
 			Fetcher fetcher = new JdbcFetcher(jndiDS);
 
-			handler = new ZipHandler(res, res.getOutputStream());
+			String email = req.getParameter("email");
+			if ( StrUtils.isEmpty(email) ) {
+				handler = new ZipHandler(res, res.getOutputStream());
+			} else {
+				File   tmp = File.createTempFile("data_" + StrUtils.uniqueName(12), ".zip");
+				handler = new EmailLinkHandler(res, tmp, email);
+			}
+
 			fetcher.doFetch(req, handler);
 		} catch (Exception e) {
 			IoUtils.quiteClose(handler);

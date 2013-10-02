@@ -43,6 +43,7 @@ public class IoUtilsTest {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		HttpServletResponse   res = new MockResponse(out);
 
+		@SuppressWarnings("resource")
 		FileDownloadHandler handler = new MultiPartHandler(res, out);
 
 		handler.writeFile("text/csv", "foo.csv", fileData);
@@ -72,6 +73,7 @@ public class IoUtilsTest {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		HttpServletResponse   res = new MockResponse(out);
 
+		@SuppressWarnings("resource")
 		FileDownloadHandler handler = new MultiPartHandler(res, out);
 
 		handler.writeFile("text/csv", "foo1.csv", fileData1);

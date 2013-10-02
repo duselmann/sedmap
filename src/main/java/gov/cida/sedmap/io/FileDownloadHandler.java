@@ -7,12 +7,13 @@ import java.io.InputStream;
 public interface FileDownloadHandler extends Closeable {
 
 	String getContentType();
-	void beginWritingFiles() throws IOException;
-	void startNewFile(String contentType, String filename) throws IOException;
-	void writeFile(String contentType, String filename, InputStream fileData) throws IOException;
-	void endNewFile() throws IOException;
-	void finishWritingFiles() throws IOException;
-	void write(byte[] data) throws IOException;
-	void write(String data) throws IOException;
+	FileDownloadHandler beginWritingFiles() throws IOException;
+	FileDownloadHandler startNewFile(String contentType, String filename) throws IOException;
+	FileDownloadHandler writeFile(String contentType, String filename, InputStream fileData) throws IOException;
+	FileDownloadHandler endNewFile() throws IOException;
+	FileDownloadHandler finishWritingFiles() throws IOException;
+	FileDownloadHandler write(byte[] data) throws IOException;
+	FileDownloadHandler write(byte[] data, int length) throws IOException;
+	FileDownloadHandler write(String data) throws IOException;
 
 }

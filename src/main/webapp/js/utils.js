@@ -235,3 +235,8 @@ function openUrlInNewTab(url) {
   var win=window.open(url, '_blank');
   win.focus();
 }
+
+function clearDelay(el, ms) {
+    ms = isDefined(ms) ?ms :5000
+    setTimeout(function(){$(el).html('')},ms);
+}

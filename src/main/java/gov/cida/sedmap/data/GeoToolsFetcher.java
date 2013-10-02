@@ -1,6 +1,6 @@
 package gov.cida.sedmap.data;
 
-import gov.cida.sedmap.io.FileInputStreamWithFile;
+import gov.cida.sedmap.io.InputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.WriterWithFile;
 import gov.cida.sedmap.ogc.FeatureValueIterator;
@@ -8,7 +8,6 @@ import gov.cida.sedmap.ogc.FilterWithViewParams;
 import gov.cida.sedmap.ogc.OgcUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -46,9 +45,9 @@ public class GeoToolsFetcher extends Fetcher {
 	// this will work if the query is against a table or layer feature but not a join query
 
 	@Override
-	protected InputStream handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
+	protected InputStreamWithFile handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
 			throws IOException, SQLException, NamingException {
-		FileInputStreamWithFile fileData = null;
+		InputStreamWithFile fileData = null;
 
 		JDBCFeatureReader reader = null;
 		try {
@@ -84,7 +83,7 @@ public class GeoToolsFetcher extends Fetcher {
 
 
 	@Override
-	protected InputStream handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
+	protected InputStreamWithFile handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
 			throws IOException, SQLException, NamingException {
 		// TODO IMPL
 		throw new RuntimeException("Not yet impl");

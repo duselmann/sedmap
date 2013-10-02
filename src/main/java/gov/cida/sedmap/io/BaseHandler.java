@@ -32,12 +32,19 @@ public class BaseHandler implements FileDownloadHandler {
 	}
 
 	@Override
-	public void write(byte[] data) throws IOException {
+	public FileDownloadHandler write(byte[] data) throws IOException {
 		out.write(data);
+		return this; //chain
 	}
 	@Override
-	public void write(String data) throws IOException {
+	public FileDownloadHandler write(byte[] data, int length) throws IOException {
+		out.write(data, 0, length);
+		return this; //chain
+	}
+	@Override
+	public FileDownloadHandler write(String data) throws IOException {
 		this.write(data.getBytes());
+		return this; //chain
 	}
 
 	@Override
@@ -47,18 +54,20 @@ public class BaseHandler implements FileDownloadHandler {
 
 
 	@Override
-	public void beginWritingFiles() throws IOException {
+	public FileDownloadHandler beginWritingFiles() throws IOException {
 		resp.setContentType( getContentType() );
+		return this; //chain
 	}
 
 
 	@Override
-	public void startNewFile(String contentType, String filename) throws IOException {
+	public FileDownloadHandler startNewFile(String contentType, String filename) throws IOException {
+		return this; //chain
 	}
 
 
 	@Override
-	public void writeFile(String contentType, String filename, InputStream fileData) throws IOException {
+	public FileDownloadHandler writeFile(String contentType, String filename, InputStream fileData) throws IOException {
 
 		try {
 			startNewFile(contentType, filename);
@@ -78,21 +87,24 @@ public class BaseHandler implements FileDownloadHandler {
 		} finally {
 			IoUtils.quiteClose(fileData);
 		}
+		return this; //chain
 	}
 
 
 
 	@Override
-	public void endNewFile() throws IOException {
+	public FileDownloadHandler endNewFile() throws IOException {
 		// place holder for book-ending
+		return this; //chain
 	}
 
 
 	@Override
-	public void finishWritingFiles() throws IOException {
+	public FileDownloadHandler finishWritingFiles() throws IOException {
 		// if the container handles this then it does not have to be in a finally block
 		out.flush();
 		out.close();
+		return this; //chain
 	}
 
 }

@@ -1,8 +1,12 @@
 package gov.cida.sedmap.io.util;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class StringValueIterator implements Iterator<String>, Iterable<String> {
+
+	public static final List<String> EMPTY = new ArrayList<String>();
 
 	protected Iterator<? extends Object> values;
 
