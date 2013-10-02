@@ -36,7 +36,6 @@
         <link rel="stylesheet" type="text/css" href="css/openlayers/basic.css">
         <link type="text/css" rel="stylesheet" href="css/custom.css" />
         <link type="text/css" rel="stylesheet" href="css/app.css" />
-        <link type="text/css" rel="stylesheet" href="css/app-ie.css" />
         <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
         <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
