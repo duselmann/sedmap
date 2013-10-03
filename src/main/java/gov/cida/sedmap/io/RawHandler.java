@@ -1,6 +1,9 @@
 package gov.cida.sedmap.io;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,16 +14,23 @@ public class RawHandler extends BaseHandler {
 	protected static final String CONTENT_TYPE= "application/zip"; // TODO make this configurable
 
 	protected final InputStream source;
+	protected final File file;
 
-	public RawHandler(HttpServletResponse res, OutputStream stream, InputStream fis) {
+	public RawHandler(HttpServletResponse res, OutputStream stream, File file) {
 		super(res, stream, CONTENT_TYPE);
-		source = fis;
+		try {
+			this.file = file;
+			source = new FileInputStream(file);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException("Failed to open requested data file.",e);
+		}
 	}
 
 	@Override
 	public FileDownloadHandler beginWritingFiles() throws IOException {
 		super.beginWritingFiles();
 		resp.addHeader("Content-Disposition", "attachment; filename=data.zip");
+		resp.addHeader("Content-Length", ""+file.length());
 
 		int count=0;
 		byte[] data=new byte[1024<<3]; // 8k buffer
@@ -30,5 +40,11 @@ public class RawHandler extends BaseHandler {
 		}
 
 		return this; //chain
+	}
+
+	@Override
+	public void close() throws IOException {
+		IoUtils.quiteClose(source);
+		super.close();
 	}
 }

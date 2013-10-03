@@ -8,7 +8,6 @@ import gov.cida.sedmap.io.RawHandler;
 import gov.cida.sedmap.io.util.ErrUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -49,7 +48,6 @@ public class DownloadService extends HttpServlet {
 		logger.debug("doPost");
 
 		FileDownloadHandler handler = null;
-		FileInputStream fis = null;
 		try {
 			String fileId = req.getParameter("file");
 			File file = new DataFileMgr().getDataFile(fileId);
@@ -57,15 +55,13 @@ public class DownloadService extends HttpServlet {
 			if (file==null) {
 				handler = new MissingFileHandler(res, res.getOutputStream());
 			} else {
-				fis = new FileInputStream(file);
-				handler = new RawHandler(res, res.getOutputStream(), fis);
+				handler = new RawHandler(res, res.getOutputStream(), file);
 			}
 			handler.beginWritingFiles();
 			handler.finishWritingFiles();
 		} catch (Exception e) {
 			ErrUtils.handleExceptionResponse(req,res,e);
 		} finally {
-			IoUtils.quiteClose(fis);
 			IoUtils.quiteClose(handler);
 		}
 	}
