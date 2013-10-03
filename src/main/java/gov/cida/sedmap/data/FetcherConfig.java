@@ -28,6 +28,7 @@ public class FetcherConfig {
 	Map<String, Object>       DATA_STORE_ENV;
 	Map<String, List<Column>> TABLE_METADATA;
 	Map<String, String>       DATA_TABLES;
+	// TODO before making the following view - make sure it is still relevant
 	// TODO create this view "select d.* from sedmap.discrete_sample_fact d join sedmap.discrete_stations s on s.site_no = d.site_no "
 
 	Map<String, Class<? extends Formatter>> FILE_FORMATS;
@@ -75,20 +76,20 @@ public class FetcherConfig {
 
 	private List<String> configDataTypes() {
 		logger.info("Static Fetcher configDataTypes.");
-		return Collections.unmodifiableList( Arrays.asList("daily","discrete") );
+		return Collections.unmodifiableList( Arrays.asList("discrete","daily") ); // discrete first so if want flow can send w/ daily
 	}
 
 
 
-	private static List<String> configDataValues() {
-		logger.info("Static Fetcher configDataTypes.");
+	private List<String> configDataValues() {
+		logger.info("Static Fetcher configDataValues.");
 		return Collections.unmodifiableList( Arrays.asList("sites","data") ); // sites first for use with NWIS data
 	}
 
 
 
 	protected Map<String, Class<? extends Formatter>> configFormats() {
-		logger.info("Static Fetcher configDataTypes.");
+		logger.info("Static Fetcher configFormats.");
 		Map<String, Class<? extends Formatter>> formats = new HashMap<String, Class<? extends Formatter>>();
 		formats.put("csv", CsvFormatter.class);
 		formats.put("rdb", RdbFormatter.class);
@@ -99,7 +100,7 @@ public class FetcherConfig {
 
 
 	protected Map<String, String> configTables() {
-		logger.info("Static Fetcher configDataTypes.");
+		logger.info("Static Fetcher configTables.");
 		Map<String,String> tables = new HashMap<String,String>();
 		tables.put("daily_sites",    "DAILY_STATIONS_DL");
 		tables.put("discrete_sites", "DISCRETE_STATIONS_DL");
@@ -110,7 +111,7 @@ public class FetcherConfig {
 
 
 	protected Map<String, Object> configDataStore() {
-		logger.info("Static Fetcher configDataTypes.");
+		logger.info("Static Fetcher configDataStore.");
 		Map<String, Object> env = new HashMap<String, Object>();
 		env.put( JDBCDataStoreFactory.SCHEMA.getName(), "sedmap"); // OPTIONAL
 		env.put( JDBCDataStoreFactory.DBTYPE.getName(), "oracle");

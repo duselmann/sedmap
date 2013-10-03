@@ -54,8 +54,8 @@ public class JdbcFetcher extends Fetcher {
 			+ " left join ( "
 			+ "    select site_no, count(*) sample_count "
 			+ "      from sedmap.discrete_sample_fact  "
-			+ "     where EXTRACT(year FROM datetime)>=? " // yr1
-			+ "       and EXTRACT(year FROM datetime)<=? " // yr2
+			+ "     where EXTRACT(YEAR FROM \"DATETIME\")>=? " // yr1
+			+ "       and EXTRACT(YEAR FROM \"DATETIME\")<=? " // yr2
 			+ "     group by site_no) y "
 			+ "   on (y.site_no = s.site_no) "
 			+ " where sample_count > 0 and ";
@@ -63,8 +63,8 @@ public class JdbcFetcher extends Fetcher {
 	static final String DEFAULT_DISCRETE_DATA_SQL = ""
 			+ " select * "
 			+ "   from sedmap.discrete_sample_fact "
-			+ "  where EXTRACT(year FROM datetime)>=? " // yr1
-			+ "    and EXTRACT(year FROM datetime)<=? " // yr2
+			+ "  where EXTRACT(YEAR FROM \"DATETIME\")>=? " // yr1
+			+ "    and EXTRACT(YEAR FROM \"DATETIME\")<=? " // yr2
 			+ "    and site_no in (_siteList_) " // replaced with list of sites
 			+ "  order by site_no, datetime";
 
@@ -113,21 +113,21 @@ public class JdbcFetcher extends Fetcher {
 			throws IOException, SQLException, NamingException {
 
 		InputStreamWithFile fileData = null;
-		Results rs = new Results();
+		FileWriter tmpw = null;
+		Results      rs = new Results();
 
 		try {
 			String     tableName = getDataTable(descriptor);
 			List<Column> columns = getTableMetadata(tableName);
-			String header = formatter.fileHeader(columns);
-
-			String sql = buildQuery(descriptor, filter);
+			String        header = formatter.fileHeader(columns);
+			String           sql = buildQuery(descriptor, filter);
 			logger.debug(sql);
 			rs = initData(sql);
 			getData(rs, filter, true);
 
-			File   tmp = File.createTempFile(descriptor +'_'+  StrUtils.uniqueName(12), formatter.getFileType());
-			logger.debug(tmp.getAbsolutePath());
-			FileWriter tmpw = new FileWriter(tmp);
+			File tmp = File.createTempFile(descriptor +'_'+  StrUtils.uniqueName(12), formatter.getFileType());
+			tmpw     = new FileWriter(tmp);
+			logger.debug( tmp.getAbsolutePath() );
 
 			//logger.debug(header);
 			tmpw.write(header);
@@ -136,15 +136,14 @@ public class JdbcFetcher extends Fetcher {
 				//logger.debug(row);
 				tmpw.write(row);
 			}
-			IoUtils.quiteClose(tmpw);
 
 			fileData = new InputStreamWithFile(tmp);
-			//tmp.delete(); // TODO not for delayed download
 
 		} catch (FilterToSQLException e) {
 			throw new SQLException("Failed to convert filter to sql where clause.",e);
 		} finally {
-			IoUtils.quiteClose(rs.rs, rs.ps, rs.cn);
+			IoUtils.quiteClose(tmpw, rs.rs, rs.ps, rs.cn);
+			// TODO maybe close fileData?
 		}
 
 		return fileData;

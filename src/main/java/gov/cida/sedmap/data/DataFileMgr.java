@@ -12,21 +12,22 @@ public class DataFileMgr {
 
 	protected static final String RETAIN_ENV_KEY = "sedmap/data/retain";
 	protected static final int    RETAIN_DEFAULT = 7;
-	protected static final int    RETAIN_DAYS;
+	protected static final int    RETAIN_TIME;
+	public    static final int    RETAIN_DAYS;
 
 
 
 	static {
-		DATA_PATH      = SessionUtil.lookup(PATH_ENV_KEY,  PATH_DEFAULT);
+		DATA_PATH   = SessionUtil.lookup(PATH_ENV_KEY,  PATH_DEFAULT);
 
-		int retainDays = SessionUtil.lookup(RETAIN_ENV_KEY,  RETAIN_DEFAULT);
-		RETAIN_DAYS    = retainDays * 24 * 3600 * 1000; //convert days to milliseconds
+		RETAIN_DAYS = SessionUtil.lookup(RETAIN_ENV_KEY,  RETAIN_DEFAULT);
+		RETAIN_TIME = RETAIN_DAYS * 24 * 3600 * 1000; //convert days to milliseconds
 	}
 
 
 
-	public File getDataFile(String fileName) { // TODO fetch not get
-		File file = new File(DATA_PATH +"/"+ fileName);
+	public File getDataFile(String fileId) { // TODO fetch not get
+		File file = new File(DATA_PATH +"/data_"+ fileId +".zip");
 		if ( file.exists() ) {
 			return file;
 		}
@@ -66,7 +67,7 @@ public class DataFileMgr {
 
 
 	public int deleteIfOld(File file) {
-		if (file.lastModified()+RETAIN_DAYS <  System.currentTimeMillis()) {
+		if (file.lastModified()+RETAIN_TIME <  System.currentTimeMillis()) {
 			file.delete();
 			return 1;
 		}

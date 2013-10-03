@@ -19,7 +19,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 
 
@@ -64,7 +63,10 @@ public class DataService extends HttpServlet {
 		logger.debug("doPost");
 
 		try {
-			new DataFileMgr().deleteOldFiles();
+			int count = new DataFileMgr().deleteOldFiles();
+			if (count>0) {
+				logger.error("Deleting old data files: " + count);
+			}
 		} catch (Exception e) {
 			logger.error("Error deleting old data files", e);
 		}
@@ -84,8 +86,18 @@ public class DataService extends HttpServlet {
 
 			fetcher.doFetch(req, handler);
 		} catch (Exception e) {
+			String errorid = null;
+			try {
+				errorid = ErrUtils.handleExceptionResponse(req,res,e);
+				if (handler instanceof EmailLinkHandler) {
+					((EmailLinkHandler)handler).setErrorId(errorid);
+					handler.finishWritingFiles();
+				}
+			} catch (Exception t) {
+				logger.error(t);
+			}
+		} finally {
 			IoUtils.quiteClose(handler);
-			ErrUtils.handleExceptionResponse(req,res,e);
 		}
 	}
 

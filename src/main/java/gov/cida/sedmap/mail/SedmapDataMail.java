@@ -11,6 +11,10 @@ public class SedmapDataMail {
 	protected static final String MSG_DEFAULT         = "\nYour data file is ready for download.\n\nClick on the link below to commence download.\n\nYour file will be retained for 7 days.\n\n";
 	protected static final String MSG_BODY;
 
+	protected static final String ERR_ENV_KEY         = "sedmap/email/body";
+	protected static final String ERR_DEFAULT         = "\nThere was an error while downloading your data.\n\nSupport has been contacted.\n\n Here is your trouble ticket: ";
+	protected static final String ERR_BODY;
+
 	protected static final String LINK_ENV_KEY        = "sedmap/email/link";
 	protected static final String LINK_DEFAULT        = "http://localhost:8080/sediment/download?file=";
 	protected static final String LINK_STUB;
@@ -30,19 +34,34 @@ public class SedmapDataMail {
 
 
 	static {
-		MSG_BODY    = SessionUtil.lookup(MSG_ENV_KEY,  MSG_DEFAULT);
-		LINK_STUB   = SessionUtil.lookup(LINK_ENV_KEY, LINK_DEFAULT);
-		SENDER_ADDR = SessionUtil.lookup(SENDER_ADDR_ENV_KEY,SENDER_ADDR_DEFAULT);
-		SENDER_NAME = SessionUtil.lookup(SENDER_NAME_ENV_KEY, SENDER_NAME_DEFAULT);
+		ERR_BODY    = SessionUtil.lookup(ERR_ENV_KEY,     ERR_DEFAULT);
+		MSG_BODY    = SessionUtil.lookup(MSG_ENV_KEY,     MSG_DEFAULT);
+		LINK_STUB   = SessionUtil.lookup(LINK_ENV_KEY,    LINK_DEFAULT);
 		SUBJECT     = SessionUtil.lookup(SUBJECT_ENV_KEY, SUBJECT_DEFAULT);
+		SENDER_ADDR = SessionUtil.lookup(SENDER_ADDR_ENV_KEY, SENDER_ADDR_DEFAULT);
+		SENDER_NAME = SessionUtil.lookup(SENDER_NAME_ENV_KEY, SENDER_NAME_DEFAULT);
 	}
 
-	public boolean sendFileMessage(String emailAddr, String fileName) {
-		logger.debug("sendMail attempt "+ emailAddr +":"+ fileName);
 
-		String msgText = MSG_BODY+LINK_STUB+fileName+"\n";
+
+	public boolean sendFileMessage(String emailAddr, String fileId) {
+		logger.debug("sendMail attempt "+ emailAddr +":"+ fileId);
+
+		String msgText = MSG_BODY+LINK_STUB+fileId+"\n";
 
 		return new JavaMail().sendMail(SUBJECT, SENDER_ADDR, SENDER_NAME, emailAddr, msgText);
+	}
 
+
+
+	public boolean sendErrorMessage(String emailAddr, String errorId) {
+		logger.debug("sendMail error attempt "+ emailAddr +":"+ errorId);
+
+		String msgText = ERR_BODY+errorId+"\n";
+
+		JavaMail mailer = new JavaMail();
+		// TODO send support an email in production
+		// mailer.sendMail(SUBJECT, SENDER_ADDR, SENDER_NAME, SENDER_ADDR, msgText);
+		return mailer.sendMail(SUBJECT, SENDER_ADDR, SENDER_NAME, emailAddr, msgText);
 	}
 }

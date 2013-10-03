@@ -1,7 +1,5 @@
 package gov.cida.sedmap.io.util;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -14,17 +12,21 @@ public class ErrUtils {
 
 
 
-	public static void handleExceptionResponse(HttpServletRequest req, HttpServletResponse res, Throwable e) {
-		String tag    = StrUtils.uniqueName(9);
-		HttpSession s = req.getSession();
-		s.setAttribute("errorid",tag);
-		logger.error( tag +" url: "+ req.getRequestURL() +'?'+ req.getQueryString() );
-		logger.error("This marker tag is for the following exception: " + tag, e);
+	public static String handleExceptionResponse(HttpServletRequest req, HttpServletResponse res, Throwable e) {
+		String errorid = StrUtils.uniqueName(9);
+		logger.error( errorid ); // log it right away in case something else goes wrong
+
 		try {
+			HttpSession s = req.getSession();
+			s.setAttribute("errorid",errorid);
+			logger.error( errorid +" url: "+ req.getRequestURL() +'?'+ req.getQueryString() );
+			logger.error("This marker tag is for the following exception: " + errorid, e);
 			res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} catch (IOException ioe) {
-			logger.error("failed to send error for " + tag, ioe);
+		} catch (Exception ioe) {
+			logger.error("failed to send error for " + errorid, ioe);
 		}
+
+		return errorid;
 	}
 
 }

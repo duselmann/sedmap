@@ -66,9 +66,6 @@ public class GeoToolsFetcher extends Fetcher {
 					String line = formatter.fileRow(values);
 					tmp.write(line);
 				}
-				// TODO
-				// } catch (Exception e) {
-				//     tmp.deleteFile();
 			} finally {
 				IoUtils.quiteClose(tmp);
 			}

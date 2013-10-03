@@ -3,6 +3,7 @@ package gov.cida.sedmap.web;
 import gov.cida.sedmap.data.DataFileMgr;
 import gov.cida.sedmap.io.FileDownloadHandler;
 import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.MissingFileHandler;
 import gov.cida.sedmap.io.RawHandler;
 import gov.cida.sedmap.io.util.ErrUtils;
 
@@ -50,25 +51,22 @@ public class DownloadService extends HttpServlet {
 		FileDownloadHandler handler = null;
 		FileInputStream fis = null;
 		try {
-			String fileName = req.getParameter("file");
-			File file = new DataFileMgr().getDataFile(fileName);
-			fis = new FileInputStream(file);
+			String fileId = req.getParameter("file");
+			File file = new DataFileMgr().getDataFile(fileId);
 
-			handler = new RawHandler(res, res.getOutputStream());
-			handler.beginWritingFiles();
-
-			int count=0;
-			byte[] data=new byte[1024<<3]; // 8k buffer
-
-			while ( (count=fis.read(data)) >0 ) {
-				handler.write(data, count);
+			if (file==null) {
+				handler = new MissingFileHandler(res, res.getOutputStream());
+			} else {
+				fis = new FileInputStream(file);
+				handler = new RawHandler(res, res.getOutputStream(), fis);
 			}
-
+			handler.beginWritingFiles();
 			handler.finishWritingFiles();
 		} catch (Exception e) {
+			ErrUtils.handleExceptionResponse(req,res,e);
+		} finally {
 			IoUtils.quiteClose(fis);
 			IoUtils.quiteClose(handler);
-			ErrUtils.handleExceptionResponse(req,res,e);
 		}
 	}
 

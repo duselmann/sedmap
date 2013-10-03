@@ -4,6 +4,7 @@ import gov.cida.sedmap.io.FileDownloadHandler;
 import gov.cida.sedmap.io.InputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.WriterWithFile;
+import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.io.util.StringValueIterator;
 import gov.cida.sedmap.ogc.FilterWithViewParams;
 import gov.cida.sedmap.ogc.OgcUtils;
@@ -171,20 +172,18 @@ public abstract class Fetcher {
 
 		String    dataTypes = getDataTypes(req);
 		Formatter formatter = getFormatter(req);
+		boolean   alsoFlow  = getDiscreteFlow(req);
+		List<String> sites  = new LinkedList<String>();
 
 		handler.beginWritingFiles(); // start writing files
-
-		Iterator<String> sites = null;
 
 		for (String site  : conf.DATA_TYPES) { // check for daily and discrete
 			if ( ! dataTypes.contains(site) ) continue;
 
 			String    ogcXml = getFilter(req, site);
 			AbstractFilter aFilter = OgcUtils.ogcXmlToFilter(ogcXml);
-			@SuppressWarnings("unchecked") // suppress warning that is bug in java
 			String yr1 = OgcUtils.removeFilter(aFilter, "year", PropertyIsGreaterThanOrEqualTo.class, PropertyIsGreaterThan.class);
-			@SuppressWarnings("unchecked") // suppress warning that is bug in java
-			String yr2 = OgcUtils.removeFilter(aFilter, "year", PropertyIsLessThanOrEqualTo.class, PropertyIsLessThan.class);
+			String yr2 = OgcUtils.removeFilter(aFilter, "year", PropertyIsLessThanOrEqualTo.class,    PropertyIsLessThan.class);
 			FilterWithViewParams filter = new FilterWithViewParams(aFilter);
 			filter.putViewParam("yr1", "1900", yr1);
 			filter.putViewParam("yr2", "2100", yr2);
@@ -198,27 +197,41 @@ public abstract class Fetcher {
 
 				InputStreamWithFile fileData = null;
 				try {
+					// TODO this was originally going to be a single call but reality got in the way - could use a refactor
 					if ( "daily_data".equals(descriptor) ) {
-						fileData = handleNwisData(sites, filter, formatter);
-						sites = null;
+						fileData = handleNwisData(sites.iterator(), filter, formatter);
 					} else if ( "discrete_data".equals(descriptor) ) {
-						fileData = handleDiscreteData(sites, filter, formatter);
-						sites = null;
+						fileData = handleDiscreteData(sites.iterator(), filter, formatter);
 					} else if (descriptor.contains("sites") ) {
 						fileData = handleSiteData(descriptor, filter, formatter);
-						sites = makeSiteIterator(fileData, formatter);
+						List<String> descriptorSites = makeSiteIterator(fileData, formatter);
+
+						if ( ! alsoFlow) { // if the user does not want discrete flow data
+							sites.clear(); // do not retain the discrete sites for NWIS daily data
+						}
+
+						if (sites.size() == 0) { // this is a short circuit to prevent an unneccessary loop
+							sites = descriptorSites;
+						} else {
+							// TODO refactor to use sorted set
+							for (String siteNo : descriptorSites) {
+								if ( ! sites.contains(siteNo) ) {
+									sites.add(siteNo);
+								}
+							}
+						}
 					}
 					handler.writeFile(formatter.getContentType(), filename, fileData);
 
 				} catch (Exception e) {
-					logger.error("failed to fetch from DB", e);
+					String msg = "failed to fetch from DB";
+					logger.error(msg);
 					logger.error(e);
-					// TODO empty results and err msg to user
-					return;
+					throw new ServletException(msg, e);
 				} finally {
 					IoUtils.quiteClose(fileData);
-					if (fileData != null && fileData.getFile() != null) {
-						fileData.getFile().delete(); // TODO these files are not deleting. it must still be open?
+					if (fileData != null) {
+						fileData.deleteFile(); // TODO these files are not deleting. it must still be open?
 					}
 				}
 			}
@@ -232,13 +245,13 @@ public abstract class Fetcher {
 	// once for the use return download and again for the NWIS site list.
 	// right now, it assumes that the data comes from a cached file.
 	// it uses the formatter that created the file to know how to split the file
-	protected Iterator<String> makeSiteIterator(InputStream fileData, Formatter formatter) throws IOException {
+	protected List<String> makeSiteIterator(InputStream fileData, Formatter formatter) throws IOException {
 
 		LinkedList<String> sites = new LinkedList<String>();
 
 		if (fileData instanceof InputStreamWithFile) {
 			File file = ((InputStreamWithFile) fileData).getFile(); // TODO change to zip for temp files
-			if (file==null) return StringValueIterator.EMPTY.iterator();
+			if (file==null) return StringValueIterator.EMPTY;
 			InputStream       fin = null;// IoUtils.createTmpZipStream(file) );
 			InputStreamReader rin = null;
 			BufferedReader reader = null;
@@ -263,7 +276,7 @@ public abstract class Fetcher {
 			}
 		}
 
-		return new StringValueIterator( sites.iterator() );
+		return sites;
 	}
 
 
@@ -280,6 +293,13 @@ public abstract class Fetcher {
 		return ogcXml;
 	}
 
+
+
+	protected boolean getDiscreteFlow(HttpServletRequest req) {
+		String  flow     = req.getParameter("dataTypes");
+		boolean alsoFlow = ! StrUtils.isEmpty(flow) && flow.toLowerCase().contains("flow");
+		return alsoFlow;
+	}
 
 
 	protected String getDataTypes(HttpServletRequest req) {

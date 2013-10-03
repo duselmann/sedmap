@@ -20,6 +20,8 @@ public class WriterWithFile extends BufferedWriter {
 	public void deleteFile() {
 		IoUtils.quiteClose(this);
 
+		if (file == null) return;
+
 		if ( ! file.delete() ) {
 			file.deleteOnExit();
 		}
