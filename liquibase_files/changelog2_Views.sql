@@ -3,9 +3,9 @@
 --This is for the sedmap schema
  
 --changeset duselman:siteRefBasinView
---s.eco_l3_code as eco_l3_cod is because of shape file 10 char field name limit
+--s.eco_l2_code as eco_l2_cod is because of shape file 10 char field name limit
 create or replace view sedmap.SITE_REF_BASIN as
-select s.*, b.basin_ids basin_no, s.eco_l3_code eco_l3_cod
+select s.*, b.basin_ids basin_no, s.eco_l2_code eco_l2_cod
 from sedmap.site_ref s
 left outer join sedmap.site_basin b on s.site_no=b.site_no;
 grant select on SITE_REF_BASIN to seduser;
@@ -45,17 +45,15 @@ grant select on daily_stations to seduser;
             
 --changeset duselman:CreateSiteInfoView
 create or replace view sedmap.SITE_INFO as
-select s.SITE_NO,SNAME,LATITUDE,LONGITUDE,GEOM_LL,HUC_8,NWISDA1,"STATE",
+select s.*,
     y.minyr as daily_min, y.maxyr as daily_max, y.minyr ||'-'|| y.maxyr as Daily_Period,
     f.minyr as discrete_min, f.maxyr as discrete_max, f.minyr ||'-'|| f.maxyr as Discrete_Period,
-    NVL2(b.SITE_NO, '1','0') as BENCHMARK_SITE,
       NVL( (select 1 from sedmap.daily_sites d where s.SITE_NO=d.SITE_NO) ,0) as daily_site,
       NVL( (select 1 from sedmap.discrete_sites  d where s.SITE_NO=d.SITE_NO) ,0) as discrete_site,
       NVL(y.sample_years,0) as daily_years,
       NVL(y.sample_years,0) as sample_years,
       NVL(f.sample_count,0) as discrete_samples,
-      NVL(f.sample_count,0) as sample_count,
-      s.basin_no
+      NVL(f.sample_count,0) as sample_count
   from sedmap.site_ref_basin s 
   left outer join sedmap.BENCHMARK_SITES b on s.SITE_NO = b.SITE_NO
   left outer join (
@@ -146,7 +144,9 @@ select s.SITE_NO,
   nhdp80,
   nhdp90,
   nhdp95,
-  nhdp99
+  nhdp99,
+  ECO_L2_COD, --  need to filter out on java side, needed for filtering
+  BASIN_NO    --  need to filter out on java side, needed for filtering
 from DISCRETE_STATIONS s
 left join sedmap.flow_exceedance f on s.site_no=f.site_no;
 
@@ -206,7 +206,9 @@ select s.SITE_NO,
   nhdp80,
   nhdp90,
   nhdp95,
-  nhdp99
+  nhdp99,
+  ECO_L2_COD, --  need to filter out on java side, needed for filtering
+  BASIN_NO    --  need to filter out on java side, needed for filtering
 from DAILY_STATIONS s
 left join sedmap.flow_exceedance f on s.site_no=f.site_no;
 
