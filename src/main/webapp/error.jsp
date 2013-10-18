@@ -114,7 +114,6 @@
             </div>
             <div class="modal-footer"></div>
         </div>
-        <jsp:include page="menu.jsp"/>
         
         
     </body>
