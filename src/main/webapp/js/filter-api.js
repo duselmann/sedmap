@@ -223,6 +223,12 @@ var Filters = Class.extend({
 				// TODO re-factor to a callback of some fashion
 				var isDaily = $('#DL-daily:checkbox:checked').length != 0
 				var isDiscr = $('#DL-discrete:checkbox:checked').length != 0
+				
+				if (!isDaily && !isDiscr) {
+                    $('#DL-msg').html("Please select a data set.")
+				    return
+				}
+				
                 var isData  = $('#DL-sitesOnly:checkbox:checked').length == 0
                 var isFlow  = $('#DL-discreteFlow:checkbox:checked').length != 0
                 var email   = $("#DL-email").val()

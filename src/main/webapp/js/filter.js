@@ -382,7 +382,7 @@ function downloadShow() {
 
     $("#DL-daily").prop('checked', isDaily)
     $("#DL-discrete").prop('checked', isDiscr)
-    $("#DL-discreteFlow").prop('checked', isDiscr)
+    //$("#DL-discreteFlow").prop('checked', isDiscr)
 
     $(".blackoverlay").fadeIn("slow")
 }
