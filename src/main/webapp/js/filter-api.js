@@ -204,9 +204,12 @@ var Filters = Class.extend({
 		var _this = this
 		
 		$().ready(function(){
-			$(_this.parent).keypress(function(e){
-                var keycode = (event.keyCode ? event.keyCode : event.which);
-                if(keycode == '13' || keyCode === 13) { // on enter
+			$(_this.parent + " input" ).keypress(function(e){
+                var keyCode = (event.keyCode ? event.keyCode : event.which);
+                if (keyCode == '13' || keyCode === 13) { // on enter
+                	var element = event.target || event.srcElement;
+                    element.blur()
+                    element.focus()
 					applyFilters(_this.parent)
 				}
 			})
