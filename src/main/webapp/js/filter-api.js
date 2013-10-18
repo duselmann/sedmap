@@ -167,6 +167,7 @@ var Filters = Class.extend({
 		this.isMapOgc= defaultValue(params.isMapOgc,true)
 		this.filter  = undefined
 		this.isPrime = defaultValue(params.isPrime, true) // default not sub-filter
+		this.callback= params.callback
 		
 		// if there is no give clear action then used the default undefined action
 		if (params.clearAction) {
@@ -304,6 +305,9 @@ var Filters = Class.extend({
 	
 	onchange : function() {
 		this.clearFilter()
+		if ( isDefined(this.callback) ) {
+		  this.callback(this.$el)
+		}
 		this.validate()
 		// no text is a clean bill of health
 		return $(this.$warn).text().length > 0

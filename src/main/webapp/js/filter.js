@@ -96,7 +96,7 @@ function setupFilters() {
         group:'#Site-Characteristics',
         label:'USGS Station ID:',
         pattern: /^\d+\*?$/,
-        patternMsg: "Expecting a HUC number with possible wild card, '*'",
+        patternMsg: "Expecting a USGS Station number with possible wild card, '*'",
         layers:[    "Discrete Sites",
                     "Daily Sites",
                 ]
@@ -290,16 +290,22 @@ function setupFilters() {
         field:'HUC_8', 
         el:'huc', 
         size:8,
-        maxlength:12,
+        maxlength:8,
         parent:'#filterDiv', 
         group:'#Boundaries',
         label:'HUC:',
-        pattern: /^\d+\*?$/,
-        patternMsg: "Expecting a HUC number with possible wild card, '*'",
+        pattern: /^(\d\d)+\*?$/,
+        patternMsg: "Expecting a 2, 4, 6, or 8 digit HUC number with possible wild card, '*'",
         layers:[	"Discrete Sites",
                 	"Daily Sites",
                 	"HUC8",
-                ]
+                ],
+        callback: function(el) {
+            var val = $(el + " input").val()
+            if (val.length < 8  &&  val.indexOf('*') < 0) {
+                $(el + " input").val( val+'*' )
+            }
+        }
     })
 	
     states = new Filters.Option({
