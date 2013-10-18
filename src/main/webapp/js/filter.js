@@ -321,7 +321,7 @@ function setupFilters() {
                 	"Daily Sites",
                 	"States",
                 	"Counties",
-                	"NID",
+                	"National Inventory of Dams",
                     "USGS Basin Boundaries"
                 ],
         options: {
