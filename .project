@@ -1,14 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-  <name>sediment</name>
-  <comment>Sediment web mapping application. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
-  <projects/>
-  <buildSpec>
-    <buildCommand>
-      <name>org.eclipse.jdt.core.javabuilder</name>
-    </buildCommand>
-  </buildSpec>
-  <natures>
-    <nature>org.eclipse.jdt.core.javanature</nature>
-  </natures>
+	<name>sediment</name>
+	<comment>Sediment web mapping application. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>_tomcat</name>
+			<type>2</type>
+			<locationURI>WORKSPACE_LOC/tomcat/webapps/sediment</locationURI>
+		</link>
+		<link>
+			<name>_webapp</name>
+			<type>2</type>
+			<locationURI>PROJECT_LOC/src/main/webapp</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>
