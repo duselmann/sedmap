@@ -1,4 +1,4 @@
-package gov.cida.sedmap.io.util;
+package gov.cida.sedmap.web;
 
 import java.io.*;
 import javax.xml.parsers.DocumentBuilder;
