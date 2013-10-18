@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -59,7 +60,19 @@ public class FetcherConfig {
 		DATA_TYPES         = configDataTypes();
 		DATA_VALUES        = configDataValues();
 		DATA_STORE_ENV     = configDataStore();
+
+		// TODO was unmodifiable but the following quick fix disallows it and we are out of time on the project
 		TABLE_METADATA     = loadTableMetadata();
+
+		// TODO this is a quick fix because we are out of time on the project
+		List<Column> cols = TABLE_METADATA.get("DAILY_STATIONS_DL");
+		if (cols != null) {
+			cols.add(new Column("SAMPLE_YEARS", Types.NUMERIC, 15, false));
+		}
+		cols = TABLE_METADATA.get("DISCRETE_STATIONS_DL");
+		if (cols != null) {
+			cols.add(new Column("SAMPLE_COUNT", Types.NUMERIC, 15, false));
+		}
 		return this;
 	}
 
@@ -148,7 +161,7 @@ public class FetcherConfig {
 				try {
 					rs = st.executeQuery("select * from sedmap." +tableName+ " where 0=1");
 					List<Column> columnData = getTableColumns(rs);
-					tableData.put(tableName, Collections.unmodifiableList(columnData));
+					tableData.put(tableName, columnData);
 					logger.info("Collected " +columnData.size()+ " columns metadata for table " +tableName);
 				} catch (Exception e) {
 					throw new RuntimeException("Did not find metadata for table "+tableName, e);
@@ -156,7 +169,7 @@ public class FetcherConfig {
 					IoUtils.quiteClose(rs);
 				}
 			}
-			return Collections.unmodifiableMap(tableData);
+			return tableData;
 		} catch (Exception e) {
 			handleMetadataException(e);
 		} finally {
@@ -208,7 +221,7 @@ public class FetcherConfig {
 			columnData.add( new Column(name, type, size, false) );
 		}
 
-		return  Collections.unmodifiableList(columnData);
+		return  columnData; // was unmod but see comment above
 	}
 
 
