@@ -278,7 +278,7 @@ function setupFilters() {
         group:'#Boundaries',
         label:'Ecoregion Level 2 Number:',
         pattern: /^(\d?(\d\.?))?\d?\*?$/,
-        patternMsg: "Eco Region number have the format ##.## with possible wild card, '*'",
+        patternMsg: "Eco Region number have the format 'Level 1 value.Level 2 value' with possible wild card, '*'",
         layers:[	"Discrete Sites",
                 	"Daily Sites",
                 	"Ecoregion Level 2"
