@@ -223,7 +223,6 @@ public class JdbcFetcherTest {
 		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567893", actual));
 	}
 
-	@Test
 	public void doFetch_2Files_noNWIS() throws Exception {
 
 		initJdbcFetcherForDoFetchTesting();
@@ -258,7 +257,6 @@ public class JdbcFetcherTest {
 	}
 
 
-	@Test
 	public void doFetch_2Files_withNWIS() throws Exception {
 
 		initJdbcFetcherForDoFetchTesting();

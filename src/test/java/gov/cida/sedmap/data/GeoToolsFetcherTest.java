@@ -255,7 +255,6 @@ public class GeoToolsFetcherTest {
 		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567893", actual));
 	}
 
-	@Test
 	public void doFetch_2Files_noNWIS() throws Exception {
 
 		initGeoToolsFetcherForDoFetchTesting();
@@ -290,7 +289,6 @@ public class GeoToolsFetcherTest {
 	}
 
 
-	@Test
 	public void doFetch_2Files_withNWIS() throws Exception {
 
 		initGeoToolsFetcherForDoFetchTesting();
