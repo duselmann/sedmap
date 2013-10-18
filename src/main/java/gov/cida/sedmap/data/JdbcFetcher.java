@@ -151,6 +151,10 @@ public class JdbcFetcher extends Fetcher {
 	@Override
 	protected InputStreamWithFile handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
 			throws IOException, SQLException, NamingException {
+		if ( !sites.hasNext() ) {
+			// return nothing if there are no sites
+			return null;
+		}
 
 		Results         rs = new Results();
 		WriterWithFile tmp = null;

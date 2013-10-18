@@ -9,7 +9,6 @@ import gov.cida.sedmap.io.util.StringValueIterator;
 import gov.cida.sedmap.ogc.FilterWithViewParams;
 import gov.cida.sedmap.ogc.OgcUtils;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -64,17 +63,15 @@ public abstract class Fetcher {
 
 	protected InputStreamWithFile handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
 			throws IOException, SQLException, NamingException {
-		String url = NWIS_URL;
-
 		if ( !sites.hasNext() ) {
 			// return nothing if there are no sites
-			return new InputStreamWithFile( new ByteArrayInputStream("".getBytes()), null);
+			return null;
 		}
 
-		// NWIS offers RDB only
-		String format = "rdb";
+		// NWIS offers RDB only that is compatible with sedmap needs
 		Formatter rdb = new RdbFormatter();
-		url = url.replace("_format_",    format);
+		String format = "rdb";
+		String url = NWIS_URL.replace("_format_", format);
 
 		// extract expressions from the filter we can handle
 		String yr1 = filter.getViewParam("yr1");
@@ -87,9 +84,10 @@ public abstract class Fetcher {
 		url = url.replace("_startDate_", startDate);
 		url = url.replace("_endDate_",   endDate);
 
+		// we need to include the second header line for rdb format
+		int headerLines    = formatter instanceof RdbFormatter ?2 :1;
 		boolean needHeader = true;
 		int readLineCountAfterComments = 0;
-		int headerLines = formatter instanceof RdbFormatter ?2 :1;
 
 		// open temp file
 		WriterWithFile tmp = null;
@@ -129,7 +127,7 @@ public abstract class Fetcher {
 								continue;
 							}
 						}
-						// translate from NWIS format to requested format
+						// translate from NWIS RDB format to requested format
 						line = formatter.transform(line, rdb);
 						tmp.write(line);
 						tmp.write(IoUtils.LINE_SEPARATOR);
@@ -182,7 +180,9 @@ public abstract class Fetcher {
 
 			String    ogcXml = getFilter(req, site);
 			AbstractFilter aFilter = OgcUtils.ogcXmlToFilter(ogcXml);
+			@SuppressWarnings("unchecked") // fyi: for some reason this is not require for all jdks
 			String yr1 = OgcUtils.removeFilter(aFilter, "year", PropertyIsGreaterThanOrEqualTo.class, PropertyIsGreaterThan.class);
+			@SuppressWarnings("unchecked") // fyi: for some reason this is not require for all jdks
 			String yr2 = OgcUtils.removeFilter(aFilter, "year", PropertyIsLessThanOrEqualTo.class,    PropertyIsLessThan.class);
 			FilterWithViewParams filter = new FilterWithViewParams(aFilter);
 			filter.putViewParam("yr1", "1900", yr1);
@@ -221,8 +221,10 @@ public abstract class Fetcher {
 							}
 						}
 					}
-					handler.writeFile(formatter.getContentType(), filename, fileData);
-
+					// if we found some sites or data then append it to the collection
+					if ( fileData != null && !sites.isEmpty() ) {
+						handler.writeFile(formatter.getContentType(), filename, fileData);
+					}
 				} catch (Exception e) {
 					String msg = "failed to fetch from DB";
 					logger.error(msg);
