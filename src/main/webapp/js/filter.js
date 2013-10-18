@@ -44,7 +44,7 @@ function setupFilters() {
         max:90,
         compare: Ogc.Comp.GREATER_THAN_OR_EQUAL_TO ,
         pattern: /^\d+$/,
-        patternMsg: "Expecting a positive number",
+        patternMsg: "Expecting a positive integer",
         layers:["Daily Sites"]
     })
 
@@ -59,7 +59,7 @@ function setupFilters() {
         label:'Min Discrete Samples:',
         compare: Ogc.Comp.GREATER_THAN_OR_EQUAL_TO ,
         pattern: /^\d+$/,
-        patternMsg: "Expecting a positive number",
+        patternMsg: "Expecting a positive integer",
         layers:["Discrete Sites"]
     })
 	
@@ -72,7 +72,7 @@ function setupFilters() {
         maxlength:15,
         parent:'#filterDiv', 
         group:'#Boundaries',
-        label:'Gage Basin ID:',
+        label:'USGS Station ID:',
         pattern: /^\d{8,15}$/,
         valueDecorator: function(value) {
             return "*"+value+"*"
