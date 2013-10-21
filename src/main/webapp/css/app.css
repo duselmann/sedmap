@@ -496,10 +496,10 @@ div.filterActions {
     margin: 0;
     position: absolute;
     top: 74px;
-    left: 940px;
+    left: 900px;
     z-index: 100;
     font-weight: bold;
-    width: 350px;
+    width: 400px;
     padding: 3px;
     border: 1px solid #345280;
 }

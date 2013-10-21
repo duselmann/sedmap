@@ -159,7 +159,7 @@ var Filters = Class.extend({
 		this.parent  = params.parent
 		this.group   = defaultValue(params.group, params.parent)
 		this.field   = params.field
-		this.classEl = defaultValue(params.class,'') + ' filterAll'
+		this.classEl = defaultValue(params.clazz,'') + ' filterAll'
 		this.label   = params.label
 		this.lblClass= defaultValue(params.labelClass,'')
 		this.errClass= defaultValue(params.errorClass,'inputFilterWarn')
@@ -461,7 +461,7 @@ Filters.Bool   = Filters.extend({
 	init: function(params) {
 		this.trueVal = params.trueVal
 		
-		params.class = defaultValue(params.class,'') + ' filterBool'
+		params.clazz = defaultValue(params.clazz,'') + ' filterBool'
 		this._super(params)
 	},
 	
@@ -504,7 +504,7 @@ Filters.Bool   = Filters.extend({
 Filters.Value  = Filters.extend({
 	init : function(params) {
 		// use size if given, use class if exists, default to 8 chars
-		this.size       = defaultValue(params.size, params.class ? '' : 8)
+		this.size       = defaultValue(params.size, params.clazz ? '' : 8)
 		this.maxlength  = defaultValue(params.maxlength,256)
 		this.minValue   = params.min
 		this.maxValue   = params.max
@@ -513,7 +513,7 @@ Filters.Value  = Filters.extend({
 		this.patternMsg = params.patternMsg
 		this.valueDecor = defaultValue(params.valueDecorator, Filters.defaultDecor)
 		
-		params.class = defaultValue(params.class,'') + ' filterValue'
+		params.clazz = defaultValue(params.clazz,'') + ' filterValue'
 		this._super(params)
 	},
 	
@@ -564,10 +564,10 @@ Filters.Range  = Filters.extend({
 	init : function(params) {
 		var label = params.label
 		params.label=""
-		params.class = defaultValue(params.class,'') + ' filterRange'
+		params.clazz = defaultValue(params.clazz,'') + ' filterRange'
 		this._super(params) // had to call this first so the parent conatiner exists
 		
-		var baseclass      = defaultValue(params.class, '')
+		var baseclass      = defaultValue(params.clazz, '')
 		
 		var minParams      = $.extend({}, params)
 		minParams.el      += "-lo"
@@ -576,7 +576,7 @@ Filters.Range  = Filters.extend({
 		minParams.isPrime  = false
 		minParams.parent   = this.$el
 		minParams.group    = undefined
-		minParams.class    = baseclass + " loRange"
+		minParams.clazz    = baseclass + " loRange"
 		this.lo            = new Filters.Value(minParams)
 		this.lo.$warn      = this.$warn
 		
@@ -587,7 +587,7 @@ Filters.Range  = Filters.extend({
 		maxParams.isPrime  = false
 		maxParams.parent   = this.$el
 		maxParams.group    = undefined
-		maxParams.class    = baseclass + " hiRange"
+		maxParams.clazz    = baseclass + " hiRange"
 		this.hi            = new Filters.Value(maxParams)
 		this.hi.$warn      = this.$warn
 		
@@ -643,7 +643,7 @@ Filters.Option = Filters.extend({
 		
 		window[this.globalRef] = this
 		
-		params.class = defaultValue(params.class,'') + ' filterOption'
+		params.clazz = defaultValue(params.clazz,'') + ' filterOption'
 		this._super(params)
 	},
 

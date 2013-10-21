@@ -27,13 +27,13 @@ function setupFilters() {
         label:'Hydrologic Benchmark Sites:',
         layers:[
                 "Discrete Sites",
-                "Daily Sites",
+                "Daily Sites"
                 ]
     })
     
 
     minYears = new Filters.Value({
-        class:"minyrs",
+        clazz:"minyrs",
         field:'SAMPLE_YEARS', 
         el:'minyrs', 
         size:4,
@@ -49,7 +49,7 @@ function setupFilters() {
     })
 
     minSamples = new Filters.Value({
-        class:"minSamples",
+        clazz:"minSamples",
         field:'SAMPLE_COUNT', 
         el:'minSamples', 
         size:8,
@@ -65,7 +65,7 @@ function setupFilters() {
 	
 
     gageBasin = new Filters.Value({
-        class:"usgsBasinNo",
+        clazz:"usgsBasinNo",
         field:'BASIN_NO', 
         el:'BASIN_ID', 
         size:11,
@@ -87,7 +87,7 @@ function setupFilters() {
 
     
     usgsStation = new Filters.Value({
-        class:"usgsStationId",
+        clazz:"usgsStationId",
         field:'SITE_NO', 
         el:'USGS_STATION_ID', 
         size:11,
@@ -98,12 +98,12 @@ function setupFilters() {
         pattern: /^\d+\*?$/,
         patternMsg: "Expecting a USGS Station number with possible wild card, '*'",
         layers:[    "Discrete Sites",
-                    "Daily Sites",
+                    "Daily Sites"
                 ]
     })
 
     stationName = new Filters.Value({
-        class:"usgsStationName",
+        clazz:"usgsStationName",
         field:'SNAME', 
         el:'USGS_STATION_NAME', 
         size:11,
@@ -118,13 +118,13 @@ function setupFilters() {
         },
         patternMsg: "Expecting any part of a station name.",
         layers:[    "Discrete Sites",
-                    "Daily Sites",
+                    "Daily Sites"
                 ]
     })
     
     
     drainArea = new Filters.Range({
-        class:"drainage",
+        clazz:"drainage",
         field:'NWISDA1', 
         el:'DRAINAGE_AREA_MI_SQ', 
         size:8,
@@ -137,12 +137,12 @@ function setupFilters() {
         pattern: /^\d+$/,
         patternMsg: "Expecting a positive number",
         layers:[	"Discrete Sites",
-                	"Daily Sites",
+                	"Daily Sites"
                 ]
     })
     
     soilKfactor = new Filters.Range({
-        class:"soilkfactor",
+        clazz:"soilkfactor",
         field:'KFACT', 
         el:'SOIL_K', 
         size:6,
@@ -155,12 +155,12 @@ function setupFilters() {
         pattern: /^[01]?\.\d{0,3}$/,
         patternMsg: "Expecting number between 0.008 and 0.550",
         layers:[    "Discrete Sites",
-                    "Daily Sites",
+                    "Daily Sites"
                 ]
     })
     
     soilRfactor = new Filters.Range({
-        class:"rfactor",
+        clazz:"rfactor",
         field:'RFACT', 
         el:'rfact', 
         size:6,
@@ -173,12 +173,12 @@ function setupFilters() {
         pattern: /^\d{0,3}(\.\d{0,3})?$/,
         patternMsg: "Expecting number between 2.85 and 670",
         layers:[    "Discrete Sites",
-                    "Daily Sites",
+                    "Daily Sites"
                 ]
     })
     
     soilPerm = new Filters.Range({
-        class:"soilPerm",
+        clazz:"soilPerm",
         field:'PERM', 
         el:'SOIL_PERM', 
         size:6,
@@ -191,12 +191,12 @@ function setupFilters() {
         pattern: /^\d{0,2}(\.\d{0,3})?$/,
         patternMsg: "Expecting number between 0.23 and 14.2",
         layers:[    "Discrete Sites",
-                    "Daily Sites",
+                    "Daily Sites"
                 ]
     })
     
     urbanLand = new Filters.Range({
-        class:"urbanLand",
+        clazz:"urbanLand",
         field:'URBAN', 
         el:'urbanLand', 
         size:4,
@@ -209,12 +209,12 @@ function setupFilters() {
         pattern: /^\d+$/,
         patternMsg: "Expecting number between 0 and 100",
         layers:[	"Discrete Sites",
-                	"Daily Sites",
+                	"Daily Sites"
                 ]
     })
     
     agLand = new Filters.Range({
-        class:"agLand",
+        clazz:"agLand",
         field:'AGRIC', 
         el:'agLand', 
         size:4,
@@ -227,12 +227,12 @@ function setupFilters() {
         pattern: /^\d+$/,
         patternMsg: "Expecting number between 0 and 100",
         layers:[	"Discrete Sites",
-                	"Daily Sites",
+                	"Daily Sites"
                 ]
     })
     
     forestLand = new Filters.Range({
-        class:"forestLand",
+        clazz:"forestLand",
         field:'FOREST', 
         el:'forestLand', 
         size:4,
@@ -245,12 +245,12 @@ function setupFilters() {
         pattern: /^\d+$/,
         patternMsg: "Expecting number between 0 and 100",
         layers:[	"Discrete Sites",
-                	"Daily Sites",
+                	"Daily Sites"
                 ]
     })
     
 	theYearFilter = new Filters.Range({
-        class:"yearRange",
+        clazz:"yearRange",
         field:'YEAR', 
         el:'year', 
         size:8,
@@ -264,12 +264,12 @@ function setupFilters() {
         patternMsg: "Expecting a positive number",
         isMapOgc: false,
         layers:[	"Discrete Sites",
-                	"Daily Sites",
+                	"Daily Sites"
                 ]
     })
     
 	ecoNum = new Filters.Value({
-        class:"ecoNumFilter",
+        clazz:"ecoNumFilter",
         field:'ECO_L2_COD', 
         el:'ecoNum', 
         size:8,
@@ -286,7 +286,7 @@ function setupFilters() {
     })
 	
     huc = new Filters.Value({
-        class:"hucFilter",
+        clazz:"hucFilter",
         field:'HUC_8', 
         el:'huc', 
         size:8,
@@ -298,7 +298,7 @@ function setupFilters() {
         patternMsg: "Expecting a 2, 4, 6, or 8 digit HUC number with possible wild card, '*'",
         layers:[	"Discrete Sites",
                 	"Daily Sites",
-                	"HUC8",
+                	"HUC8"
                 ],
         callback: function(el) {
             var val = $(el + " input").val()
@@ -309,7 +309,7 @@ function setupFilters() {
     })
 	
     states = new Filters.Option({
-        class:"stateFilter",
+        clazz:"stateFilter",
         field:'STATE', 
         el:'state', 
         parent:'#filterDiv', 
@@ -348,7 +348,7 @@ function setupFilters() {
             "UT":"Utah",
             "VT":"Vermont","VA":"Virginia","VI":"Virgin Islands",
             "WA":"Washington","WV":"West Virginia",
-            "WI":"Wisconsin","WY":"Wyoming",
+            "WI":"Wisconsin","WY":"Wyoming"
         }
     })
 

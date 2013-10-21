@@ -296,8 +296,8 @@ function _addLayer(map, title, layerId, type, url, options, params, noDefaults) 
                isBaseLayer: false, // overlay layer
                wrapDateLine: false,// repeat the world map
                visibility: false,   // initial visibility
-               displayOutsideMaxExtent: true, // display full map returned
-//               yx : {'EPSG:3857' : false}
+//               yx : {'EPSG:3857' : false},
+               displayOutsideMaxExtent: true // display full map returned
            }
     
     if (noDefaults) {
