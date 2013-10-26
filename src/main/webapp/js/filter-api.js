@@ -205,7 +205,7 @@ var Filters = Class.extend({
 		var _this = this
 		
 		$().ready(function(){
-			$(_this.parent + " input" ).keypress(function(e){
+			$(_this.parent + " input" ).keypress(function(event){
                 var keyCode = (event.keyCode ? event.keyCode : event.which);
                 if (keyCode == '13' || keyCode === 13) { // on enter
                 	var element = event.target || event.srcElement;
