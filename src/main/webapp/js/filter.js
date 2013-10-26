@@ -133,7 +133,7 @@ function setupFilters() {
         group:'#Site-Characteristics',
         label:'Drainage Area (mi<sup>2</sup>):',
         min:0,
-        max:999999999,
+        max:9999999,
         pattern: /^\d+$/,
         patternMsg: "Expecting a positive number",
         layers:[	"Discrete Sites",
