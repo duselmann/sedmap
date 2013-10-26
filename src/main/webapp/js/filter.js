@@ -302,7 +302,7 @@ function setupFilters() {
                 ],
         callback: function(el) {
             var val = $(el + " input").val()
-            if (val.length < 8  &&  val.indexOf('*') < 0) {
+            if (val.length > 0  && val.length < 8  &&  val.indexOf('*') < 0) {
                 $(el + " input").val( val+'*' )
             }
         }
