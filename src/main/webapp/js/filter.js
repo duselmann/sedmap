@@ -150,10 +150,10 @@ function setupFilters() {
         parent:'#filterDiv', 
         group:'#Site-Characteristics',
         label:'Soil K-Factor:',
-        min:0.008,
+        min:0.08,
         max:0.55,
         pattern: /^[01]?\.\d{0,3}$/,
-        patternMsg: "Expecting number between 0.008 and 0.550",
+        patternMsg: "Expecting number between 0.08 and 0.55",
         layers:[    "Discrete Sites",
                     "Daily Sites"
                 ]
