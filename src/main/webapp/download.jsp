@@ -17,8 +17,8 @@
                 <span title="Check to download mean daily flow data from NWIS for the discrete sample sites.">&nbsp;(?)</span>
             </div>
         </li>
-        <li><label><input type="checkbox" id="DL-sitesOnly"> Sites Only</label>
-            <span title="Check this option if you only want site attribute information."> (?)</span>
+        <li><label><input type="checkbox" id="DL-sitesOnly"> Site Attribute Information Only</label>
+            <span title="Check this option if you only want site attribute information. (Daily or Discrete data must also be selected.)"> (?)</span>
         </li>
         <li>File Format: 
             <select id="DL-format"><option>csv</option><option selected="true">tsv</option></select>
