@@ -4,7 +4,7 @@
 <div class="filterActions">
     <div class="item"><a class="applyFilter" href="#">Apply Filter</a></div>
     <div class="item"><a class="clearFilter" href="#">Clear Filter</a></div>
-    <div class="item"><a onclick="downloadShow()" href="#">Download Data...</a></div>
+    <div class="item"><a onclick="downloadShow()" href="#">Download Data</a></div>
 </div>
 
     
