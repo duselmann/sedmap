@@ -155,8 +155,8 @@ function getSiteInfo(e) {
     if (layer.params.FEATUREID) {
         params.featureid = layer.params.FEATUREID;
     }
-    if (layer.params.viewparams) {
-        params.viewparams = layer.params.viewparams;
+    if (layer.params.VIEWPARAMS) {
+        params.viewparams = layer.params.VIEWPARAMS;
     }
     OpenLayers.Request.GET({url:projectUrl+"wms", params:params, scope:this, success:onSiteInfoResponse, failure:onSiteInfoResponseFail});
     OpenLayers.Event.stop(e);
