@@ -762,7 +762,7 @@ Filters.Option = Filters.extend({
 		} else {
 			$(this.$el+num).change(function(e){_this.optionchange(e)})
 		}
-	},
+	}
 })
 
 
