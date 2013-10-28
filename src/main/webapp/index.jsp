@@ -2,8 +2,7 @@
 <%@page import="org.slf4j.LoggerFactory"%>
 <%@page import="gov.usgs.cida.config.DynamicReadOnlyProperties"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<!DOCTYPE html public "-//W3C//DTD HTML 4.0//en">
-
+<!DOCTYPE html>
 
 <%!    
     protected DynamicReadOnlyProperties props = new DynamicReadOnlyProperties();
@@ -21,6 +20,8 @@
 <html lang="en">
     
     <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" >    
+    
         <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
         <link rel="icon" href="favicon.ico" type="image/x-icon" />
         <link type="text/css" rel="stylesheet" href="css/normalize/normalize.css" />
