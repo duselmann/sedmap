@@ -18,6 +18,27 @@ var stationName
 
 function setupFilters() {
 	
+    gageBasin = new Filters.Value({
+        clazz:"usgsBasinNo",
+        field:'BASIN_NO', 
+        el:'BASIN_ID', 
+        size:11,
+        maxlength:15,
+        parent:'#filterDiv', 
+        group:'#Boundaries',
+        label:'USGS Station ID:',
+        pattern: /^\d{8,15}$/,
+        valueDecorator: function(value) {
+            return "*"+value+"*"
+        },
+        patternMsg: "Expecting a full 8-15 digit basin ID.",
+        layers:[    "Discrete Sites",
+                    "Daily Sites",
+                    "USGS Basin Boundaries"
+                ]
+    })
+    
+
     benchmark = new Filters.Bool({
         field:'BENCHMARK_SITE', 
         trueVal:'1', 
@@ -63,27 +84,6 @@ function setupFilters() {
         layers:["Discrete Sites"]
     })
 	
-
-    gageBasin = new Filters.Value({
-        clazz:"usgsBasinNo",
-        field:'BASIN_NO', 
-        el:'BASIN_ID', 
-        size:11,
-        maxlength:15,
-        parent:'#filterDiv', 
-        group:'#Boundaries',
-        label:'USGS Station ID:',
-        pattern: /^\d{8,15}$/,
-        valueDecorator: function(value) {
-            return "*"+value+"*"
-        },
-        patternMsg: "Expecting a full 8-15 digit basin ID.",
-        layers:[    "Discrete Sites",
-                    "Daily Sites",
-                    "USGS Basin Boundaries"
-                ]
-    })
-    
 
     
     usgsStation = new Filters.Value({
