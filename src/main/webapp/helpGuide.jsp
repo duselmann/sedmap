@@ -4,12 +4,6 @@
 <html lang="en">
     
     <head>
-        <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE" />
-        <META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
-        <META HTTP-EQUIV="EXPIRES" CONTENT="0" />
-        <META HTTP-EQUIV="CONTENT-LANGUAGE" CONTENT="en-US" />
-        <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=UTF-8" />
-        <meta name="viewport" content="width=device-width">
         <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
         <link rel="icon" href="favicon.ico" type="image/x-icon" />
         <link type="text/css" rel="stylesheet" href="css/normalize/normalize.css" />
