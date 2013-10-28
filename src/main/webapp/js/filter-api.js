@@ -196,7 +196,7 @@ var Filters = Class.extend({
 		if ( this.group !== this.parent && $(this.group).length === 0 ) {
 			// use the group el without the # for jquery
 			var group = this.group.replace('#','')
-			$(this.parent).append('<div id="'+group+'" class="filterGroup"><div class="filterGroupLabel">'+group+'</div></div>')
+			$(this.parent).append('<div id="'+group+'" class="filterGroup"><div class="filterGroupLabel">'+group+' Filters'+'</div></div>')
 		}
 		if ( isDefined(Filters.Instances[this.parent]) ) return
 		

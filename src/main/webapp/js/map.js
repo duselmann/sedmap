@@ -33,7 +33,7 @@ var flowUrl    = '/sediment/flow/'; // url to the flow proxy point
 var layers = {}
 
 var layerSwitcher;
-var lastControls   = false;
+var lastControls   = true;
 var lastSiteLegend = false;
 
 function init(){
@@ -108,6 +108,7 @@ function init(){
     $('#nlcdimg').appendTo('#map:first-child')
     $('#siteInfo').click(clearSiteInfo)
     $('#sitethumb').click(siteLegendToggle)
+    layerSwitcher.maximizeControl()
 }
 
 function getSiteInfo(e) {

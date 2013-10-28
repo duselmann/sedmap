@@ -25,8 +25,8 @@ function setupFilters() {
         size:11,
         maxlength:15,
         parent:'#filterDiv', 
-        group:'#Boundaries',
-        label:'USGS Station ID:',
+        group:'#Boundary',
+        label:'USGS Station ID Basin Boundary:',
         pattern: /^\d{8,15}$/,
         valueDecorator: function(value) {
             return "*"+value+"*"
@@ -38,21 +38,6 @@ function setupFilters() {
                 ]
     })
     
-
-    benchmark = new Filters.Bool({
-        field:'BENCHMARK_SITE', 
-        trueVal:'1', 
-        el:'refonly', 
-        parent:'#filterDiv', 
-        group:'#Site-Characteristics',
-        label:'Hydrologic Benchmark Sites:',
-        layers:[
-                "Discrete Sites",
-                "Daily Sites"
-                ]
-    })
-    
-
     minYears = new Filters.Value({
         clazz:"minyrs",
         field:'SAMPLE_YEARS', 
@@ -60,7 +45,7 @@ function setupFilters() {
         size:4,
         maxlength:2,
         parent:'#filterDiv', 
-        group:'#Data-Characteristics',
+        group:'#Data-Characteristic',
         label:'Min Years of Daily Data:',
         max:90,
         compare: Ogc.Comp.GREATER_THAN_OR_EQUAL_TO ,
@@ -69,6 +54,40 @@ function setupFilters() {
         layers:["Daily Sites"]
     })
 
+    
+    
+    usgsStation = new Filters.Value({
+        clazz:"usgsStationId",
+        field:'SITE_NO', 
+        el:'USGS_STATION_ID', 
+        size:11,
+        maxlength:15,
+        parent:'#filterDiv', 
+        group:'#Site-Characteristic',
+        label:'USGS Station ID:',
+        pattern: /^\d+\*?$/,
+        patternMsg: "Expecting a USGS Station number with possible wild card, '*'",
+        layers:[    "Discrete Sites",
+                    "Daily Sites"
+                ]
+    })
+
+    
+
+    benchmark = new Filters.Bool({
+        field:'BENCHMARK_SITE', 
+        trueVal:'1', 
+        el:'refonly', 
+        parent:'#filterDiv', 
+        group:'#Site-Characteristic',
+        label:'Hydrologic Benchmark Sites:',
+        layers:[
+                "Discrete Sites",
+                "Daily Sites"
+                ]
+    })
+    
+
     minSamples = new Filters.Value({
         clazz:"minSamples",
         field:'SAMPLE_COUNT', 
@@ -76,7 +95,7 @@ function setupFilters() {
         size:8,
         maxlength:12,
         parent:'#filterDiv', 
-        group:'#Data-Characteristics',
+        group:'#Data-Characteristic',
         label:'Min Discrete Samples:',
         compare: Ogc.Comp.GREATER_THAN_OR_EQUAL_TO ,
         pattern: /^\d+$/,
@@ -86,22 +105,6 @@ function setupFilters() {
 	
 
     
-    usgsStation = new Filters.Value({
-        clazz:"usgsStationId",
-        field:'SITE_NO', 
-        el:'USGS_STATION_ID', 
-        size:11,
-        maxlength:15,
-        parent:'#filterDiv', 
-        group:'#Site-Characteristics',
-        label:'USGS Station ID:',
-        pattern: /^\d+\*?$/,
-        patternMsg: "Expecting a USGS Station number with possible wild card, '*'",
-        layers:[    "Discrete Sites",
-                    "Daily Sites"
-                ]
-    })
-
     stationName = new Filters.Value({
         clazz:"usgsStationName",
         field:'SNAME', 
@@ -109,7 +112,7 @@ function setupFilters() {
         size:11,
         maxlength:50,
         parent:'#filterDiv', 
-        group:'#Site-Characteristics',
+        group:'#Site-Characteristic',
         label:'USGS Station Name:',
         pattern: /^[\w\. ]+$/,
         valueDecorator: function(value) {
@@ -130,7 +133,7 @@ function setupFilters() {
         size:8,
         maxlength:11,
         parent:'#filterDiv', 
-        group:'#Site-Characteristics',
+        group:'#Site-Characteristic',
         label:'Drainage Area (mi<sup>2</sup>):',
         min:0,
         max:9999999,
@@ -148,7 +151,7 @@ function setupFilters() {
         size:6,
         maxlength:6,
         parent:'#filterDiv', 
-        group:'#Site-Characteristics',
+        group:'#Site-Characteristic',
         label:'Soil K-Factor:',
         min:0.08,
         max:0.55,
@@ -166,7 +169,7 @@ function setupFilters() {
         size:6,
         maxlength:6,
         parent:'#filterDiv',
-        group:'#Site-Characteristics',
+        group:'#Site-Characteristic',
         label:'R-Factor:',
         min:2.85,
         max:670,
@@ -184,7 +187,7 @@ function setupFilters() {
         size:6,
         maxlength:6,
         parent:'#filterDiv', 
-        group:'#Site-Characteristics',
+        group:'#Site-Characteristic',
         label:'Soil Permeability:',
         min:0.23,
         max:14.2,
@@ -202,7 +205,7 @@ function setupFilters() {
         size:4,
         maxlength:4,
         parent:'#filterDiv', 
-        group:'#Site-Characteristics',
+        group:'#Site-Characteristic',
         label:'Urban Land Use (%):',
         min:0,
         max:100,
@@ -220,7 +223,7 @@ function setupFilters() {
         size:4,
         maxlength:4,
         parent:'#filterDiv', 
-        group:'#Site-Characteristics',
+        group:'#Site-Characteristic',
         label:'Ag Land Use (%):',
         min:0,
         max:100,
@@ -238,7 +241,7 @@ function setupFilters() {
         size:4,
         maxlength:4,
         parent:'#filterDiv', 
-        group:'#Site-Characteristics',
+        group:'#Site-Characteristic',
         label:'Forest Land Use (%):',
         min:0,
         max:100,
@@ -256,7 +259,7 @@ function setupFilters() {
         size:8,
         maxlength:4,
         parent:'#filterDiv', 
-        group:'#Data-Characteristics',
+        group:'#Data-Characteristic',
         label:'Year Range:',
         min:1900,
         max:new Date().getFullYear(),
@@ -275,7 +278,7 @@ function setupFilters() {
         size:8,
         maxlength:12,
         parent:'#filterDiv', 
-        group:'#Boundaries',
+        group:'#Boundary',
         label:'Ecoregion Level 2 Number:',
         pattern: /^(\d?(\d\.?))?\d?\*?$/,
         patternMsg: "Eco Region number have the format 'Level 1 value.Level 2 value' with possible wild card, '*'",
@@ -292,7 +295,7 @@ function setupFilters() {
         size:8,
         maxlength:8,
         parent:'#filterDiv', 
-        group:'#Boundaries',
+        group:'#Boundary',
         label:'HUC:',
         pattern: /^(\d\d)+\*?$/,
         patternMsg: "Expecting a 2, 4, 6, or 8 digit HUC number with possible wild card, '*'",
@@ -313,7 +316,7 @@ function setupFilters() {
         field:'STATE', 
         el:'state', 
         parent:'#filterDiv', 
-        group:'#Boundaries',
+        group:'#Boundary',
         label:'States:',
         labelClass:"stateFilterLabel",
         baseTxt: "Select a State",
