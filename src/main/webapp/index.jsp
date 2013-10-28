@@ -2,7 +2,7 @@
 <%@page import="org.slf4j.LoggerFactory"%>
 <%@page import="gov.usgs.cida.config.DynamicReadOnlyProperties"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<!DOCTYPE html>
+<!doctype html>
 
 <%!    
     protected DynamicReadOnlyProperties props = new DynamicReadOnlyProperties();
