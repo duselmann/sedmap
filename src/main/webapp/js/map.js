@@ -45,7 +45,7 @@ function init(){
         new OpenLayers.Control.Scale($('scale')),
         new OpenLayers.Control.MousePosition({element: $('location')}),
         new OpenLayers.Control.LayerSwitcher(),
-        new OpenLayers.Control.ScaleLine(),
+        new OpenLayers.Control.ScaleLine()
     ]
     layerSwitcher = controls[4]
     var bounds = new OpenLayers.Bounds(-173*111000, 18*111000, -60*111000, 70*111000);
@@ -83,7 +83,7 @@ function init(){
     addProjectLayer(map, "States", "sedmap:statep010", false) // add a new visible layer *new added 7/23/13 mwarren
     addProjectLayer(map, "Counties", "sedmap:countyp020", false)   // add a new invisible layer
     addProjectLayer(map, "HUC8", "sedmap:huc_8_multipart_wgs", false)
-    addFlowLinesLayer(map);
+    if (isHtml5()) addFlowLinesLayer(map)
     addProjectLayer(map, "Ecoregion Level 2", "sedmap:NA_CEC_Eco_Level2", false)
 //    addProjectLayer(map, DAILY+" USGS Gage Basins", "sedmap:Alldailybasins", false)
 //    addProjectLayer(map, DISCRETE+" USGS Gage Basins", "sedmap:Alldiscretebasins", false)

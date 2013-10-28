@@ -164,6 +164,15 @@ function getStyle(className) {
 	}
 }
 
+
+
+var canvas  = document.createElement("canvas")
+var hasCanvasContext = canvas.getContext !== undefined
+canvas = null
+function isHtml5() {
+    return hasCanvasContext
+}
+
 	
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/

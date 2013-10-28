@@ -20,6 +20,8 @@
 <html lang="en">
     
     <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" >            
+        
         <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
         <link rel="icon" href="favicon.ico" type="image/x-icon" />
         <link type="text/css" rel="stylesheet" href="css/normalize/normalize.css" />
