@@ -235,7 +235,7 @@ var Filters = Class.extend({
 				var urlPart = []
 				var p = 0
 				urlPart[p++] = "/sediment/data?format="
-				urlPart[p++] = $('#downloadFormat').val()
+				urlPart[p++] = $('#DL-format').val()
                 urlPart[p++] = "&email="+ email
 				urlPart[p++] = "&dataTypes=sites_" // always include site info
 				urlPart[p++] = isData  ?"data_"     :""
