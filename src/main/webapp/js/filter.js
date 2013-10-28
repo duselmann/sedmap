@@ -56,6 +56,20 @@ function setupFilters() {
 
     
     
+    benchmark = new Filters.Bool({
+        field:'BENCHMARK_SITE', 
+        trueVal:'1', 
+        el:'refonly', 
+        parent:'#filterDiv', 
+        group:'#Site-Characteristic',
+        label:'Hydrologic Benchmark Sites:',
+        layers:[
+                "Discrete Sites",
+                "Daily Sites"
+                ]
+    })
+    
+
     usgsStation = new Filters.Value({
         clazz:"usgsStationId",
         field:'SITE_NO', 
@@ -72,20 +86,6 @@ function setupFilters() {
                 ]
     })
 
-    
-
-    benchmark = new Filters.Bool({
-        field:'BENCHMARK_SITE', 
-        trueVal:'1', 
-        el:'refonly', 
-        parent:'#filterDiv', 
-        group:'#Site-Characteristic',
-        label:'Hydrologic Benchmark Sites:',
-        layers:[
-                "Discrete Sites",
-                "Daily Sites"
-                ]
-    })
     
 
     minSamples = new Filters.Value({
