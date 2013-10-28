@@ -155,10 +155,9 @@ function getSiteInfo(e) {
     if (layer.params.FEATUREID) {
         params.featureid = layer.params.FEATUREID;
     }
-// TODO need the site info layer to function like discrete and daily
-//    if (layer.params.VIEWPARAMS) {
-//        params.viewparams = layer.params.VIEWPARAMS;
-//    }
+    if (layer.params.VIEWPARAMS) {
+        params.viewparams = layer.params.VIEWPARAMS;
+    }
     OpenLayers.Request.GET({url:projectUrl+"wms", params:params, scope:this, success:onSiteInfoResponse, failure:onSiteInfoResponseFail});
     OpenLayers.Event.stop(e);
 }
