@@ -55,7 +55,7 @@ function setupFilters() {
         compare: Ogc.Comp.GREATER_THAN_OR_EQUAL_TO ,
         pattern: /^\d+$/,
         patternMsg: "Expecting a positive integer",
-        orDefaultValue: '0',
+        orDefaultValue: '1',
         layers:[
                 "Daily Sites",
                 "SiteInfo"
@@ -112,7 +112,7 @@ function setupFilters() {
         pattern: /^\d+$/,                            // the pattern to validate entries against
         patternMsg: "Expecting a positive integer",  // the message to display when the pattern is violated
         orWith: [minYears],                          // the other filters used in or-conjunction
-        orDefaultValue: '0',                         // the default value to use in or-conjunction
+        orDefaultValue: '1',                         // the default value to use in or-conjunction
         layers:[                                     // the array of layers that this filter should be applied
                 "Discrete Sites",
                 "SiteInfo"
