@@ -221,7 +221,8 @@ var Filters = Class.extend({
 		}
 		
 		if (isDefined(this.orDefaultValue)) {
-            this.orDafaultFilter = this.makeFilter(this.orDefaultValue)
+            this.orDefaultFilter = this.makeFilter(this.orDefaultValue)
+			this.filter = undefined // TODO makeFilter should not set filter any more
 		}
 		
 		if (this.isPrime) {
