@@ -48,57 +48,112 @@ var getFilters = function(parentGroupEl, layerName) {
 
 
 
+var checkForErrorsBeforeApplingFilters = function(parentGroupEl) {
+    var hasErrors = $(parentGroupEl + ' .filterWarn:not(:empty):not(#applyFilter-warn)').length>0
+    if (hasErrors) {
+        $('#applyFilter-warn').fadeIn(1000).delay(1000).fadeOut(1000)
+        return true
+    }
+    return false
+}
+var initLayerFilters = function(map) {
+    var layerFilters = {}
+	var layerOr={}
+    $.each(map.layers, function(i,layer){
+        layerFilters[layer.name]=[]
+        layerOr[layer.name]=[]
+        if ( isUndefined(Filters.Layers[layer.name]) ) {
+            Filters.Layers[layer.name] = {filter:'',viewparams:''}
+        } 
+    })
+    return [layerFilters,layerOr]
+}
+var buildEachLayerOGCandViewparamFilter = function(map, parentGroupEl, layerFilters) {
+
+    var filters      = initLayerFilters(map)
+    var layerFilters = filters[0]
+    var layerOr      = filters[1]
+    
+    $.each(Filters.Instances[parentGroupEl], function(i, inst) {
+        // isMapOgc is used to differentiate viewparams from OGC standard filters like year range 
+        if ( inst.isMapOgc && (isDefined(inst.filter) || isDefined(inst.orDefaultFilter)) ) {
+            $.each(inst.layers, function(i, layerTitle) {
+                var orClauses = layerOr[layerTitle]
+                if (inst.orWith) {
+                    // if there is an orWith clause then handle it
+                    var orClause = []
+                    // first check if there is an orClause with the given orWith dependencies commenced
+                    $.each(inst.orWith, function(i,orWith) {
+                        if (isDefined(orClauses[orWith])) {
+                            orClause = orClauses[orWith]
+                        }
+                    })
+                    // if there is no existing orClause then init one
+                    if (orClause.length===0) {
+                        orClauses[inst] = orClause
+                    }
+                    // if the main filter has not been set then take the default filter for or-clause
+                    var filter = isDefined(inst.filter) ?inst.filter :inst.orDefaultFilter
+                    // finally add this clause to the orClause
+                    orClause.push(filter)
+                } else {
+                    layerFilters[layerTitle].push(inst.filter)
+                }
+            })
+        }
+    })
+    
+    // if there are orClauses then add then to the parent filter
+    $.each(layerOr, function(layerTitle, orClauses) {
+		$.each(Object.keys(orClauses), function(i, inst) {
+    	    var orClause = orClauses[inst][0]
+	        // if there is only one then there is no need for or-wrapper
+            if (orClauses[inst].length>1) {
+                var newOr = new Ogc.Logic({
+                    type   : Ogc.Logic.OR,
+                    filters: orClauses[inst]
+                })
+                orClause = newOr
+            }
+            layerFilters[layerTitle].push(orClause)
+ 	    })
+    })
+	
+	return layerFilters
+}
+var encodeEachLayerFilterOGC = function(layerFilters) {
+    // encode each layers filters
+    $.each(layerFilters, function(layerTitle,filters) {
+        if (layerFilters[layerTitle].length>0) {
+            var filter = new Ogc.Logic({
+                type   : Ogc.Logic.AND,
+                filters: layerFilters[layerTitle]
+            })
+            layerFilters[layerTitle] = Ogc.encode(filter)
+        } else {
+            layerFilters[layerTitle] = ''
+        }
+    })
+}
+
+// because year filter has to be a different, viewparams, filter for geoserver.
+// this is annoying but geoserver handles viewparams outside the OGC query.
+// we will have to apply year to the OGC for data download with the isMapOgc flag ignored.
+var makeYearFilter = function() {
+    var filter = theYearFilter.filter
+    if ( isUndefined(filter) ) {
+        return ''
+    }
+    var yr1 = filter.filters[0].value
+    var yr2 = filter.filters[1].value
+    return 'yr1:'+yr1+';yr2:'+yr2
+}
 
 // apply for each layer and each filter
-// TODO split into two functions genFilter and applyFilter
 var applyFilters = function(parentGroupEl) {
-	var hasErrors = $(parentGroupEl + ' .filterWarn:not(:empty):not(#applyFilter-warn)').length>0
-	if (hasErrors) {
-		$('#applyFilter-warn').fadeIn(1000).delay(1000).fadeOut(1000)
-		return
-	}
-
-	var layerFilters = {}
-	$.each(map.layers, function(i,layer){
-		layerFilters[layer.name]=[]
-		if ( isUndefined(Filters.Layers[layer.name]) ) {
-			Filters.Layers[layer.name] = {filter:'',viewparams:''}
-		} 
-	})
-
-	// build each layers' OGC filter
-	$.each(Filters.Instances[parentGroupEl], function(i,inst) {
-		// isMapOgc is used to identify the view param based filters like year range 
-		if ( inst.isMapOgc && isDefined(inst.filter) ) {
-			// default to filter layers and use all layers for keyword 'all' 
-			var applyTo = inst.layers
-			if ( inst.layers.indexOf('all') !== -1 ) {
-				applyTo = []
-				$.each(map.layers, function(i,layer){
-					applyTo.push( layer.name )
-				})
-			}
-			
-			$.each(applyTo, function(i,layerTitle){
-				layerFilters[layerTitle].push(inst.filter)
-			})
-		}
-	})
-
-	// encode each layers filters
-	$.each(layerFilters, function(layerTitle,filters) {
-		if (layerFilters[layerTitle].length>0) {
-			var filter = new Ogc.Logic({
-				type   : Ogc.Logic.AND,
-				filters: layerFilters[layerTitle]
-			})
-			layerFilters[layerTitle] = Ogc.encode(filter)
-		} else {
-			layerFilters[layerTitle] = ''
-		}
-	})
-	
-	// because year filter hads to be a different filter
+    if ( checkForErrorsBeforeApplingFilters(parentGroupEl) ) return
+	var layerFilters = buildEachLayerOGCandViewparamFilter(map, parentGroupEl, layerFilters)
+    encodeEachLayerFilterOGC(layerFilters)
 	var yearFilter = makeYearFilter()
 
 	// apply filters to layers
@@ -111,7 +166,8 @@ var applyFilters = function(parentGroupEl) {
 		var ogcXml = layerFilters[layer.name]
 		// apply filter
 		if ( isDefined(layer.mergeNewParams) ) {
-			// do not render a filter against an unchanged filter layer
+		
+			// do not apply a filter against an unchanged filter layer
 			if (Filters.Layers[layer.name].filter     !== ogcXml
 			 || Filters.Layers[layer.name].viewparams !== localYearFilter) {
 				
@@ -122,20 +178,8 @@ var applyFilters = function(parentGroupEl) {
 			}
 		}
 	})
-
 }
 
-// this is annoying but geoserver handles view params outside the OGC query 
-// we will render the OGC for data download as per apply but the isMapOgc will be ignored
-var makeYearFilter = function() {
-	var filter = theYearFilter.filter
-	if ( isUndefined(filter) ) {
-		return ''
-	}
-	var yr1 = filter.filters[0].value
-	var yr2 = filter.filters[1].value
-	return 'yr1:'+yr1+';yr2:'+yr2
-}
 
 
 var clearFilters = function(parentGroup) {
@@ -168,10 +212,16 @@ var Filters = Class.extend({
 		this.filter  = undefined
 		this.isPrime = defaultValue(params.isPrime, true) // default not sub-filter
 		this.callback= params.callback
+        this.orWith  = params.orWith
+        this.orDefaultValue = params.orDefaultValue
 		
 		// if there is no give clear action then used the default undefined action
 		if (params.clearAction) {
 			this.clear = params.clearAction
+		}
+		
+		if (isDefined(this.orDefaultValue)) {
+            this.orDafaultFilter = this.makeFilter(this.orDefaultValue)
 		}
 		
 		if (this.isPrime) {

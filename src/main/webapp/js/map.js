@@ -79,15 +79,15 @@ function init(){
     })
 
     // sedmap project maps
-//    addProjectLayer(map, "Soil K Factor", "sedmap:soilk", false, 1)
+//    addProjectLayer(map, "Soil K Factor", "sedmap:soilk", false, 1) // TODO add in later
     addProjectLayer(map, "States", "sedmap:statep010", false) // add a new visible layer *new added 7/23/13 mwarren
     addProjectLayer(map, "Counties", "sedmap:countyp020", false)   // add a new invisible layer
     addProjectLayer(map, "HUC8", "sedmap:huc_8_multipart_wgs", false)
     if (isHtml5()) addFlowLinesLayer(map)
     addProjectLayer(map, "Ecoregion Level 2", "sedmap:NA_CEC_Eco_Level2", false)
-//    addProjectLayer(map, DAILY+" USGS Gage Basins", "sedmap:Alldailybasins", false)
-//    addProjectLayer(map, DISCRETE+" USGS Gage Basins", "sedmap:Alldiscretebasins", false)
     addProjectLayer(map, "USGS Basin Boundaries", "sedmap:Allbasinsupdate", false)
+
+    addProjectLayer(map, "SiteInfo", "sedmap:_siteInfo", false, undef, false) // hidden site ID layer
 
 
     addProjectLayer(map, DAILY, "sedmap:_daily", true)
@@ -112,7 +112,7 @@ function init(){
 }
 
 function getSiteInfo(e) {
-    var layer = layers[DAILY]
+    var layer = layers["SiteInfo"]
     
     var buffer= Math.round(map.zoom * Math.pow(3, map.zoom/20))
     if (map.zoom >= 10) buffer*=2
@@ -337,7 +337,7 @@ function mergeDefaults(obj, defaults) {
 /* 
 it is best to make a method for repetitive tasks.  you will likely have more than one layer and the order they are added determines the order they are overlaid 
 */
-function addProjectLayer(map, title, layerId, show, opacity) {
+function addProjectLayer(map, title, layerId, show, opacity, displayInSwitcher) {
 
     var type    = "wms"
     var url     = projectUrl+"wms"
@@ -349,13 +349,14 @@ function addProjectLayer(map, title, layerId, show, opacity) {
     
     if (show) {
 	    options = {
+               displayInLayerSwitcher: isUndefined(displayInSwitcher) ?true :displayInSwitcher, // default to showing it
                visibility: show,   // initial visibility
                gutter:35          // the amount of overlap to render large features the cross tile boundaries
            }
     }
-    options.opacity = opacity?opacity:0.5
+    options.opacity = opacity ?opacity :0.5
     
-   return _addLayer(map, title, layerId, type, url, options, params)
+    return _addLayer(map, title, layerId, type, url, options, params)
 }
 
 //the NLCD topographical world map

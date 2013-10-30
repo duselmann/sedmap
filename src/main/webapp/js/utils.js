@@ -1,5 +1,7 @@
 // should consider underscore.js
 
+var undef; // an undefined value for setting things to undefined
+
 if (typeof String.prototype.startsWith !== 'function') {
     String.prototype.startsWith = function (str){
     	if (str===undefined || str.length===0) return false

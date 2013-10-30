@@ -16,6 +16,8 @@ var ecoNum
 var usgsStation
 var stationName 
 
+// see minSamples for field comments
+
 function setupFilters() {
 	
     gageBasin = new Filters.Value({
@@ -32,9 +34,11 @@ function setupFilters() {
             return "*"+value+"*"
         },
         patternMsg: "Expecting a full 8-15 digit basin ID.",
-        layers:[    "Discrete Sites",
-                    "Daily Sites",
-                    "USGS Basin Boundaries"
+        layers:[
+                "Discrete Sites",
+                "Daily Sites",
+                "USGS Basin Boundaries",
+                "SiteInfo"
                 ]
     })
     
@@ -51,7 +55,11 @@ function setupFilters() {
         compare: Ogc.Comp.GREATER_THAN_OR_EQUAL_TO ,
         pattern: /^\d+$/,
         patternMsg: "Expecting a positive integer",
-        layers:["Daily Sites"]
+        orDefaultValue: '0',
+        layers:[
+                "Daily Sites",
+                "SiteInfo"
+                ]
     })
 
     
@@ -65,7 +73,8 @@ function setupFilters() {
         label:'Hydrologic Benchmark Sites:',
         layers:[
                 "Discrete Sites",
-                "Daily Sites"
+                "Daily Sites",
+                "SiteInfo"
                 ]
     })
     
@@ -81,28 +90,35 @@ function setupFilters() {
         label:'USGS Station ID:',
         pattern: /^\d+\*?$/,
         patternMsg: "Expecting a USGS Station number with possible wild card, '*'",
-        layers:[    "Discrete Sites",
-                    "Daily Sites"
-                ]
+        layers:[
+                "Discrete Sites",
+                "Daily Sites",
+                "SiteInfo"
+               ]
     })
 
     
 
     minSamples = new Filters.Value({
-        clazz:"minSamples",
-        field:'SAMPLE_COUNT', 
-        el:'minSamples', 
-        size:8,
-        maxlength:12,
-        parent:'#filterDiv', 
-        group:'#Data-Characteristic',
-        label:'Min Discrete Samples:',
-        compare: Ogc.Comp.GREATER_THAN_OR_EQUAL_TO ,
-        pattern: /^\d+$/,
-        patternMsg: "Expecting a positive integer",
-        layers:["Discrete Sites"]
+        clazz:"minSamples",                          // the css class to attach for use custom UI
+        field:'SAMPLE_COUNT',                        // the filter field to apply to - note: all layers must use the same filed at this time
+        el:'minSamples',                             // the element name
+        size:8,                                      // the input field UI size
+        maxlength:12,                                // the input field max length
+        parent:'#filterDiv',                         // the filter parent group
+        group:'#Data-Characteristic',                // the display-only group EL and label
+        label:'Min Discrete Samples:',               // the label for this filter parameter
+        compare: Ogc.Comp.GREATER_THAN_OR_EQUAL_TO , // the compare to perform on this field - default is EQUALS
+        pattern: /^\d+$/,                            // the pattern to validate entries against
+        patternMsg: "Expecting a positive integer",  // the message to display when the pattern is violated
+        orWith: [minYears],                          // the other filters used in or-conjunction
+        orDefaultValue: '0',                         // the default value to use in or-conjunction
+        layers:[                                     // the array of layers that this filter should be applied
+                "Discrete Sites",
+                "SiteInfo"
+                ]
     })
-	
+    minYears.orWith = [minSamples]
 
     
     stationName = new Filters.Value({
@@ -120,8 +136,10 @@ function setupFilters() {
             return "*"+value.toUpperCase()+"*"
         },
         patternMsg: "Expecting any part of a station name.",
-        layers:[    "Discrete Sites",
-                    "Daily Sites"
+        layers:[
+                "Discrete Sites",
+                "Daily Sites",
+                "SiteInfo"
                 ]
     })
     
@@ -139,8 +157,10 @@ function setupFilters() {
         max:9999999,
         pattern: /^\d+$/,
         patternMsg: "Expecting a positive number",
-        layers:[	"Discrete Sites",
-                	"Daily Sites"
+        layers:[
+                "Discrete Sites",
+                "Daily Sites",
+                "SiteInfo"
                 ]
     })
     
@@ -157,8 +177,10 @@ function setupFilters() {
         max:0.55,
         pattern: /^[01]?\.\d{0,3}$/,
         patternMsg: "Expecting number between 0.08 and 0.55",
-        layers:[    "Discrete Sites",
-                    "Daily Sites"
+        layers:[
+                "Discrete Sites",
+                "Daily Sites",
+                "SiteInfo"
                 ]
     })
     
@@ -175,8 +197,10 @@ function setupFilters() {
         max:670,
         pattern: /^\d{0,3}(\.\d{0,3})?$/,
         patternMsg: "Expecting number between 2.85 and 670",
-        layers:[    "Discrete Sites",
-                    "Daily Sites"
+        layers:[
+                "Discrete Sites",
+                "Daily Sites",
+                "SiteInfo"
                 ]
     })
     
@@ -193,8 +217,10 @@ function setupFilters() {
         max:14.2,
         pattern: /^\d{0,2}(\.\d{0,3})?$/,
         patternMsg: "Expecting number between 0.23 and 14.2",
-        layers:[    "Discrete Sites",
-                    "Daily Sites"
+        layers:[
+                "Discrete Sites",
+                "Daily Sites",
+                "SiteInfo"
                 ]
     })
     
@@ -211,8 +237,10 @@ function setupFilters() {
         max:100,
         pattern: /^\d+$/,
         patternMsg: "Expecting number between 0 and 100",
-        layers:[	"Discrete Sites",
-                	"Daily Sites"
+        layers:[
+                "Discrete Sites",
+                "Daily Sites",
+                "SiteInfo"
                 ]
     })
     
@@ -229,8 +257,10 @@ function setupFilters() {
         max:100,
         pattern: /^\d+$/,
         patternMsg: "Expecting number between 0 and 100",
-        layers:[	"Discrete Sites",
-                	"Daily Sites"
+        layers:[
+                "Discrete Sites",
+                "Daily Sites",
+                "SiteInfo"
                 ]
     })
     
@@ -247,8 +277,10 @@ function setupFilters() {
         max:100,
         pattern: /^\d+$/,
         patternMsg: "Expecting number between 0 and 100",
-        layers:[	"Discrete Sites",
-                	"Daily Sites"
+        layers:[
+                "Discrete Sites",
+                "Daily Sites",
+                "SiteInfo"
                 ]
     })
     
@@ -266,8 +298,10 @@ function setupFilters() {
         pattern: /^\d+$/,
         patternMsg: "Expecting a positive number",
         isMapOgc: false,
-        layers:[	"Discrete Sites",
-                	"Daily Sites"
+        layers:[
+                "Discrete Sites",
+                "Daily Sites",
+                "SiteInfo"
                 ]
     })
     
@@ -282,9 +316,11 @@ function setupFilters() {
         label:'Ecoregion Level 2 Number:',
         pattern: /^(\d?(\d\.?))?\d?\*?$/,
         patternMsg: "Eco Region number have the format 'Level 1 value.Level 2 value' with possible wild card, '*'",
-        layers:[	"Discrete Sites",
-                	"Daily Sites",
-                	"Ecoregion Level 2"
+        layers:[
+                "Ecoregion Level 2",
+                "Discrete Sites",
+                "Daily Sites",
+                "SiteInfo"
                 ]
     })
 	
@@ -299,16 +335,18 @@ function setupFilters() {
         label:'HUC:',
         pattern: /^(\d\d)+\*?$/,
         patternMsg: "Expecting a 2, 4, 6, or 8 digit HUC number with possible wild card, '*'",
-        layers:[	"Discrete Sites",
-                	"Daily Sites",
-                	"HUC8"
-                ],
         callback: function(el) {
             var val = $(el + " input").val()
             if (val.length > 0  && val.length < 8  &&  val.indexOf('*') < 0) {
                 $(el + " input").val( val+'*' )
             }
-        }
+        },
+        layers:[
+                "HUC8",
+                "Discrete Sites",
+                "Daily Sites",
+                "SiteInfo"
+                ]
     })
 	
     states = new Filters.Option({
@@ -320,12 +358,14 @@ function setupFilters() {
         label:'States:',
         labelClass:"stateFilterLabel",
         baseTxt: "Select a State",
-        layers:[	"Discrete Sites",
-                	"Daily Sites",
-                	"States",
-                	"Counties",
-                	"National Inventory of Dams",
-                    "USGS Basin Boundaries"
+        layers:[	
+                "Discrete Sites",
+            	"Daily Sites",
+            	"States",
+            	"Counties",
+            	"National Inventory of Dams",
+                "USGS Basin Boundaries",
+                "SiteInfo"
                 ],
         options: {
             "AK":"Alaska","AL":"Alabama","AZ":"Arizona","AR":"Arkansas",
