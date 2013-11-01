@@ -198,7 +198,9 @@ function getStyle(className) {
 	    if ( isUndefinedOrNull(classes) ) continue;
 	    
 	    for (var c=0; c<classes.length; c++) {
-	        if ( classes[c].selectorText.toLowerCase() == className.toLowerCase() ) {
+	        if ( classes[c] && classes[c].selectorText 
+	          && classes[c].selectorText.toLowerCase() == className.toLowerCase() ) {
+	          
 	        	var def = isDefined(classes[c].cssText) ? classes[c].cssText : classes[c].style.cssText;
 	        	if ( isDefined(def) ) {
 	        		def = def.substring( def.indexOf('{') )
@@ -206,6 +208,7 @@ function getStyle(className) {
 	        		def = def.replace(/px/g,'')
 	        		def = def.replace(/:\s*(.*?),/g,":'$1',")
 	        		def = def.replace(/\b((?:\w+-)+\w+)\b/g,"'$1'")
+	        		def = "var css={"+def+"};"
 	        		eval("var css={"+def+"};")
 	        		$.each(css, function(k,v){
 	        			v = $.isNumeric(v) ?parseInt(v) :v
