@@ -51,7 +51,8 @@ select s.*,
       NVL( (select 1 from sedmap.daily_sites d where s.SITE_NO=d.SITE_NO) ,0) as daily_site,
       NVL( (select 1 from sedmap.discrete_sites  d where s.SITE_NO=d.SITE_NO) ,0) as discrete_site,
       NVL(y.sample_years,0) as daily_years,
-      NVL(f.sample_count,0) as discrete_samples
+      NVL(f.sample_count,0) as discrete_samples,
+      NVL2(b.SITE_NO, '1','0') as BENCHMARK_SITE
   from sedmap.site_ref_basin s 
   left outer join sedmap.BENCHMARK_SITES b on s.SITE_NO = b.SITE_NO
   left outer join (
