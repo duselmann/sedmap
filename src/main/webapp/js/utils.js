@@ -209,7 +209,9 @@ function getStyle(className) {
 	        		def = def.replace(/:\s*(.*?),/g,":'$1',")
 	        		def = def.replace(/\b((?:\w+-)+\w+)\b/g,"'$1'")
 	        		def = "var css={"+def+"};"
-	        		eval("var css={"+def+"};")
+	        		def = def.replace(/\{\{/,'{')
+	        		def = def.replace(/\}\}/,'}')
+	        		eval(def)
 	        		$.each(css, function(k,v){
 	        			v = $.isNumeric(v) ?parseInt(v) :v
 	        			css[k] = css[k.toLowerCase()] = v
