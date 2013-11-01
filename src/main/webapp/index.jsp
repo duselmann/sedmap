@@ -54,7 +54,7 @@
         <script type="text/javascript" src="js/utils.js"></script>
     </head>
     
-    <body onload="init()">
+    <body>
         <%-- Loads during application startup, fades out when application is built --%>
         <!--  jsp:include page="components/application-overlay.jsp">< /jsp:include -->
 
@@ -79,7 +79,7 @@
                         <li><a href="#results" data-toggle="tab"><img id="results_img" src="images/workflow_figures/results_future.png" title="Display Results"/></a></li>
                      -->
                     </ul>
-                    <div id="application-spinner"><img src="images/spinner/spinner2.gif" /></div>
+                    <div id="app-spinner" class="mapSpinner"><img src="images/spinner/spinner-big.gif"  class="mapSpinner"/></div>
                 </div>
 
                 <!-- Toolbox -->
@@ -141,18 +141,6 @@
         <jsp:include page="download.jsp"/>
         <jsp:include page="menu.jsp"/>
         
-<div id="waitSpinner" class="spinner circles hidden" style="left:-400px;top:150px;">
-     <div></div>
-     <div></div>
-     <div></div>
-     <div></div>
-     <div></div>
-     <div></div>
-     <div></div>
-     <div></div>
-</div>        
-        
-    
     
     <script type="text/javascript" src="js/jquery-ui/jquery-ui-1.10.0.custom.min.js"></script>
     <script type="text/javascript" src="js/util/util.js"></script>

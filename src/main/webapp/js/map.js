@@ -36,7 +36,7 @@ var layerSwitcher;
 var lastControls   = true;
 var lastSiteLegend = false;
 
-function init(){
+function initMap() {
     
     // build up all controls
     var controls = [

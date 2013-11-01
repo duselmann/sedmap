@@ -18,6 +18,27 @@ body {
 div.olMap {
 	float:left;
 }
+
+
+div.mapSpinner {
+    position: absolute;
+    top: 105px;
+    left: 0px;
+    z-index: 999;
+    background: white;
+    opacity: 0.5;
+    width: 1001px;
+    height: 552px;
+    text-align: center;
+    display:none;
+}
+img.mapSpinner  {
+    margin-top: 175px;
+}
+
+
+/* map legends */
+
 #nlcdlegendOld {
 	width: 244px;
 	position: relative;
@@ -110,6 +131,8 @@ div.olMap {
     background-color: #345280;
 }
 
+
+/* filter box */
 
 div.filter {
     position: absolute;
@@ -382,6 +405,9 @@ div.filter div.filterOdd {
      opacity:0.1;
 }
 
+
+/* download window */
+
 div.downloadNote {
     font-size: 10px;
     width: 100%;
@@ -496,6 +522,10 @@ input[type="button"]:hover,
           box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(0, 0, 100, 0.6);
 }
 
+
+/* filter menu buttons */
+
+
 div.filterActions {
     margin: 0;
     position: absolute;
@@ -538,6 +568,9 @@ div.filterActions a:after {
     content: '\0000a0\0000a0';
 }
 
+
+
+/* help menu (used to include filter actions menu) */
 
 
 div.menubar {

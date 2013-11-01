@@ -18,7 +18,7 @@ var stationName
 
 // see minSamples for field comments
 
-function setupFilters() {
+function initFilters() {
 	
     gageBasin = new Filters.Value({
         clazz:"usgsBasinNo",
@@ -119,6 +119,25 @@ function setupFilters() {
                 ]
     })
     minYears.orWith = [minSamples]
+
+    
+    layers[DAILY].events.register('visibilitychanged', layers[DAILY], function() {
+        if (layers[DAILY].visibility) {
+            minYears.setDefaultOrFilter('1')
+        } else {
+            minYears.setDefaultOrFilter('999999')
+        }
+        applyFilters(minYears.parent)
+    })
+    layers[DISCRETE].events.register('visibilitychanged', layers[DISCRETE], function() {
+        if (layers[DISCRETE].visibility) {
+            minSamples.setDefaultOrFilter('1')
+        } else {
+            minSamples.setDefaultOrFilter('999999')
+        }
+        applyFilters(minYears.parent)
+    })
+
 
     
     stationName = new Filters.Value({
@@ -408,7 +427,6 @@ function setupFilters() {
     })
 }
 
-$().ready(setupFilters)
 
 
 function closeDL() {
@@ -416,6 +434,8 @@ function closeDL() {
         $(".blackoverlay").fadeOut("slow")
     },5000)
 }
+
+
 
 function downloadShow() {
     clearDelay('#DL-msg',0)
@@ -429,3 +449,11 @@ function downloadShow() {
 
     $(".blackoverlay").fadeIn("slow")
 }
+
+
+
+$().ready(function(){
+    initMap()
+    initFilters()
+})
+

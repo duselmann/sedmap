@@ -73,8 +73,9 @@ var buildEachLayerOGCandViewparamFilter = function(map, parentGroupEl, layerFilt
     var filters      = initLayerFilters(map)
     var layerFilters = filters[0]
     var layerOr      = filters[1]
+    var filterGroup  = Filters.Instances[parentGroupEl]
     
-    $.each(Filters.Instances[parentGroupEl], function(i, inst) {
+    $.each(filterGroup, function(f, inst) {
         // isMapOgc is used to differentiate viewparams from OGC standard filters like year range 
         if ( inst.isMapOgc && (isDefined(inst.filter) || isDefined(inst.orDefaultFilter)) ) {
             $.each(inst.layers, function(i, layerTitle) {
@@ -83,14 +84,15 @@ var buildEachLayerOGCandViewparamFilter = function(map, parentGroupEl, layerFilt
                     // if there is an orWith clause then handle it
                     var orClause = []
                     // first check if there is an orClause with the given orWith dependencies commenced
-                    $.each(inst.orWith, function(i,orWith) {
-                        if (isDefined(orClauses[orWith])) {
-                            orClause = orClauses[orWith]
+                    $.each(inst.orWith, function(w,orWith) {
+						var fw = filterGroup.indexOf(orWith)
+                        if (isDefined(orClauses[fw])) {
+                            orClause = orClauses[fw]
                         }
                     })
                     // if there is no existing orClause then init one
                     if (orClause.length===0) {
-                        orClauses[inst] = orClause
+                        orClauses[f] = orClause
                     }
                     // if the main filter has not been set then take the default filter for or-clause
                     var filter = isDefined(inst.filter) ?inst.filter :inst.orDefaultFilter
@@ -108,19 +110,25 @@ var buildEachLayerOGCandViewparamFilter = function(map, parentGroupEl, layerFilt
 		$.each(Object.keys(orClauses), function(i, inst) {
     	    var orClause = orClauses[inst][0]
 	        // if there is only one then there is no need for or-wrapper
-            if (orClauses[inst].length>1) {
+            if (orClauses[inst].length > 1) {
                 var newOr = new Ogc.Logic({
                     type   : Ogc.Logic.OR,
                     filters: orClauses[inst]
                 })
                 orClause = newOr
+            } else if (orClause.value === filterGroup[inst].orDefaultValue) {
+                orClause = undef;
             }
-            layerFilters[layerTitle].push(orClause)
+            // apply filter if the orClause survived
+            if (isDefined(orClause)) {
+                layerFilters[layerTitle].push(orClause)
+            }
  	    })
     })
 	
 	return layerFilters
 }
+
 var encodeEachLayerFilterOGC = function(layerFilters) {
     // encode each layers filters
     $.each(layerFilters, function(layerTitle,filters) {
@@ -220,10 +228,7 @@ var Filters = Class.extend({
 			this.clear = params.clearAction
 		}
 		
-		if (isDefined(this.orDefaultValue)) {
-            this.orDefaultFilter = this.makeFilter(this.orDefaultValue)
-			this.filter = undefined // TODO makeFilter should not set filter any more
-		}
+		this.setDefaultOrFilter(this.orDefaultValue)
 		
 		if (this.isPrime) {
 			this.checkAndInitParentGroup()
@@ -241,6 +246,16 @@ var Filters = Class.extend({
 			this.linkEvents()
 		}
 	},
+
+    setDefaultOrFilter : function(orDefaultValue) {
+        if (isDefined(orDefaultValue)) {
+            this.orDefaultValue = orDefaultValue
+            var save = this.filter
+            this.orDefaultFilter = this.makeFilter(orDefaultValue)
+            this.filter = save // TODO makeFilter should not set filter any more
+        }
+    },
+
 	
 	checkAndInitParentGroup : function() {
 		// if there is no group yet and needed then make it
