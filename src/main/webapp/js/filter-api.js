@@ -846,7 +846,8 @@ function updateFilterScroll(e) {
 		childHeight += $(child).height()
 	})
 
-	if ( childHeight > getStyle('div.filter').height) {
+    var styleClass = getStyle('div.filter')
+	if ( childHeight > styleClass.height) {
 		$(e.target).addClass('filterScroll')
 	} else {
 		$(e.target).removeClass('filterScroll')

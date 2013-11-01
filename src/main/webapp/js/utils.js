@@ -193,24 +193,23 @@ function getOptionValues(el) {
 
 
 function getStyle(className) {
-	for (var s=0; document.styleSheets.length; s++) {
+	for (var s=0; s<document.styleSheets.length; s++) {
 	    var classes = document.styleSheets[s].rules || document.styleSheets[s].cssRules
 	    if ( isUndefinedOrNull(classes) ) continue;
 	    
 	    for (var c=0; c<classes.length; c++) {
-	        if ( classes[c].selectorText==className ) {
+	        if ( classes[c].selectorText.toLowerCase() == className.toLowerCase() ) {
 	        	var def = isDefined(classes[c].cssText) ? classes[c].cssText : classes[c].style.cssText;
 	        	if ( isDefined(def) ) {
 	        		def = def.substring( def.indexOf('{') )
 	        		def = def.replace(/;/g,',')
 	        		def = def.replace(/px/g,'')
 	        		def = def.replace(/:\s*(.*?),/g,":'$1',")
-	        		var css = eval("("+def+")")
+	        		def = def.replace(/\b((?:\w+-)+\w+)\b/g,"'$1'")
+	        		eval("var css={"+def+"};")
 	        		$.each(css, function(k,v){
-	        			if ($.isNumeric(v)) {
-	        				++v;
-	        				css[k] = --v
-	        			}
+	        			v = $.isNumeric(v) ?parseInt(v) :v
+	        			css[k] = css[k.toLowerCase()] = v
 	        		})
 	        		return css
 	        	}
