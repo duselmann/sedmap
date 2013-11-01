@@ -242,7 +242,7 @@ div.filter div.inputFilterWarnOn {
     position: absolute;
     z-index: 9999;
     border: 1px solid;
-    left: 900px;
+    left: 725px;
     top: 80px;
 }
 div.filter div.inputFilterWarn input {

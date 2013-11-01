@@ -56,6 +56,9 @@ function initFilters() {
         pattern: /^\d+$/,
         patternMsg: "Expecting a positive integer",
         orDefaultValue: '1',
+        callback: function(el) {                     // the special validation handler
+			return hiddenLayerWarning(el, layers[DAILY])
+        },
         layers:[
                 "Daily Sites",
                 "SiteInfo"
@@ -113,12 +116,17 @@ function initFilters() {
         patternMsg: "Expecting a positive integer",  // the message to display when the pattern is violated
         orWith: [minYears],                          // the other filters used in or-conjunction
         orDefaultValue: '1',                         // the default value to use in or-conjunction
+        callback: function(el) {                     // the special validation handler
+            return hiddenLayerWarning(el, layers[DISCRETE])
+        },
         layers:[                                     // the array of layers that this filter should be applied
                 "Discrete Sites",
                 "SiteInfo"
                 ]
     })
     minYears.orWith = [minSamples]
+
+
 
     
     layers[DAILY].events.register('visibilitychanged', layers[DAILY], function() {
@@ -359,6 +367,7 @@ function initFilters() {
             if (val.length > 0  && val.length < 8  &&  val.indexOf('*') < 0) {
                 $(el + " input").val( val+'*' )
             }
+            return true
         },
         layers:[
                 "HUC8",
@@ -448,6 +457,20 @@ function downloadShow() {
     //$("#DL-discreteFlow").prop('checked', isDiscr)
 
     $(".blackoverlay").fadeIn("slow")
+}
+
+
+function hiddenLayerWarning(el, layer) {
+    if ( ! layer.visibility ) {
+        var val = $(el + " input").val()
+        if (val.length > 0) {
+            var elWarn = el + "-warn" 
+            var msgText = "Please avoid filtering on hidden layers."
+            Filters.applyWarn(el, elWarn, '#filterDiv', 'inputFilterWarn', msgText)
+            return false
+        }
+    }
+    return true
 }
 
 

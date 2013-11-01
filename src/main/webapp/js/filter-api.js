@@ -377,10 +377,13 @@ var Filters = Class.extend({
 	
 	onchange : function() {
 		this.clearFilter()
-		if ( isDefined(this.callback) ) {
-		  this.callback(this.$el)
-		}
-		this.validate()
+        var callbackOk = true
+        if ( isDefined(this.callback) ) {
+            callbackOk = this.callback(this.$el)
+        }
+        if (callbackOk) {
+            this.validate()
+        }
 		// no text is a clean bill of health
 		return $(this.$warn).text().length > 0
 	},
@@ -403,10 +406,7 @@ var Filters = Class.extend({
 		// if there is a message, and sub-filters do not manage the messages
 		if (this.isPrime && msgs.length>0) {
 			var msgsText = msgs.join(', ')
-			$(this.$el).addClass(this.errClass)
-			$(this.$warn).addClass(this.errClass+"On")
-			$(this.$warn).html(msgsText)
-			$(this.parent).trigger('childchange');
+			Filters.applyWarn(this.$el, this.$warn, this.parent, this.errClass, msgsText)
 		}
 		return msgs
 	},
@@ -434,6 +434,13 @@ var Filters = Class.extend({
 })
 
 
+Filters.applyWarn = function(el, elWarn, parent, errClass, msg) {
+    $(el).addClass(errClass)
+    $(elWarn).addClass(errClass+"On")
+    $(elWarn).html(msg)
+    $(parent).trigger('childchange')
+}
+
 // storage of the filter obj instances
 Filters.Instances = {}
 // storage of the unique filter names
@@ -444,7 +451,7 @@ Filters.Map = undefined
 Filters.OddClass  = 'filterOdd'
 Filters.EvenClass = 'filterEven'
 
-Filters.defaultDecor = function(value){return value};
+Filters.defaultDecor = function(value){return value}
 
 
 // general validation
