@@ -356,11 +356,14 @@ function initFilters() {
         callback: function(el) {
         	try {
                 var val = $(el + " input").val()
-                val = isDefined(val) ?val.replace(/\*/g,'') :val
-                if (val && val.length > 0) {
-                    if (val.split('\.').length < 3) {
-                        val = parseFloat(val)
-                        if (val < 2.2 || val > 15.4) {
+                var int = isDefined(val) ?val.replace(/\*/g,'') :val
+                if (int && int.length > 0) {
+                    if (int.split('\.').length < 3) {
+                        int = parseFloat(val)
+                        if (int < 2.2 || int > 15.4) {
+                            if (int === 2) {
+                                if (val.indexOf('*')>=0) return true
+                            }
                             var elWarn = el + "-warn" 
                             var msgText = "Valid Ecoregions are between 2.2 and 15.4"
                             Filters.applyWarn(el, elWarn, '#filterDiv', 'inputFilterWarn', msgText)
