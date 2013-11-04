@@ -130,20 +130,30 @@ function initFilters() {
 
     
     layers[DAILY].events.register('visibilitychanged', layers[DAILY], function() {
+        hiddenSiteLayerFilterToggle(minYears, layers[DAILY]) 
+        /*
         if (layers[DAILY].visibility) {
             minYears.setDefaultOrFilter('1')
         } else {
             minYears.setDefaultOrFilter('999999')
+            $("#" +minYears.el+ " input").val('')
+            minYears.filter = undef;
         }
         applyFilters(minYears.parent)
+        */
     })
     layers[DISCRETE].events.register('visibilitychanged', layers[DISCRETE], function() {
+        hiddenSiteLayerFilterToggle(minSamples, layers[DISCRETE]) 
+        /*
         if (layers[DISCRETE].visibility) {
             minSamples.setDefaultOrFilter('1')
         } else {
             minSamples.setDefaultOrFilter('999999')
+            $("#" +minSamples.el+ " input").val('')
+            minSamples.filter = undef;
         }
         applyFilters(minYears.parent)
+        */
     })
 
 
@@ -342,7 +352,27 @@ function initFilters() {
         group:'#Boundary',
         label:'Ecoregion Level 2 Number:',
         pattern: /^(\d?(\d\.?))?\d?\*?$/,
-        patternMsg: "Eco Region number have the format 'Level 1 value.Level 2 value' with possible wild card, '*'",
+        patternMsg: "Ecoregion numbers have the format 'Level 1 value.Level 2 value' with possible wild card, '*'",
+        callback: function(el) {
+        	try {
+                var val = $(el + " input").val()
+                val = isDefined(val) ?val.replace(/\*/g,'') :val
+                if (val && val.length > 0) {
+                    if (val.split('\.').length < 3) {
+                        val = parseFloat(val)
+                        if (val < 2.2 || val > 15.4) {
+                            var elWarn = el + "-warn" 
+                            var msgText = "Valid Ecoregions are between 2.2 and 15.4"
+                            Filters.applyWarn(el, elWarn, '#filterDiv', 'inputFilterWarn', msgText)
+                            return false
+                        }
+                    }
+                }
+            } catch(e) {
+            	console.log(e) // this is here so that if a parseFloat fails the parser will continue
+            }
+            return true
+        },
         layers:[
                 "Ecoregion Level 2",
                 "Discrete Sites",
@@ -465,12 +495,23 @@ function hiddenLayerWarning(el, layer) {
         var val = $(el + " input").val()
         if (val.length > 0) {
             var elWarn = el + "-warn" 
-            var msgText = "Please avoid filtering on hidden layers."
+            var msgText = "Please turn on related layer to apply filter."
             Filters.applyWarn(el, elWarn, '#filterDiv', 'inputFilterWarn', msgText)
             return false
         }
     }
     return true
+}
+function hiddenSiteLayerFilterToggle(filter, layer) {
+    if (layer.visibility) {
+        filter.setDefaultOrFilter('1')
+        filter.onchange();
+    } else {
+        filter.setDefaultOrFilter('999999')
+        $("#" +filter.el+ " input").val('')
+        filter.clearFilter();
+    }
+    applyFilters(filter.parent)
 }
 
 

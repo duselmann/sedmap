@@ -116,7 +116,6 @@ function getSiteInfo(e) {
     
     var buffer= Math.round(map.zoom * Math.pow(3, map.zoom/20))
     if (map.zoom >= 10) buffer*=2
-    console.log(buffer)
      
     var params = {
             REQUEST: "GetFeatureInfo",

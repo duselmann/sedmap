@@ -48,6 +48,7 @@ var getFilters = function(parentGroupEl, layerName) {
 
 
 
+
 var checkForErrorsBeforeApplingFilters = function(parentGroupEl) {
     var hasErrors = $(parentGroupEl + ' .filterWarn:not(:empty):not(#applyFilter-warn)').length>0
     if (hasErrors) {
@@ -275,9 +276,9 @@ var Filters = Class.extend({
                 var keyCode = (event.keyCode ? event.keyCode : event.which);
                 if (keyCode == '13' || keyCode === 13) { // on enter
                 	var element = event.target || event.srcElement;
-                    element.blur()
-                    element.focus()
-					applyFilters(_this.parent)
+                    $(element).blur().focus()
+					// This is to prevent IE from executing the click before the blur
+                    setInterval(function(){$('.applyFilter').click()},10)
 				}
 			})
 			// I would have like this to be related to the filter parent
