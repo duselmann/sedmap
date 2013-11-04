@@ -278,7 +278,7 @@ var Filters = Class.extend({
                 	var element = event.target || event.srcElement;
                     $(element).blur().focus()
 					// This is to prevent IE from executing the click before the blur
-                    setInterval(function(){$('.applyFilter').click()},10)
+                    setTimeout(function(){$('.applyFilter').click()},10)
 				}
 			})
 			// I would have like this to be related to the filter parent
