@@ -12,8 +12,22 @@ public class CharSepFormatter implements Formatter {
 	private final String FILE_TYPE;
 	private final String TYPE;
 	private final String SEPARATOR;
-
-
+        
+        public static final String DEFAULT_HEADER_FILENAME = "/default-header.txt";
+        public static final String SITE_HEADER_FILENAME = "/site-header.txt";
+        public static final String DISCRETE_HEADER_FILENAME = "/discrete-header.txt";
+        public static final String DAILY_HEADER_FILENAME = "/daily-header.txt";
+        
+        public static final String DEFAULT_HEADER;
+        public static final String SITE_HEADER;
+        public static final String DISCRETE_HEADER;
+        public static final String DAILY_HEADER;
+        static {
+             DEFAULT_HEADER = IoUtils.readTextResource(DEFAULT_HEADER_FILENAME);
+            SITE_HEADER = IoUtils.readTextResource(SITE_HEADER_FILENAME);
+            DISCRETE_HEADER = IoUtils.readTextResource(DISCRETE_HEADER_FILENAME);
+            DAILY_HEADER = IoUtils.readTextResource(DAILY_HEADER_FILENAME);
+        }
 
 	public CharSepFormatter(String contentType, String separator, String type) {
 		CONTENT_TYPE = contentType;
@@ -58,7 +72,7 @@ public class CharSepFormatter implements Formatter {
 	@Override
 	public String fileHeader(List<Column> columns) throws SQLException {
 		StringBuilder header = new StringBuilder();
-
+                
 		String sep = "";
 		for (Column col : columns) {
 			header.append(sep).append(col.name);
@@ -92,4 +106,26 @@ public class CharSepFormatter implements Formatter {
 
 		return row.toString();
 	}
+
+    @Override
+    public String fileHeader(List<Column> columns, HeaderType headerType) throws SQLException {
+        StringBuilder header = new StringBuilder();
+        header.append(DEFAULT_HEADER);
+        String typeSpecificHeader = "";
+        switch (headerType) {
+            case DAILY:
+                typeSpecificHeader = DAILY_HEADER;
+                break;
+            case DISCRETE:
+                typeSpecificHeader = DISCRETE_HEADER;
+                break;
+
+            case SITE:
+                typeSpecificHeader = SITE_HEADER;
+                break;
+        }
+        header.append(typeSpecificHeader);
+        header.append(fileHeader(columns));
+        return header.toString();
+    }
 }

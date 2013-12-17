@@ -59,7 +59,7 @@ public class GeoToolsFetcher extends Fetcher {
 
 			try {
 				List<Column> columns = getTableMetadata(tableName);
-				String header = formatter.fileHeader(columns);
+				String header = formatter.fileHeader(columns, HeaderType.SITE);
 				tmp.write(header);
 
 				while (reader.hasNext()) {

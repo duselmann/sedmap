@@ -119,7 +119,7 @@ public class JdbcFetcher extends Fetcher {
 		try {
 			String     tableName = getDataTable(descriptor);
 			List<Column> columns = getTableMetadata(tableName);
-			String        header = formatter.fileHeader(columns);
+			String        header = formatter.fileHeader(columns, HeaderType.SITE);
 			String           sql = buildQuery(descriptor, filter);
 			logger.debug(sql);
 			rs = initData(sql);
@@ -163,7 +163,7 @@ public class JdbcFetcher extends Fetcher {
 		try {
 			String     tableName = getDataTable(descriptor);
 			List<Column> columns = getTableMetadata(tableName);
-			String header = formatter.fileHeader(columns);
+			String header = formatter.fileHeader(columns, HeaderType.DISCRETE);
 
 			// TODO use IoUtils tmp file creator
 			//			File   tmpFile = File.createTempFile(descriptor + StrUtils.uniqueName(12), formatter.getFileType());

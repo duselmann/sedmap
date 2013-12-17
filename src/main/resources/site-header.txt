@@ -1,0 +1,2 @@
+#  Site attribute data are from various sources; refer to the sediment portal user guide for additional information on data sources.
+
