@@ -227,7 +227,7 @@ public class GeoToolsFetcherTest {
 		String expect = "Site_Id,Latitude,Longitude,create_date";
 		System.out.println(actual);
 		assertTrue("file should contain column header row", actual.contains(expect));
-                assertTrue("file should contain general header text", actual.contains(CharSepFormatter.DEFAULT_HEADER));
+                assertTrue("file should contain general header text", actual.contains(CharSepFormatter.GENERAL_HEADER));
                 assertTrue("file should contain site header text", actual.contains(CharSepFormatter.SITE_HEADER));
                 
 
