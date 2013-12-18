@@ -1,24 +1,6 @@
-<%@page import="javax.naming.NamingException"%>
-<%@page import="javax.naming.InitialContext"%>
-<%@page import="org.slf4j.Logger"%>
-<%@page import="org.slf4j.LoggerFactory"%>
+<%@ include file="/context.jsp" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-
-<%!    
-    protected boolean development = false;
-    {
-        try {
-            InitialContext ctx = new InitialContext();
-            String sedS = (String) ctx.lookup("java:comp/env/sedmap/development");
-            development = Boolean.parseBoolean(sedS);
-        }
-        catch (NamingException e) {
-            LoggerFactory.getLogger("index.jsp").error("Error reading environment variables.");
-        }
-    }
-%>
-
 <html lang="en">
     
     <head>
@@ -50,7 +32,7 @@
             <jsp:param name="nextReview" value="" />
             <jsp:param name="expires" value="never" />
             <jsp:param name="development" value="<%= development %>" />
-            <jsp:param name="google-analytics-account-code" value="UA-46483138-1" />
+            <jsp:param name="google-analytics-account-code" value="<%= googleAnalyticsAccountNumber %>" />
         </jsp:include>
         <script type="text/javascript" src="js/jquery/jquery-1.10.2.min.js"></script>
         <script type="text/javascript" src="js/openlayers/OpenLayers.js"></script>
