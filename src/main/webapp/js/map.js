@@ -1,17 +1,3 @@
-OpenLayers.Layer.WMS.prototype.getFullRequestString = function(newParams,altUrl)
-{
-    try{
-        var projectionCode=typeof this.options.projection == 'undefined' ? this.map.getProjection() : this.options.projection;
-    }catch(err){
-        var projectionCode=this.map.getProjection();
-    }
-    projectionCode = 'EPSG:3857'
-
-    this.params.SRS = projectionCode=="none" ?null :projectionCode;
- 
-    return OpenLayers.Layer.Grid.prototype.getFullRequestString.apply(this,arguments);
-}
-
 OpenLayers.ImgPath = "images/openlayers/"
 
 // pink tile avoidance
@@ -22,7 +8,8 @@ OpenLayers.DOTS_PER_INCH = 90; // 25.4 / 0.28;
 var NUM_ZOOM_LEVELS = 18
 var DAILY    = "Daily Sites"
 var DISCRETE = "Discrete Sites"
-
+var DEFAULT_EXTERNAL_PROJECTION = 'EPSG:3857'//projection for external map services
+var DEFAULT_CIDA_PROJECTION = 'EPSG:900913'//projection for our own map services
 var map // this will be your main openlayers handle
 var format     = 'image/png'; // your default wms return type. 
 var projectUrl = '/sediment/map/'; // your project server. 
@@ -48,18 +35,17 @@ function initMap() {
         new OpenLayers.Control.ScaleLine()
     ]
     layerSwitcher = controls[4]
-    var bounds = new OpenLayers.Bounds(-173*111000, 18*111000, -60*111000, 70*111000);
+    var bounds = new OpenLayers.Bounds(
+            -159.46609000000004,
+    13.306943999999989,
+    144.753833,
+    64.845403
+    );
     
     var options = {
         controls: controls,
-//        numZoomLevels: NUM_ZOOM_LEVELS,
-//      maxExtent: bounds,
-        maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34),
-//        maxExtent: new OpenLayers.Bounds(-20037508,-20037508,20037508,20037508),
-        maxResolution: 1.40625/2,
-//        maxResolution: 0.45,
-        projection: "EPSG:3857",
-        units: 'm'
+        maxExtent: bounds,
+        projection: DEFAULT_CIDA_PROJECTION
     };
     
     map = new OpenLayers.Map('map', options);
@@ -130,7 +116,7 @@ function getSiteInfo(e) {
             HEIGHT: map.size.h,
             format: format,
             styles: layer.params.STYLES,
-            srs: "EPSG:3857",
+            srs: DEFAULT_CIDA_PROJECTION,
             buffer: buffer
     };
     
@@ -285,9 +271,11 @@ function _addLayer(map, title, layerId, type, url, options, params, noDefaults) 
     var paramDefaults  = {
                LAYERS: layerId,    // the layer id
                transparent: true,  // overlay layer
-               isBaseLayer: false, // overlay layer
                STYLES: '',         // default style
                format: format,     // png file
+               width: 256,
+               height: 256,
+               srs: DEFAULT_EXTERNAL_PROJECTION,
                tiled: true         // it is best to tile
            }
     var optionDefaults = {
@@ -296,7 +284,6 @@ function _addLayer(map, title, layerId, type, url, options, params, noDefaults) 
                isBaseLayer: false, // overlay layer
                wrapDateLine: false,// repeat the world map
                visibility: false,   // initial visibility
-//               yx : {'EPSG:3857' : false},
                displayOutsideMaxExtent: true // display full map returned
            }
     
@@ -341,15 +328,14 @@ function addProjectLayer(map, title, layerId, show, opacity, displayInSwitcher) 
     var type    = "wms"
     var url     = projectUrl+"wms"
     var params  = {
-               tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
+            projection: DEFAULT_CIDA_PROJECTION
            }
     
     var options = {}
     
     if (show) {
 	    options = {
-               visibility: show,   // initial visibility
-               gutter:35          // the amount of overlap to render large features the cross tile boundaries
+               visibility: show   // initial visibility
            }
     }
     options.opacity = opacity ?opacity :0.5
