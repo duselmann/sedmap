@@ -21,7 +21,9 @@ ALTER TABLE SEDMAP.DISCRETE_SITES ADD (
 GRANT SELECT ON SEDMAP.DISCRETE_SITES TO SEDUSER;
 
 insert into discrete_sites
-select distinct "site_no" from SRC_ALLSSCDATACOMBINED_8_14_13;
+select distinct "site_no" from SRC_ALLSSCDATA_11_26_13
+where "site_no" not in 
+(select "site_no" from SRC_AJM_EXCESS_SITES_11_26_13);
 --rollback Drop table discrete_sites;
 
 
@@ -56,12 +58,10 @@ CREATE TABLE SEDMAP.DISCRETE_SAMPLE_FACT
   SAMPLEPURPOSE  VARCHAR2(255 BYTE),
   SAMPTYPE       VARCHAR2(255 BYTE),
   NUMBERSAMPPTS  VARCHAR2(255 BYTE),
-  VISITPURPOSE   VARCHAR2(255 BYTE),
   WIDTH          VARCHAR2(255 BYTE),
   VELOCITY       VARCHAR2(255 BYTE),
   TURB70         VARCHAR2(255 BYTE),
   TURB76         VARCHAR2(255 BYTE),
-  TURB1350       VARCHAR2(255 BYTE),
   TURB61028      VARCHAR2(255 BYTE),
   TURB63675      VARCHAR2(255 BYTE),
   TURB63676      VARCHAR2(255 BYTE),
@@ -69,10 +69,12 @@ CREATE TABLE SEDMAP.DISCRETE_SAMPLE_FACT
   TEMPC          VARCHAR2(255 BYTE),
   TEMPAIRC       VARCHAR2(255 BYTE),
   SC             VARCHAR2(255 BYTE),
-  SCFIELD        VARCHAR2(255 BYTE),
+  SCLAB          VARCHAR2(255 BYTE),
   DSS            VARCHAR2(255 BYTE),
   PH             VARCHAR2(255 BYTE),
-  PHFIELD        VARCHAR2(255 BYTE));
+  PHLAB          VARCHAR2(255 BYTE),
+  END_DATE       date,
+  END_TIME       VARCHAR2(4 BYTE));
 
  ALTER TABLE SEDMAP.DISCRETE_SAMPLE_FACT ADD (
   CONSTRAINT DISCRETE_SAMPLE_FACT_U01
@@ -117,12 +119,10 @@ select
   "Samplepurpose",
   "Samptype",
   "Numbersamppts",
-  "VisitPurpose" ,
   "Width" ,
   "Velocity",
   "Turb70",
   "Turb76",
-  "Turb1350",
   "Turb61028",
   "Turb63675",
   "Turb63676",
@@ -130,9 +130,13 @@ select
   "TempC",
   "TempairC",
   SC,
-  "Scfield",
+  "Sclab",
   DSS ,
   "pH",
-  "pHfield" 
-   from SRC_ALLSSCDATACOMBINED_8_14_13;
+  "pHlab",
+  TO_DATE("end_date", 'MM/DD/YYYY'),
+  "end_time" 
+   from SRC_ALLSSCDATA_11_26_13
+ where "site_no" not in 
+(select "site_no" from SRC_AJM_EXCESS_SITES_11_26_13);
 --rollback Drop table discrete_sample_fact;  
