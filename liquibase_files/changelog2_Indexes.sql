@@ -48,12 +48,12 @@ CREATE INDEX "SEDMAP"."SITE_REF_CLAY_IDX" ON "SEDMAP"."SITE_REF" ("CLAY");
 --rollback Drop index SITE_REF_CLAY_IDX;
   
 --changeset duselman:CreateSandIndex
-CREATE INDEX "SEDMAP"."SITE_REF_Sand_IDX" ON "SEDMAP"."SITE_REF" ("SAND");
---rollback Drop index "SITE_REF_Sand_IDX";
+CREATE INDEX "SEDMAP"."SITE_REF_SAND_IDX" ON "SEDMAP"."SITE_REF" ("SAND");
+--rollback Drop index SITE_REF_SAND_IDX;
   
 --changeset duselman:CreateSiltIndex
-CREATE INDEX "SEDMAP"."SITE_REF_Silt_IDX" ON "SEDMAP"."SITE_REF" ("SILT");
---rollback Drop index "SITE_REF_Silt_IDX";
+CREATE INDEX "SEDMAP"."SITE_REF_SILT_IDX" ON "SEDMAP"."SITE_REF" ("SILT");
+--rollback Drop index SITE_REF_SILT_IDX;
   
 --changeset duselman:CreateDiscreteYearIndex
 CREATE INDEX "SEDMAP"."DISCRETE_SAMPLE_YEAR_IDX" ON "SEDMAP"."DISCRETE_SAMPLE_FACT" (EXTRACT(YEAR FROM "DATETIME"));
