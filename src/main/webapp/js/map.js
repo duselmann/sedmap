@@ -275,7 +275,6 @@ function _addLayer(map, title, layerId, type, url, options, params, noDefaults) 
                format: format,     // png file
                width: 256,
                height: 256,
-               srs: DEFAULT_EXTERNAL_PROJECTION,
                tiled: true         // it is best to tile
            }
     var optionDefaults = {
@@ -348,9 +347,13 @@ function addProjectLayer(map, title, layerId, show, opacity, displayInSwitcher) 
 function addNlcdLayer(map, title, layerId, displayInSwitcher) {
     var type    = "wms"
     
-    var options = {displayInLayerSwitcher: displayInSwitcher}
+    var options = {displayInLayerSwitcher: displayInSwitcher,
+        projection: DEFAULT_EXTERNAL_PROJECTION
+}
     // nlcd layer uses the default params and options
-    return _addLayer(map, title, layerId, type, nlcdUrl, options, {})
+    var params = {
+    }
+    return _addLayer(map, title, layerId, type, nlcdUrl, options, params)
 }
 
 //the arcgis topographical world map - these are returned as EPSG:3857 or unofficially 900913
