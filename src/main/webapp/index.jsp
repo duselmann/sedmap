@@ -1,22 +1,6 @@
-<%@page import="org.slf4j.Logger"%>
-<%@page import="org.slf4j.LoggerFactory"%>
-<%@page import="gov.usgs.cida.config.DynamicReadOnlyProperties"%>
+<%@ include file="/context.jsp" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-
-<%!    
-    protected DynamicReadOnlyProperties props = new DynamicReadOnlyProperties();
-
-    {
-        try {
-            props.addJNDIContexts(new String[0]);
-        } catch (Exception e) {
-            LoggerFactory.getLogger("index.jsp").error("Could not find JNDI - Application will probably not function correctly");
-        }
-    }
-    boolean development = Boolean.parseBoolean(props.getProperty("development"));
-%>
-
 <html lang="en">
     
     <head>
@@ -48,6 +32,7 @@
             <jsp:param name="nextReview" value="" />
             <jsp:param name="expires" value="never" />
             <jsp:param name="development" value="<%= development %>" />
+            <jsp:param name="google-analytics-account-code" value="<%= googleAnalyticsAccountNumber %>" />
         </jsp:include>
         <script type="text/javascript" src="js/jquery/jquery-1.10.2.min.js"></script>
         <script type="text/javascript" src="js/openlayers/OpenLayers.js"></script>
