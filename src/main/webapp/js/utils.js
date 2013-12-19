@@ -1,4 +1,4 @@
-// should consider underscore.js
+// should consider underscore.js or sugarjs
 
 var undef; // an undefined value for setting things to undefined
 

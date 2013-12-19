@@ -153,6 +153,7 @@
     <script type="text/javascript" src="js/map.js" defer="defer" ></script>
     <script type="text/javascript" src="js/filter-api.js"></script>
     <script type="text/javascript" src="js/filter.js"></script>
+    <script type="text/javascript" src="js/onReady.js"></script>
     
 </body>
 </html>

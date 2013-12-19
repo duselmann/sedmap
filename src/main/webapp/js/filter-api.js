@@ -728,7 +728,9 @@ Filters.Option = Filters.extend({
 	
 	onchange: function(e){
 		this.addFilter(e)
-		var optDom = this.createOptionDom()
+                var optDom = this.createOptionDom();
+                var selectDom = $(optDom).find('select');
+                Util.highlightApplyFilterButtonOnInputChange(selectDom);
 		// add the new state selection to the dom
 		$(this.$optDiv).prepend(optDom)
 		$(this.parent).trigger('childchange');
@@ -749,6 +751,7 @@ Filters.Option = Filters.extend({
 		this.removeFilter(oldVal)
 		// then add the new filter
 		this.addFilter(e)
+                Util.highlightApplyFilterButton();
 		// update the old value for the next pissible remove/change
 		this.setOldVal(el, el)
 	},
