@@ -221,6 +221,7 @@ var Filters = Class.extend({
 		this.filter  = undefined
 		this.isPrime = defaultValue(params.isPrime, true) // default not sub-filter
 		this.callback= params.callback
+                this.helpText = params.helpText
         this.orWith  = params.orWith
         this.orDefaultValue = params.orDefaultValue
 		
@@ -355,8 +356,15 @@ var Filters = Class.extend({
 		return dom
 	},
 	endDom : function() {
-		return '</div>'
+		return this.createHelpText() + '</div>';
 	},
+        createHelpText: function(){
+            var helpDom = '';
+            if(isDefined(this.helpText)){
+                helpDom = '<a class="helpText" title="'+this.helpText+'">(?)</a>';
+            }
+            return helpDom;
+        },
 	createLabel : function() {
 		var label = ''
 		if (isDefined(this.label) && this.label.length) {

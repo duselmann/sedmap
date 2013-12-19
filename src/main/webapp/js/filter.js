@@ -28,7 +28,7 @@ function initFilters() {
         maxlength:15,
         parent:'#filterDiv', 
         group:'#Boundary',
-        label:'USGS Station ID Basin Boundary:',
+        label:'Basin Boundary:',
         pattern: /^\d{8,15}$/,
         valueDecorator: function(value) {
             return "*"+value+"*"
@@ -39,7 +39,8 @@ function initFilters() {
                 "Daily Sites",
                 "USGS Basin Boundaries",
                 "SiteInfo"
-                ]
+                ],
+        helpText: 'Enter corresponding USGS Station ID'
     })
     
     minYears = new Filters.Value({
