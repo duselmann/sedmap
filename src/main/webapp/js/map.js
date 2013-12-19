@@ -334,7 +334,8 @@ function addProjectLayer(map, title, layerId, show, opacity, displayInSwitcher) 
     
     if (show) {
 	    options = {
-               visibility: show   // initial visibility
+               visibility: show,   // initial visibility
+               gutter:35          // the amount of overlap to render large features the cross tile boundaries
            }
     }
     options.opacity = opacity ?opacity :0.5
