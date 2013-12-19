@@ -137,6 +137,9 @@
             </div>
             <div class="modal-footer"></div>
         </div>
+        <div id="noFiltersConfirmation" title="Large Download Confirmation" class="hidden"> 
+            <p>No filters have been applied. All data for all sites will be downloaded for the data types selected.</p>
+        </div>
         <jsp:include page="siteLegend.jsp"/>
         <jsp:include page="download.jsp"/>
         <jsp:include page="menu.jsp"/>

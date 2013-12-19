@@ -480,16 +480,38 @@ function closeDL() {
 
 
 function downloadShow() {
-    clearDelay('#DL-msg',0)
+    clearDelay('#DL-msg', 0)
+    var filterDiv = '#filterDiv';
+    var dailyFilters = getFilters(filterDiv, DAILY);
+    var discreteFilters = getFilters(filterDiv, DISCRETE);
+    var doDownload = function () {
+        var isDaily = layers[DAILY].visibility
+        var isDiscr = layers[DISCRETE].visibility
 
-    var isDaily = layers[DAILY].visibility
-    var isDiscr = layers[DISCRETE].visibility
+        $("#DL-daily").prop('checked', isDaily)
+        $("#DL-discrete").prop('checked', isDiscr)
+        //$("#DL-discreteFlow").prop('checked', isDiscr)
 
-    $("#DL-daily").prop('checked', isDaily)
-    $("#DL-discrete").prop('checked', isDiscr)
-    //$("#DL-discreteFlow").prop('checked', isDiscr)
-
-    $(".blackoverlay").fadeIn("slow")
+        $(".blackoverlay").fadeIn("slow")
+    };
+    if ((dailyFilters.length === 0) && (discreteFilters.length === 0)) {
+        $('#noFiltersConfirmation').dialog({
+            height: 250,
+            modal: true,
+            buttons: {
+                "Proceed with large download": function(){
+                    $(this).dialog("close");
+                    doDownload();
+                },
+                "Cancel": function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+    }
+    else {
+        doDownload();
+    }
 }
 
 
