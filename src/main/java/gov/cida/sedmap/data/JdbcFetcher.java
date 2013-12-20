@@ -15,6 +15,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,11 +33,78 @@ public class JdbcFetcher extends Fetcher {
 
 
 	private static final Logger logger = Logger.getLogger(JdbcFetcher.class);
-
+        
 	private static final Map<String,String> dataQueries  = new HashMap<String, String>();
-
+        public static final String[] DEFAULT_DAILY_SITE_COLUMN_NAMES = {
+            "SITE_NO",
+            "SNAME",
+            "LATITUDE",
+            "LONGITUDE",
+            "NWISDA1",
+            "STATE",
+            "COUNTY_NAME",
+            "ECO_L3_CODE",
+            "ECO_L3_NAME",
+            "ECO_L2_CODE",
+            "ECO_L2_NAME",
+            "ECO_L1_NAME",
+            "ECO_L1_CODE",
+            "HUC_REGION_NAME",
+            "HUC_SUBREGION_NAME",
+            "HUC_BASIN_NAME",
+            "HUC_SUBBASIN_NAME",
+            "HUC_2",
+            "HUC_4",
+            "HUC_6",
+            "HUC_8",
+            "PERM",
+            "BFI",
+            "KFACT",
+            "RFACT",
+            "PPT30",
+            "URBAN",
+            "FOREST",
+            "AGRIC",
+            "MAJ_DAMS",
+            "NID_STOR",
+            "CLAY",
+            "SAND",
+            "SILT",
+            "BENCHMARK_SITE",
+            "NHDP1",
+            "NHDP5",
+            "NHDP10",
+            "NHDP20",
+            "NHDP25",
+            "NHDP30",
+            "NHDP40",
+            "NHDP50",
+            "NHDP60",
+            "NHDP70",
+            "NHDP75",
+            "NHDP80",
+            "NHDP90",
+            "NHDP95",
+            "NHDP99",
+            "ECO_L2_COD"
+        };
+       static{
+           StringBuilder sb = new StringBuilder();
+           int lastCommaIndex = DEFAULT_DAILY_SITE_COLUMN_NAMES.length - 1;
+           for(int i = 0; i < DEFAULT_DAILY_SITE_COLUMN_NAMES.length; i++){
+               sb.append("s.");
+               sb.append(DEFAULT_DAILY_SITE_COLUMN_NAMES[i]);
+               if(i < lastCommaIndex){
+                   sb.append(",\n");
+               }
+           }
+           DEFAULT_DAILY_SITE_COLUMN_NAMES_FOR_DOWNLOAD = sb.toString();
+       }
+       private static final String DEFAULT_DAILY_SITE_COLUMN_NAMES_FOR_DOWNLOAD;
+                
 	public static final String DEFAULT_DAILY_SITE_SQL = "" // this is for consistent formatting
-			+ " select s.*, "
+			+ " select "
+                        + DEFAULT_DAILY_SITE_COLUMN_NAMES_FOR_DOWNLOAD
 			+ "   NVL(y.sample_years,0) as sample_years "
 			+ " from sedmap.DAILY_STATIONS_DL s "
 			+ " left join ( "
@@ -118,8 +187,8 @@ public class JdbcFetcher extends Fetcher {
 
 		try {
 			String     tableName = getDataTable(descriptor);
-			List<Column> columns = getTableMetadata(tableName);
-			String        header = formatter.fileHeader(columns);
+			List<String> columnNames = Arrays.asList(DEFAULT_DAILY_SITE_COLUMN_NAMES);
+			String        header = formatter.fileHeader(columnNames.iterator());
 			String           sql = buildQuery(descriptor, filter);
 			logger.debug(sql);
 			rs = initData(sql);

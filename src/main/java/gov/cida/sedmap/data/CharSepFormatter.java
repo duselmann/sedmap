@@ -3,6 +3,8 @@ package gov.cida.sedmap.data;
 import gov.cida.sedmap.io.IoUtils;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -54,23 +56,6 @@ public class CharSepFormatter implements Formatter {
 		return line;
 	}
 
-
-	@Override
-	public String fileHeader(List<Column> columns) throws SQLException {
-		StringBuilder header = new StringBuilder();
-
-		String sep = "";
-		for (Column col : columns) {
-			header.append(sep).append(col.name);
-			sep = SEPARATOR;
-		}
-		header.append( IoUtils.LINE_SEPARATOR );
-
-		return header.toString();
-	}
-
-
-
 	@Override
 	public String fileRow(Iterator<String> values) throws SQLException {
 		StringBuilder row = new StringBuilder();
@@ -92,4 +77,26 @@ public class CharSepFormatter implements Formatter {
 
 		return row.toString();
 	}
+
+    @Override
+    public String fileHeader(Iterator<String> columns) {
+    		StringBuilder header = new StringBuilder();
+
+		String sep = "";
+		while(columns.hasNext()){
+                        String column = columns.next();
+			header.append(sep).append(column);
+			sep = SEPARATOR;
+		}
+		header.append( IoUtils.LINE_SEPARATOR );
+
+		return header.toString();
+    }
+
+    @Override
+    public String fileHeader(List<Column> columns) throws SQLException {
+        String[] columnNames = Column.getColumnNames(columns.iterator());
+        Iterator colNamesIter = Arrays.asList(columnNames).iterator();
+        return fileHeader(colNamesIter);
+    }
 }
