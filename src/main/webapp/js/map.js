@@ -335,7 +335,10 @@ function addProjectLayer(map, title, layerId, show, opacity, displayInSwitcher) 
     if (show) {
 	    options = {
                visibility: show,   // initial visibility
-               gutter:35          // the amount of overlap to render large features the cross tile boundaries
+               gutter:50          // the amount of overlap to render large features the cross tile boundaries
+                                    // using 50 because geoserver's tile-caching web interface only allows discrete
+                                    // values, and 50 is the closest option that is more than sufficient to avoid 
+                                    // large features being cut off across tile boundaries
            }
     }
     options.opacity = opacity ?opacity :0.5
