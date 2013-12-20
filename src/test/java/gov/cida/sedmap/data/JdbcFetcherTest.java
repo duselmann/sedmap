@@ -181,8 +181,11 @@ public class JdbcFetcherTest {
 		String expect = "Site_Id,Latitude,Longitude,create_date";
 		System.out.println();
 		System.out.println(actual);
-		assertTrue("file should contain header row", actual.startsWith(expect));
+		assertTrue("file should contain column header row", actual.contains(expect));
 
+                assertTrue("file should contain general header text", actual.contains(CharSepFormatter.GENERAL_HEADER));
+                assertTrue("file should contain site header text", actual.contains(CharSepFormatter.SITE_HEADER));
+                
 		assertEquals("expect three rows of data", 3, StrUtils.occurrences("123456789", actual));
 		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567891", actual));
 		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567892", actual));

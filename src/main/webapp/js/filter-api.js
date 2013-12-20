@@ -221,6 +221,7 @@ var Filters = Class.extend({
 		this.filter  = undefined
 		this.isPrime = defaultValue(params.isPrime, true) // default not sub-filter
 		this.callback= params.callback
+                this.helpText = params.helpText
         this.orWith  = params.orWith
         this.orDefaultValue = params.orDefaultValue
 		
@@ -355,8 +356,15 @@ var Filters = Class.extend({
 		return dom
 	},
 	endDom : function() {
-		return '</div>'
+		return this.createHelpText() + '</div>';
 	},
+        createHelpText: function(){
+            var helpDom = '';
+            if(isDefined(this.helpText)){
+                helpDom = '<a class="helpText" title="'+this.helpText+'">(?)</a>';
+            }
+            return helpDom;
+        },
 	createLabel : function() {
 		var label = ''
 		if (isDefined(this.label) && this.label.length) {
@@ -728,7 +736,9 @@ Filters.Option = Filters.extend({
 	
 	onchange: function(e){
 		this.addFilter(e)
-		var optDom = this.createOptionDom()
+                var optDom = this.createOptionDom();
+                var selectDom = $(optDom).find('select');
+                Util.highlightApplyFilterButtonOnInputChange(selectDom);
 		// add the new state selection to the dom
 		$(this.$optDiv).prepend(optDom)
 		$(this.parent).trigger('childchange');
@@ -749,6 +759,7 @@ Filters.Option = Filters.extend({
 		this.removeFilter(oldVal)
 		// then add the new filter
 		this.addFilter(e)
+                Util.highlightApplyFilterButton();
 		// update the old value for the next pissible remove/change
 		this.setOldVal(el, el)
 	},
