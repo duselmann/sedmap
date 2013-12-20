@@ -93,7 +93,7 @@ public abstract class Fetcher {
 		WriterWithFile tmp = null;
 		try {
 			tmp = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());
-
+                        tmp.write(CharSepFormatter.DAILY_HEADER);
 			while (sites.hasNext()) {
 				int batch = 0;
 				String sep = "";
