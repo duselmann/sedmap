@@ -125,6 +125,17 @@
         <div id="noFiltersConfirmation" title="Large Download Confirmation" class="hidden"> 
             <p>No filters have been applied. All data for all sites will be downloaded for the data types selected.</p>
         </div>
+        <div id="splashContent" class="hidden" title="USGS Sediment Data Portal">
+            <h3><a href="helpQuick.jsp">Click here to view the Quick Start guide.</a></h3>
+            <p>
+                The purpose of the USGS sediment data portal is to improve the accessibility and interpretation of USGS discrete and daily suspended-sediment and related data.  The USGS National Water Information System (NWIS) is the original source of all daily and discrete suspended-sediment data presented in the portal, though some suspended-sediment data hosted by NWIS are not provided via this portal. See the User Guide for more information about the data presented or for instructions on site navigation.
+            </p>
+            <p>
+                <em>
+Although this program has been developed by the USGS, no warranty, expressed or implied, is made by the USGS or the United States Government as to the accuracy and functioning of the program and related program material nor shall the fact of distribution constitute any such warranty, and no responsibility is assumed by the USGS in connection therewith.
+                </em>
+            </p>
+        </div>
         <jsp:include page="siteLegend.jsp"/>
         <jsp:include page="download.jsp"/>
         <jsp:include page="menu.jsp"/>
@@ -141,6 +152,7 @@
     <script type="text/javascript" src="js/map.js" defer="defer" ></script>
     <script type="text/javascript" src="js/filter-api.js"></script>
     <script type="text/javascript" src="js/filter.js"></script>
+    <script type="text/javascript" src="js/jquery-cookie/jquery.cookie.js"></script>
     <script type="text/javascript" src="js/onReady.js"></script>
     
 </body>
