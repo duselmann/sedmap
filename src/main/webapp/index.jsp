@@ -9,7 +9,8 @@
         <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
         <link rel="icon" href="favicon.ico" type="image/x-icon" />
         <link type="text/css" rel="stylesheet" href="css/normalize/normalize.css" />
-	    <link type="text/css" rel="stylesheet" href="css/smoothness/jquery-ui-1.10.0.custom.min.css" />
+        <link type="text/css" rel="stylesheet" href="css/smoothness/jquery-ui-1.10.0.custom.min.css" />
+        <link type="text/css" rel="stylesheet" href="webjars/font-awesome/4.0.3/css/font-awesome.min.css" />
         <!-- Import OL CSS, auto import does not work with our minified OL.js build -->
         <link rel="stylesheet" type="text/css" href="js/openlayers/theme/default/style.css">
         <!-- Basic CSS definitions -->
