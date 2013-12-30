@@ -361,7 +361,7 @@ var Filters = Class.extend({
         createHelpText: function(){
             var helpDom = '';
             if(isDefined(this.helpText)){
-                helpDom = '<a class="helpText" title="'+this.helpText+'">(?)</a>';
+                helpDom = '<a class="helpText" title="'+this.helpText+'"><img class="helpIcon" src="images/help.png"/></a>';
             }
             return helpDom;
         },
