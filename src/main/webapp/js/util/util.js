@@ -3,7 +3,7 @@ var Util;
 //private vars
 var highlightDuration = 2000;//ms
 var highlightCounter = 0;
-var maxFieldHighlights = 2;//max number of highlights to perform when the user blurs away from field
+var maxFieldHighlights = 3;//max number of highlights to perform when the user blurs away from field
 var maxCharacterHighlightsPerField = 2;//max number of highlights to perform when individual characters are changed in a field
 var highlightApplyFilterButton = function () {
     if(highlightCounter < maxFieldHighlights){
@@ -25,7 +25,6 @@ Util =  {
         });
         input.change(function (eventObject) {
             if(highlightCounter < maxFieldHighlights){
-                highlightApplyFilterButton();
                 highlightCounter++;
             }
         });
