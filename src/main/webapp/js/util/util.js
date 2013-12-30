@@ -3,11 +3,11 @@ var Util;
 //private vars
 var highlightDuration = 2000;//ms
 var highlightCounter = 0;
-var maxHighlights = 2;
+var maxFieldHighlights = 2;//max number of highlights to perform when the user blurs away from field
+var maxCharacterHighlightsPerField = 2;//max number of highlights to perform when individual characters are changed in a field
 var highlightApplyFilterButton = function () {
-    if(highlightCounter < maxHighlights){
+    if(highlightCounter < maxFieldHighlights){
         $('.applyFilter').effect('highlight', {}, highlightDuration);
-        highlightCounter++;
     }
 };
 Util =  {
@@ -16,8 +16,18 @@ Util =  {
         if (!input.jquery) {//check if native dom object. If so, wrap in jquery
             input = $(input);
         }
-        input.change(function (eventObject) {
+        var characterCount = 0;
+        input.keyup(function(eventObject){
+            if(characterCount < maxCharacterHighlightsPerField){
                 highlightApplyFilterButton();
+                characterCount++;
+            }
+        });
+        input.change(function (eventObject) {
+            if(highlightCounter < maxFieldHighlights){
+                highlightApplyFilterButton();
+                highlightCounter++;
+            }
         });
     },
     getRandomColor : function(args) {
