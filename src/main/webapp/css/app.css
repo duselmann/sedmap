@@ -40,7 +40,9 @@ img.mapSpinner  {
     background-color: #345280;
     color: white;
 }
-
+.helpIcon{
+    height: 1em;
+}
 /* map legends */
 
 #nlcdlegendOld {
