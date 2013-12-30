@@ -35,7 +35,11 @@ div.mapSpinner {
 img.mapSpinner  {
     margin-top: 175px;
 }
-
+.sedmap-modal .ui-widget-header{
+    background: none;
+    background-color: #345280;
+    color: white;
+}
 
 /* map legends */
 

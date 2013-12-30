@@ -20,8 +20,7 @@ public class MissingFileHandler extends BaseHandler {
 	public FileDownloadHandler beginWritingFiles() throws IOException {
 		resp.setContentType( getContentType() );
 		resp.getOutputStream().write( ("We are sorry. That file was not found.\n\n"
-				+" Please use the URL you received.\n"
-				+" If you are using a ULR your received, note that files are only retained for "
+				+" If you are using a URL you received, note that files are only retained for "
 				+DataFileMgr.RETAIN_DAYS +" days.").getBytes() );
 		resp.getOutputStream().flush();
 		resp.getOutputStream().close();

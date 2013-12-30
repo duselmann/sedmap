@@ -1,0 +1,1 @@
+# Discrete suspended-sediment and associated data are originally retrieved from the USGS National Water Information System (NWIS), and are screened and quality controlled using methods described in the Sediment Portal User Guide and USGS Data Report 776. These data were last retrieved from NWIS in April 2013.

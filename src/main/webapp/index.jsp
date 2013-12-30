@@ -1,22 +1,6 @@
-<%@page import="org.slf4j.Logger"%>
-<%@page import="org.slf4j.LoggerFactory"%>
-<%@page import="gov.usgs.cida.config.DynamicReadOnlyProperties"%>
+<%@ include file="/context.jsp" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-
-<%!    
-    protected DynamicReadOnlyProperties props = new DynamicReadOnlyProperties();
-
-    {
-        try {
-            props.addJNDIContexts(new String[0]);
-        } catch (Exception e) {
-            LoggerFactory.getLogger("index.jsp").error("Could not find JNDI - Application will probably not function correctly");
-        }
-    }
-    boolean development = Boolean.parseBoolean(props.getProperty("development"));
-%>
-
 <html lang="en">
     
     <head>
@@ -48,6 +32,7 @@
             <jsp:param name="nextReview" value="" />
             <jsp:param name="expires" value="never" />
             <jsp:param name="development" value="<%= development %>" />
+            <jsp:param name="google-analytics-account-code" value="<%= googleAnalyticsAccountNumber %>" />
         </jsp:include>
         <script type="text/javascript" src="js/jquery/jquery-1.10.2.min.js"></script>
         <script type="text/javascript" src="js/openlayers/OpenLayers.js"></script>
@@ -137,6 +122,21 @@
             </div>
             <div class="modal-footer"></div>
         </div>
+        <div id="noFiltersConfirmation" title="Large Download Confirmation" class="hidden"> 
+            <p>No filters have been applied. All data for all sites will be downloaded for the data types selected.</p>
+        </div>
+        <div id="splashContent" class="hidden" title="USGS Sediment Data Portal">
+            <h3><a href="helpQuick.jsp">Click here to view the Quick Start guide.</a></h3>
+            <p>
+                The purpose of the USGS sediment portal is to aid in the access and interpretation of USGS discrete and daily suspended-sediment and related data.  The USGS National Water Information System (NWIS) is the original source of all daily and discrete suspended-sediment data presented in the portal, though some suspended-sediment data hosted by NWIS are not provided via this portal.
+                See the <a href="helpGuide.jsp">User Guide</a> for more information about the data presented or for instructions on site navigation.
+            </p>
+            <p>
+                <em>
+Although this program has been developed by the USGS, no warranty, expressed or implied, is made by the USGS or the United States Government as to the accuracy and functioning of the program and related program material nor shall the fact of distribution constitute any such warranty, and no responsibility is assumed by the USGS in connection therewith.
+                </em>
+            </p>
+        </div>
         <jsp:include page="siteLegend.jsp"/>
         <jsp:include page="download.jsp"/>
         <jsp:include page="menu.jsp"/>
@@ -153,6 +153,7 @@
     <script type="text/javascript" src="js/map.js" defer="defer" ></script>
     <script type="text/javascript" src="js/filter-api.js"></script>
     <script type="text/javascript" src="js/filter.js"></script>
+    <script type="text/javascript" src="js/jquery-cookie/jquery.cookie.js"></script>
     <script type="text/javascript" src="js/onReady.js"></script>
     
 </body>
