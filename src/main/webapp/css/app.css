@@ -150,7 +150,7 @@ div.filter {
     height: 544px;
 }
 div.filterScroll {
-    width: 353px !important;
+    width: 375px !important;
     overflow-y: scroll !important;
     overflow-x: hidden !important;
 }
