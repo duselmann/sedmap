@@ -356,19 +356,19 @@ var Filters = Class.extend({
 		return dom
 	},
 	endDom : function() {
-		return this.createHelpText() + '</div>';
+		return '</div>';
 	},
         createHelpText: function(){
             var helpDom = '';
             if(isDefined(this.helpText)){
-                helpDom = '<a class="helpText" title="'+this.helpText+'">(?)</a>';
+                helpDom = '<a class="helpText" title="'+this.helpText+'"><img class="helpIcon" src="images/help.png"/></a>';
             }
             return helpDom;
         },
 	createLabel : function() {
 		var label = ''
 		if (isDefined(this.label) && this.label.length) {
-			label = '<span class="label '+this.lblClass+'">'+this.label+'</span>'
+			label = '<span class="label '+this.lblClass+'">' + this.label + this.createHelpText() + '</span>';
 		}
 		return label
 	},

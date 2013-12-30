@@ -497,6 +497,7 @@ function downloadShow() {
     };
     if ((dailyFilters.length === 0) && (discreteFilters.length === 0)) {
         $('#noFiltersConfirmation').dialog({
+            dialogClass: 'sedmap-modal',
             height: 250,
             modal: true,
             buttons: {
