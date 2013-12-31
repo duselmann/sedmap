@@ -248,8 +248,9 @@ public class JdbcFetcher extends Fetcher {
 		String  descriptor = "discrete_data";
 
 		try {
-                        List<String> columnNames = Arrays.asList(DEFAULT_SITE_COLUMN_NAMES);
-			String        header = formatter.fileHeader(columnNames.iterator(), HeaderType.DISCRETE);
+                        String tableName = Fetcher.conf.DATA_TABLES.get(descriptor);
+                        String[] columnNames = Column.getColumnNames(this.getTableMetadata(tableName).iterator());
+			String        header = formatter.fileHeader(Arrays.asList(columnNames).iterator(), HeaderType.DISCRETE);
 
 			// TODO use IoUtils tmp file creator
 			//			File   tmpFile = File.createTempFile(descriptor + StrUtils.uniqueName(12), formatter.getFileType());
