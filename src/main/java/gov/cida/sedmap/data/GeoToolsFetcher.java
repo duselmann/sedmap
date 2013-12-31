@@ -9,6 +9,7 @@ import gov.cida.sedmap.ogc.OgcUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -59,7 +60,9 @@ public class GeoToolsFetcher extends Fetcher {
 
 			try {
 				List<Column> columns = getTableMetadata(tableName);
-				String header = formatter.fileHeader(columns);
+                                String[] columnNames = Column.getColumnNames(columns.iterator());
+                                Iterator<String> columnNamesIter = Arrays.asList(columnNames).iterator();
+				String header = formatter.fileHeader(columnNamesIter, HeaderType.SITE);
 				tmp.write(header);
 
 				while (reader.hasNext()) {

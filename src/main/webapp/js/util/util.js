@@ -1,5 +1,34 @@
-var Util =  {
-    
+var Util;
+(function(){
+//private vars
+var highlightDuration = 2000;//ms
+var highlightCounter = 0;
+var maxFieldHighlights = 3;//max number of highlights to perform when the user blurs away from field
+var maxCharacterHighlightsPerField = 2;//max number of highlights to perform when individual characters are changed in a field
+var highlightApplyFilterButton = function () {
+    if(highlightCounter < maxFieldHighlights){
+        $('.applyFilter').effect('highlight', {}, highlightDuration);
+    }
+};
+Util =  {
+    highlightApplyFilterButton : highlightApplyFilterButton,
+    highlightApplyFilterButtonOnInputChange : function (input) {
+        if (!input.jquery) {//check if native dom object. If so, wrap in jquery
+            input = $(input);
+        }
+        var characterCount = 0;
+        input.keyup(function(eventObject){
+            if(characterCount < maxCharacterHighlightsPerField){
+                highlightApplyFilterButton();
+                characterCount++;
+            }
+        });
+        input.change(function (eventObject) {
+            if(highlightCounter < maxFieldHighlights){
+                highlightCounter++;
+            }
+        });
+    },
     getRandomColor : function(args) {
         args = args || {};
         var randomColor = '';
@@ -229,7 +258,4 @@ var Util =  {
         return dateFormat;
     }
 }
-
-
-
-
+}());

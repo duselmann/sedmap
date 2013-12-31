@@ -1,6 +1,8 @@
-<!DOCTYPE html>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ include file="/context.jsp" %>
 <%@ page import="gov.cida.sedmap.web.AtomReaderUtil" %>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+
 <html lang="en">
     
     <head>
@@ -27,7 +29,9 @@
             <jsp:param name="revisedDate" value="" />
             <jsp:param name="nextReview" value="" />
             <jsp:param name="expires" value="never" />
-            <jsp:param name="development" value="" />
+            <jsp:param name="development" value="<%= development %>" />
+            <jsp:param name="google-analytics-account-code" value="<%= googleAnalyticsAccountNumber %>" />
+
         </jsp:include>
         <script type="text/javascript" src="js/jquery/jquery-1.10.2.min.js"></script>
         <script type="text/javascript" src="js/utils.js"></script>

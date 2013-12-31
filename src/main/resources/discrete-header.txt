@@ -1,0 +1,50 @@
+# Discrete suspended-sediment and associated data are originally retrieved from the USGS National Water Information System (NWIS), and are screened and quality controlled using methods described in the Sediment Portal User Guide and USGS Data Report 776. These data were last retrieved from NWIS in April 2013.
+# Field name	Field description	Units	USGS parameter code(s)
+# SITE_NO	- USGS site identifier		
+# STATION_NM	- USGS site name		
+# DATETIME	- Date/time of sample collection		
+# DCOMMENT	- Quality control comment on the relation of SSC with daily flow		
+# ICOMMENT	- Quality control comment on the relation of SSC with instantaneous flow		
+# SSC	- Suspended-sediment concentration	- milligrams per liter	- 80154
+# DAILYFLOW	- Discharge, mean daily	- cubic feet per second	- 60
+# INSTFLOW	- Discharge, instantaneous	- cubic feet per second	- 61
+# GH	- Gage height	- feet	- 65
+# P2	- Suspended sediment, diameter, percent smaller than 0.002 millimeters.	- percent	- 70326; 70337
+# P4	- Suspended sediment, diameter, percent smaller than 0.004 millimeters.	- percent	- 70327; 70338
+# P8	- Suspended sediment, diameter, percent smaller than 0.008 millimeters.	- percent	- 70328; 70339
+# P16	- Suspended sediment, diameter, percent smaller than 0.016 millimeters.	- percent	- 70329; 70340
+# P31	- Suspended sediment, diameter, percent smaller than 0.031 millimeters.	- percent	- 70330; 70341
+# P63	- Suspended sediment, diameter, percent smaller than 0.063 millimeters.	- percent	- 70331; 70342
+# P125	- Suspended sediment, diameter, percent smaller than 0.125 millimeters.	- percent	- 70332; 70343
+# P250	- Suspended sediment, diameter, percent smaller than 0.250 millimeters.	- percent	- 70333; 70344
+# P500	- Suspended sediment, diameter, percent smaller than 0.500 millimeters.	- percent	- 70334; 70345
+# P1MILLI	- Suspended sediment, diameter, percent smaller than 1.0 millimeters.	- percent	- 70335; 70346
+# P2MILLI	- Suspended sediment, diameter, percent smaller than 2.0 millimeters.	- percent	- 70336; 70347
+# LOI	- Loss on ignition of total solids, water, unfiltered	- milligrams per liter	- 505
+# TSS	- Total solids dried at 105 degrees Celsius, water, unfiltered	- milligrams per liter	- 500
+# SS	- Suspended solids, water, unfiltered	- milligrams per liter	- 530
+# AGENCYCODE	- Agency analyzing sample	- NWIS code	- 28
+# SAMPMETHOD	- Sampling method	- NWIS code	- 82398
+# SAMPLEPURPOSE	- Sampling purpose	- NWIS code	- 71999
+# SAMPTYPE	- Sampler type	- NWIS code	- 84164
+# NUMBERSAMPPTS	- Number of Sampling points	- NWIS code	- 63
+# VISITPURPOSE	- site visit purpose	- NWIS code	- 50280
+# WIDTH	- Stream width	- feet	- 4
+# VELOCITY	- Stream velocity	- feet per second	- 55
+# TURB70	- Turbidity, water, unfiltered	- Jackson Turbidity Units	- 70
+# TURB76	- Turbidity, water, unfiltered	- nephelometric Turbidity Units	- 76
+# TURB1350	- Turbidity, severity	- code	- 1350
+# TURB61028	- Turbidity, water, unfiltered, field	- nephelometric Turbidity Units	- 61028
+# TURB63675	- Turbidity, water, unfiltered, broad band light source (400-680 nm), detection angle 90 +/- 30 degrees to incident light	- nephelometric Turbidity Units	- 63675
+# TURB63676	- Turbidity, water, unfiltered, broad band light source (400-680 nm), detectors at multiple angles including 90 +/- 30 degrees, ratiometric correction	- nephelometric Turbidity ratio Units	- 63676
+# TURB63680	- Turbidity, water, unfiltered, monochrome near infra-red LED light, 780-900 nm, detection angle 90 +/ -2.5 degrees	- formazin nephelometric Units	- 63680
+# TEMPC	- Temperature, water	- degrees Celsius	- 10
+# TEMPAIRC	- Temperature, air	- degrees Celsius	- 20
+# SC	- Specific conductance, water, unfiltered, field	- microsiemens per centimeter at 25 degrees Celsius	- 95
+# SCLAB	- Specific conductance, water, unfiltered�, laboratory	- microsiemens per centimeter at 25 degrees Celsius	- 90095
+# DSS	- Dissolved solids drived at 105 degrees Celcius, water, filtered	- milligrams per liter	- 515
+# PH	- pH, water, unfiltered, field	- standard Units	- 400
+# PHLAB	- pH, water, unfiltered, laboratory	- standard Units	- 403
+# ENDDATE	- End date of sample (rarely present; only in the case of composite samples collected over time)		
+#
+#

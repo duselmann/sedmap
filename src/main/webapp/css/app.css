@@ -35,8 +35,14 @@ div.mapSpinner {
 img.mapSpinner  {
     margin-top: 175px;
 }
-
-
+.sedmap-modal .ui-widget-header{
+    background: none;
+    background-color: #345280;
+    color: white;
+}
+.helpIcon{
+    height: 1em;
+}
 /* map legends */
 
 #nlcdlegendOld {
@@ -144,7 +150,7 @@ div.filter {
     height: 544px;
 }
 div.filterScroll {
-    width: 353px !important;
+    width: 375px !important;
     overflow-y: scroll !important;
     overflow-x: hidden !important;
 }

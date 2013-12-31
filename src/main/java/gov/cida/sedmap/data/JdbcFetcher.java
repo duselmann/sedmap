@@ -35,6 +35,7 @@ public class JdbcFetcher extends Fetcher {
 	private static final Logger logger = Logger.getLogger(JdbcFetcher.class);
         
 	private static final Map<String,String> dataQueries  = new HashMap<String, String>();
+        public static final String[] DEFAULT_DISCRETE_SITE_COLUMN_NAMES = { };
         public static final String[] DEFAULT_DAILY_SITE_COLUMN_NAMES = {
             "SITE_NO",
             "SNAME",
@@ -85,8 +86,7 @@ public class JdbcFetcher extends Fetcher {
             "NHDP80",
             "NHDP90",
             "NHDP95",
-            "NHDP99",
-            "ECO_L2_COD"
+            "NHDP99"
         };
        static{
            StringBuilder sb = new StringBuilder();
@@ -186,9 +186,8 @@ public class JdbcFetcher extends Fetcher {
 		Results      rs = new Results();
 
 		try {
-			String     tableName = getDataTable(descriptor);
 			List<String> columnNames = Arrays.asList(DEFAULT_DAILY_SITE_COLUMN_NAMES);
-			String        header = formatter.fileHeader(columnNames.iterator());
+			String        header = formatter.fileHeader(columnNames.iterator(), HeaderType.SITE);
 			String           sql = buildQuery(descriptor, filter);
 			logger.debug(sql);
 			rs = initData(sql);
@@ -230,9 +229,8 @@ public class JdbcFetcher extends Fetcher {
 		String  descriptor = "discrete_data";
 
 		try {
-			String     tableName = getDataTable(descriptor);
-			List<Column> columns = getTableMetadata(tableName);
-			String header = formatter.fileHeader(columns);
+                        List<String> columnNames = Arrays.asList(DEFAULT_DISCRETE_SITE_COLUMN_NAMES);
+			String        header = formatter.fileHeader(columnNames.iterator(), HeaderType.DISCRETE);
 
 			// TODO use IoUtils tmp file creator
 			//			File   tmpFile = File.createTempFile(descriptor + StrUtils.uniqueName(12), formatter.getFileType());

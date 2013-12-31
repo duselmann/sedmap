@@ -1,0 +1,13 @@
+#  Daily streamflow, suspended-sediment and associated are directly retrieved from the USGS National Water Information System; data are updated in near real-time.
+# Field name	Field description	Units	USGS parameter code(s)
+# agency_cd	- USGS site identifier		
+# site_no	- USGS site name		
+# datetime	- Date/time of sample collection		
+# DAILY_FLOW	- Discharge, mean daily	- cubic feet per second	-60
+# DAILY_FLOW_QUAL	- daily flow data qualifier	- "A" indicates data are approved for publication; "P" indicates data are provisional and subject to revision	
+# DAILY_SSC	- Suspended-sediment concentration, mean daily	- mg/L	-80154
+# DAILY_SSC_QUAL	- Suspended-sediment concentration data qualifier	- "A" indicates data are approved for publication; "P" indicates data are provisional and subject to revision	
+# DAILY_SSL	- Suspended-sediment load, mean daily	- tons/day	-80155
+# DAILY_SSL_QUAL	- Suspended-sediment load data qualifier	- "A" indicates data are approved for publication; "P" indicates data are provisional and subject to revision
+#
+#
