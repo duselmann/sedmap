@@ -105,18 +105,18 @@ public class CharSepFormatter implements Formatter {
 		return row.toString();
 	}
 
-    public String fileHeader(Iterator<String> columns) {
-    		StringBuilder header = new StringBuilder();
+    public String columnHeaders(Iterator<String> columns) {
+    		StringBuilder columnHeaders = new StringBuilder();
 
 		String sep = "";
 		while(columns.hasNext()){
                         String column = columns.next();
-			header.append(sep).append(column);
+			columnHeaders.append(sep).append(column);
 			sep = SEPARATOR;
 		}
-		header.append( IoUtils.LINE_SEPARATOR );
+		columnHeaders.append( IoUtils.LINE_SEPARATOR );
 
-		return header.toString();
+		return columnHeaders.toString();
     }
 
     @Override
@@ -137,7 +137,7 @@ public class CharSepFormatter implements Formatter {
                 break;
         }
         header.append(typeSpecificHeader);
-        header.append(fileHeader(columns));
+        header.append(columnHeaders(columns));
         return header.toString();
     }
 }

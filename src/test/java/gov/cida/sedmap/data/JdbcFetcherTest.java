@@ -25,6 +25,7 @@ import java.lang.reflect.Field;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -170,15 +171,16 @@ public class JdbcFetcherTest {
 				return new LinkedList<String>().iterator();
 			}
 		};
-		InputStream in = fetcher.handleSiteData("discrete_sites", filter, new CsvFormatter());
+                CsvFormatter csvFormatter = new CsvFormatter();
+		InputStream in = fetcher.handleSiteData("discrete_sites", filter, csvFormatter);
 		String actual  = IoUtils.readStream(in);
 		//		assertTrue("", new File("discrete_sites.csv"));
 		//		System.out.println(actual);
 
 		assertNotNull("data should not be null", actual);
 		assertTrue("data should not be empty", actual.trim().length()>0);
-
-		String expect = "Site_Id,Latitude,Longitude,create_date";
+                Iterator<String> colNameIterator = Arrays.asList(JdbcFetcher.DISCRETE_SITE_COLUMN_NAMES_FOR_SPREADSHEET).iterator();
+                String expect = csvFormatter.fileHeader(colNameIterator, HeaderType.SITE);
 		System.out.println();
 		System.out.println(actual);
 		assertTrue("file should contain column header row", actual.contains(expect));
@@ -207,6 +209,7 @@ public class JdbcFetcherTest {
 				return new LinkedList<String>().iterator();
 			}
 		};
+                RdbFormatter rdbFormatter = new RdbFormatter();
 		InputStream in = fetcher.handleSiteData("discrete_sites", filter, new RdbFormatter());
 		String actual  = IoUtils.readStream(in);
 		System.out.println();
@@ -216,8 +219,8 @@ public class JdbcFetcherTest {
 
 		assertNotNull("data should not be null", actual);
 		assertTrue("data should not be empty", actual.trim().length()>0);
-
-		String expect = "Site_Id	Latitude	Longitude	create_date";
+                Iterator<String> colNameIterator = Arrays.asList(JdbcFetcher.DISCRETE_SITE_COLUMN_NAMES_FOR_SPREADSHEET).iterator();
+                String expect = rdbFormatter.fileHeader(colNameIterator, HeaderType.SITE);
 		assertEquals("file should contain header row", 1, StrUtils.occurrences(expect, actual));
 
 		assertEquals("expect three rows of data", 3, StrUtils.occurrences("123456789", actual));
