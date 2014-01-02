@@ -40,7 +40,7 @@
 "# TEMPC   Temperature, water   degrees Celsius  10"
 "# TEMPAIRC   Temperature, air   degrees Celsius  20"
 "# SC   Specific conductance, water, unfiltered, field   microsiemens per centimeter at 25 degrees Celsius  95"
-"# SCLAB   Specific conductance, water, unfiltered�, laboratory   microsiemens per centimeter at 25 degrees Celsius  90095"
+"# SCLAB   Specific conductance, water, unfiltered, laboratory   microsiemens per centimeter at 25 degrees Celsius  90095"
 "# DSS   Dissolved solids drived at 105 degrees Celcius, water, filtered   milligrams per liter  515"
 "# PH   pH, water, unfiltered, field   standard Units  400"
 "# PHLAB   pH, water, unfiltered, laboratory   standard Units  403"

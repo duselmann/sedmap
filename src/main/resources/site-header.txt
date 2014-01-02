@@ -23,12 +23,12 @@
 # PERM   Average soil permeability   inches/hour   Basin
 # BFI   Average baseflow index   percent   Basin
 # KFACT   Average K-factor for the uppermost soil horizon   unitless   Basin
-# RFACT  30 year rainfall and runoff factor  (100�s ft-tonf in h-1 ac-1 yr-1) * 10   Basin
+# RFACT  30 year rainfall and runoff factor  (100's ft-tonf in h-1 ac-1 yr-1) * 10   Basin
 # PPT30  Mean annual precipitation from 1971-2000   centimeters   Basin
 "# URBAN  Percentage of urban land (sum of NLCD classes 21, 22, 23, and 24)   percent   Basin"
 "# FOREST  Percentage of forest land (sum of NLCD classes 41, 42, and 43)   percent   Basin"
 # AGRIC  Percentage of agricultural land (sum of NLCD classes 81 and 82)   percent   Basin
-"# MAJ_DAMS  Number of dams with >= 50 feet in height or having storage >= 5,000 acre-feet�      Basin"
+"# MAJ_DAMS  Number of dams with >= 50 feet in height or having storage >= 5,000 acre-feet      Basin"
 # NID_STOR   Dam storage   acre-feet   Basin
 # CLAY   Average Percentage of soil clay content   percent   Basin
 # SAND   Average Percentage of soil sand content   percent   Basin
