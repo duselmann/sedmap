@@ -4,7 +4,7 @@
 # DATETIME   Date/time of sample collection    
 # DCOMMENT   Quality control comment on the relation of SSC with daily flow    
 # ICOMMENT   Quality control comment on the relation of SSC with instantaneous flow    
-# SSC   Suspended-sediment concentration   milligrams per liter  80154
+# SSC   Suspended-sediment concentration   milligrams per liter
 "# DAILYFLOW   Discharge, mean daily   cubic feet per second"
 "# INSTFLOW   Discharge, instantaneous   cubic feet per second"
 # GH   Gage height   feet  
@@ -19,7 +19,7 @@
 "# P500   Suspended sediment, diameter, percent smaller than 0.500 millimeters.   percent"
 "# P1MILLI   Suspended sediment, diameter, percent smaller than 1.0 millimeters.   percent"
 "# P2MILLI   Suspended sediment, diameter, percent smaller than 2.0 millimeters.   percent"
-"# LOI   Loss on ignition of total solids, water, unfiltered   milligrams per liter  505"
+"# LOI   Loss on ignition of total solids, water, unfiltered   milligrams per liter"
 "# TSS   Total solids dried at 105 degrees Celsius, water, unfiltered   milligrams per liter"
 "# SS   Suspended solids, water, unfiltered   milligrams per liter"
 # AGENCYCODE   Agency analyzing sample   NWIS code
