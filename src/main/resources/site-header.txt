@@ -1,56 +1,56 @@
-# Field name  Field description  Units  Applicable to site or basin?
-# SITE_NO   USGS site identifier      site
+# Field name  Field description  Units
+# SITE_NO   USGS site identifier
 # SNAME   USGS site name      site
-# LATITUDE   Decimal latitude (datum NAD83)      site
-# LONGITUDE   Decimal longitude (datum NAD83)      site
-# NWISDA1   Upstream drainage area   square miles   Basin
-# STATE   U.S. State      site
-# COUNTY_NAME   U.S. County      site
-# ECO_L3_CODE   Level III Ecoregion Code      site
-# ECO_L3_NAME   Level III Ecoregion name      site
-# ECO_L2_CODE   Level II Ecoregion Code      site
-# ECO_L2_NAME   Level II Ecoregion name      site
-# ECO_L1_NAME   Level I Ecoregion name      site
-# ECO_L1_CODE   Level I Ecoregion Code      site
-# HUC_REGION_NAME   Hydrologic Unit Code Region name      site
-# HUC_SUBREGION_NAME   Hydrologic Unit Code Subregion name      site
-# HUC_BASIN_NAME   Hydrologic Unit Code Basin name      site
-# HUC_SUBBASIN_NAME   Hydrologic Unit Code Subbasin name      site
-# HUC_2   Hydrologic Unit Code Region Code      site
-# HUC_4   Hydrologic Unit Code Subregion Code      site
-# HUC_6   Hydrologic Unit Code Basin Code      site
-# HUC_8   Hydrologic Unit Code Subbasin Code      site
-# PERM   Average soil permeability   inches/hour   Basin
-# BFI   Average baseflow index   percent   Basin
-# KFACT   Average K-factor for the uppermost soil horizon   unitless   Basin
-# RFACT  30 year rainfall and runoff factor  (100's ft-tonf in h-1 ac-1 yr-1) * 10   Basin
-# PPT30  Mean annual precipitation from 1971-2000   centimeters   Basin
-"# URBAN  Percentage of urban land (sum of NLCD classes 21, 22, 23, and 24)   percent   Basin"
-"# FOREST  Percentage of forest land (sum of NLCD classes 41, 42, and 43)   percent   Basin"
-# AGRIC  Percentage of agricultural land (sum of NLCD classes 81 and 82)   percent   Basin
-"# MAJ_DAMS  Number of dams with >= 50 feet in height or having storage >= 5,000 acre-feet      Basin"
-# NID_STOR   Dam storage   acre-feet   Basin
-# CLAY   Average Percentage of soil clay content   percent   Basin
-# SAND   Average Percentage of soil sand content   percent   Basin
-# SILT   Average Percentage of soil silt content   percent   Basin
-# BASIN_NO   USGS site identifier for sites in which Upstream basins were delineated      Basin
-# BENCHMARK_SITE   1 indicates site is a part of the hydrologic benchmark network      site
-# nhd.p1   1st percentile of daily flows      site
-# nhd.p5   5th percentile of daily flows      site
-# nhd.p10   10th percentile of daily flows      site
-# nhd.p20   20th percentile of daily flows      site
-# nhd.p25   25th percentile of daily flows      site
-# nhd.p30   30th percentile of daily flows      site
-# nhd.p40   40th percentile of daily flows      site
-# nhd.p50   50th percentile of daily flows      site
-# nhd.p60   60th percentile of daily flows      site
-# nhd.p70   70th percentile of daily flows      site
-# nhd.p75   75th percentile of daily flows      site
-# nhd.p80   80th percentile of daily flows      site
-# nhd.p90   90th percentile of daily flows      site
-# nhd.p95   95th percentile of daily flows      site
-# nhd.p99   99th percentile of daily flows      site
-# SAMPLE_YEARS   Number of unique years in which daily suspended-sediment concentration or load data were collected (daily_sites data only)      site
-# SAMPLE_COUNT   Number of discrete suspended-sediment samples collected (discrete_sites data only)      site
+# LATITUDE   Decimal latitude (datum NAD83)
+# LONGITUDE   Decimal longitude (datum NAD83)
+# NWISDA1   Upstream drainage area   square miles
+# STATE   U.S. State
+# COUNTY_NAME   U.S. County
+# ECO_L3_CODE   Level III Ecoregion Code
+# ECO_L3_NAME   Level III Ecoregion name
+# ECO_L2_CODE   Level II Ecoregion Code
+# ECO_L2_NAME   Level II Ecoregion name
+# ECO_L1_NAME   Level I Ecoregion name
+# ECO_L1_CODE   Level I Ecoregion Code
+# HUC_REGION_NAME   Hydrologic Unit Code Region name
+# HUC_SUBREGION_NAME   Hydrologic Unit Code Subregion name
+# HUC_BASIN_NAME   Hydrologic Unit Code Basin name
+# HUC_SUBBASIN_NAME   Hydrologic Unit Code Subbasin name
+# HUC_2   Hydrologic Unit Code Region Code
+# HUC_4   Hydrologic Unit Code Subregion Code
+# HUC_6   Hydrologic Unit Code Basin Code
+# HUC_8   Hydrologic Unit Code Subbasin Code
+# PERM   Average soil permeability   inches/hour
+# BFI   Average baseflow index   percent
+# KFACT   Average K-factor for the uppermost soil horizon   unitless
+# RFACT  30 year rainfall and runoff factor  (100's ft-tonf in h-1 ac-1 yr-1) * 10
+# PPT30  Mean annual precipitation from 1971-2000   centimeters
+"# URBAN  Percentage of urban land (sum of NLCD classes 21, 22, 23, and 24)   percent"
+"# FOREST  Percentage of forest land (sum of NLCD classes 41, 42, and 43)   percent"
+# AGRIC  Percentage of agricultural land (sum of NLCD classes 81 and 82)   percent
+"# MAJ_DAMS  Number of dams with >= 50 feet in height or having storage >= 5,000 acre-feet"
+# NID_STOR   Dam storage   acre-feet
+# CLAY   Average Percentage of soil clay content   percent
+# SAND   Average Percentage of soil sand content   percent
+# SILT   Average Percentage of soil silt content   percent
+# BASIN_NO   USGS site identifier for sites in which Upstream basins were delineated
+# BENCHMARK_SITE   1 indicates site is a part of the hydrologic benchmark network
+# nhd.p1   1st percentile of daily flows
+# nhd.p5   5th percentile of daily flows
+# nhd.p10   10th percentile of daily flows
+# nhd.p20   20th percentile of daily flows
+# nhd.p25   25th percentile of daily flows
+# nhd.p30   30th percentile of daily flows
+# nhd.p40   40th percentile of daily flows
+# nhd.p50   50th percentile of daily flows
+# nhd.p60   60th percentile of daily flows
+# nhd.p70   70th percentile of daily flows
+# nhd.p75   75th percentile of daily flows
+# nhd.p80   80th percentile of daily flows
+# nhd.p90   90th percentile of daily flows
+# nhd.p95   95th percentile of daily flows
+# nhd.p99   99th percentile of daily flows
+# SAMPLE_YEARS   Number of unique years in which daily suspended-sediment concentration or load data were collected (daily_sites data only)      
+# SAMPLE_COUNT   Number of discrete suspended-sediment samples collected (discrete_sites data only)
 #
 #
