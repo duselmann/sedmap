@@ -21,7 +21,7 @@ ALTER TABLE SEDMAP.DISCRETE_SITES ADD (
 GRANT SELECT ON SEDMAP.DISCRETE_SITES TO SEDUSER;
 
 insert into discrete_sites
-select distinct "site_no" from SRC_ALLSSCDATA_11_26_13
+select distinct "site_no" from SRC_ALLSSCDATA_12_20_13
 where "site_no" not in 
 (select "site_no" from SRC_AJM_EXCESS_SITES_11_26_13);
 --rollback Drop table discrete_sites;
@@ -136,7 +136,7 @@ select
   "pHlab",
   TO_DATE("end_date", 'MM/DD/YYYY'),
   "end_time" 
-   from SRC_ALLSSCDATA_11_26_13
+   from SRC_ALLSSCDATA_12_20_13
  where "site_no" not in 
 (select "site_no" from SRC_AJM_EXCESS_SITES_11_26_13);
 --rollback Drop table discrete_sample_fact;  
