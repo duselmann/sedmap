@@ -40,7 +40,7 @@ public abstract class Fetcher {
 
 	private static final Logger logger = Logger.getLogger(Fetcher.class);
 
-	protected static String NWIS_URL = "http://waterservices.usgs.gov/nwis/dv/?format=_format_&sites=_sites_&startDT=_startDate_&endDT=_endDate_&statCd=00003&parameterCd=00060,80154,80155";
+	protected static String NWIS_URL = "http://137.227.232.147/nwis/dv/?format=_format_&sites=_sites_&startDT=_startDate_&endDT=_endDate_&statCd=00003&parameterCd=00060,80154,80155";
 
 	public static FetcherConfig conf;
         public static final int NUM_NWIS_TRIES = 3;
@@ -146,7 +146,8 @@ public abstract class Fetcher {
                         tmp = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());
                         
                         errMsgBuilder.append("Error Retrieving Daily Data");
-                        errMsgBuilder.append(IoUtils.LINE_SEPARATOR);
+                        final String newline = "\r\n";  //we always want windows newlines in error messages
+                        errMsgBuilder.append(newline);
                         if(null != sitesUrl && sitesUrl.length() > 0 ){
                             errMsgBuilder.append("No data could be retrieved from the following url:");
                             errMsgBuilder.append(sitesUrl);
@@ -154,9 +155,9 @@ public abstract class Fetcher {
                         else{
                             errMsgBuilder.append("There was an error forming the url for the NWIS web query");
                         }
-                        errMsgBuilder.append(IoUtils.LINE_SEPARATOR);
+                        errMsgBuilder.append(newline);
                         errMsgBuilder.append(e.getMessage());
-                        errMsgBuilder.append(IoUtils.LINE_SEPARATOR);
+                        errMsgBuilder.append(newline);
                         
                         //get stack trace as a string
                         StringWriter sw = new StringWriter();
@@ -192,7 +193,7 @@ public abstract class Fetcher {
 	protected BufferedReader fetchNwisData(String urlStr) throws IOException {
 		URL url = new URL(urlStr);
 		URLConnection cn = url.openConnection();
-                final int timeout = 30000;//30sec
+                final int timeout = 60000;//60sec
                 cn.setConnectTimeout(timeout);
                 cn.setReadTimeout(timeout);
                 
