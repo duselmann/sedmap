@@ -89,9 +89,9 @@ public class JdbcFetcher extends Fetcher {
         };
        static{
            StringBuilder sb = new StringBuilder();
-           for(int i = 0; i < DEFAULT_SITE_COLUMN_NAMES.length; i++){
+           for(String name : DEFAULT_SITE_COLUMN_NAMES){
                sb.append("s.");
-               sb.append(DEFAULT_SITE_COLUMN_NAMES[i]);
+               sb.append(name);
                sb.append(",");
            }
            DEFAULT_SITE_COLUMN_NAMES_FOR_DOWNLOAD = sb.toString();
