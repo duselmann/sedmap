@@ -14,6 +14,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.SQLException;
@@ -88,7 +90,7 @@ public abstract class Fetcher {
 		int headerLines    = formatter instanceof RdbFormatter ?2 :1;
 		boolean needHeader = true;
 		int readLineCountAfterComments = 0;
-
+                String sitesUrl = null;
 		// open temp file
 		WriterWithFile tmp = null;
 		try {
@@ -104,7 +106,7 @@ public abstract class Fetcher {
 					siteList.append(sep).append(sites.next());
 					sep=",";
 				}
-				String sitesUrl = url.replace("_sites_",   siteList);
+				sitesUrl = url.replace("_sites_",   siteList);
 
 				// fetch the data from NWIS
 				BufferedReader nwis = null;
@@ -136,7 +138,39 @@ public abstract class Fetcher {
 					IoUtils.quiteClose(nwis);
 				}
 			}
-		} finally {
+		}
+                catch(Exception e){
+                    if(null != tmp){
+                        StringBuilder errMsgBuilder = new StringBuilder();
+                        tmp.deleteFile();
+                        tmp = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());
+                        
+                        errMsgBuilder.append("Error Retrieving Daily Data");
+                        errMsgBuilder.append(IoUtils.LINE_SEPARATOR);
+                        if(null != sitesUrl && sitesUrl.length() > 0 ){
+                            errMsgBuilder.append("No data could be retrieved from the following url:");
+                            errMsgBuilder.append(sitesUrl);
+                        }
+                        else{
+                            errMsgBuilder.append("There was an error forming the url for the NWIS web query");
+                        }
+                        errMsgBuilder.append(IoUtils.LINE_SEPARATOR);
+                        errMsgBuilder.append(e.getMessage());
+                        errMsgBuilder.append(IoUtils.LINE_SEPARATOR);
+                        
+                        //get stack trace as a string
+                        StringWriter sw = new StringWriter();
+                        PrintWriter pw = new PrintWriter(sw);
+                        e.printStackTrace(pw);
+                        
+                        errMsgBuilder.append(sw.toString());
+                        String errMsg = errMsgBuilder.toString();
+                        
+                        tmp.write(errMsg);
+                        logger.error(errMsg, e);
+                    }
+                }
+                finally {
 			IoUtils.quiteClose(tmp);
 		}
 
