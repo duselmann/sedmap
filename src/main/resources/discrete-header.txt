@@ -45,5 +45,6 @@
 "# PH   pH, water, unfiltered, field   standard Units"
 "# PHLAB   pH, water, unfiltered, laboratory   standard Units"
 # ENDDATE   End date of sample (rarely present; only in the case of composite samples collected over time)   
+# ENDTIME  End time of sample (rarely present; only in the case of composite samples collected over time)
 #
 #
