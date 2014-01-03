@@ -33,7 +33,6 @@
 # CLAY   Average Percentage of soil clay content   percent
 # SAND   Average Percentage of soil sand content   percent
 # SILT   Average Percentage of soil silt content   percent
-# BASIN_NO   USGS site identifier for sites in which Upstream basins were delineated
 # BENCHMARK_SITE   1 indicates site is a part of the hydrologic benchmark network
 # nhd.p1   1st percentile of daily flows
 # nhd.p5   5th percentile of daily flows
