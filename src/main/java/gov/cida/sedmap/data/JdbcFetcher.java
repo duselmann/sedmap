@@ -15,6 +15,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,11 +33,88 @@ public class JdbcFetcher extends Fetcher {
 
 
 	private static final Logger logger = Logger.getLogger(JdbcFetcher.class);
-
+        
 	private static final Map<String,String> dataQueries  = new HashMap<String, String>();
-
+        private static final String[] DEFAULT_SITE_COLUMN_NAMES = {
+            "SITE_NO",
+            "SNAME",
+            "LATITUDE",
+            "LONGITUDE",
+            "NWISDA1",
+            "STATE",
+            "COUNTY_NAME",
+            "ECO_L3_CODE",
+            "ECO_L3_NAME",
+            "ECO_L2_CODE",
+            "ECO_L2_NAME",
+            "ECO_L1_NAME",
+            "ECO_L1_CODE",
+            "HUC_REGION_NAME",
+            "HUC_SUBREGION_NAME",
+            "HUC_BASIN_NAME",
+            "HUC_SUBBASIN_NAME",
+            "HUC_2",
+            "HUC_4",
+            "HUC_6",
+            "HUC_8",
+            "PERM",
+            "BFI",
+            "KFACT",
+            "RFACT",
+            "PPT30",
+            "URBAN",
+            "FOREST",
+            "AGRIC",
+            "MAJ_DAMS",
+            "NID_STOR",
+            "CLAY",
+            "SAND",
+            "SILT",
+            "BENCHMARK_SITE",
+            "NHDP1",
+            "NHDP5",
+            "NHDP10",
+            "NHDP20",
+            "NHDP25",
+            "NHDP30",
+            "NHDP40",
+            "NHDP50",
+            "NHDP60",
+            "NHDP70",
+            "NHDP75",
+            "NHDP80",
+            "NHDP90",
+            "NHDP95",
+            "NHDP99"
+        };
+       static{
+           StringBuilder sb = new StringBuilder();
+           for(String name : DEFAULT_SITE_COLUMN_NAMES){
+               sb.append("s.");
+               sb.append(name);
+               sb.append(",");
+           }
+           DEFAULT_SITE_COLUMN_NAMES_FOR_DOWNLOAD = sb.toString();
+           
+           //build column names for discrete site spreadsheet
+           int discreteSiteColumnNamesForSpreadsheetLength = DEFAULT_SITE_COLUMN_NAMES.length + 1;
+           String[] discreteSiteColumnNamesForSpreadsheet = Arrays.copyOf(DEFAULT_SITE_COLUMN_NAMES, discreteSiteColumnNamesForSpreadsheetLength);
+           discreteSiteColumnNamesForSpreadsheet[discreteSiteColumnNamesForSpreadsheetLength -1] = "sample_count";
+           DISCRETE_SITE_COLUMN_NAMES_FOR_SPREADSHEET = discreteSiteColumnNamesForSpreadsheet;
+           
+           //build column names for daily site spreadsheet
+           int dailySiteColumnNamesForSpreadsheetLength = DEFAULT_SITE_COLUMN_NAMES.length + 1;
+           String[] dailySiteColumnNamesForSpreadsheet = Arrays.copyOf(DEFAULT_SITE_COLUMN_NAMES, dailySiteColumnNamesForSpreadsheetLength);
+           dailySiteColumnNamesForSpreadsheet[dailySiteColumnNamesForSpreadsheetLength - 1] = "sample_years";
+           DAILY_SITE_COLUMN_NAMES_FOR_SPREADSHEET = dailySiteColumnNamesForSpreadsheet;
+           
+       }
+       private static final String DEFAULT_SITE_COLUMN_NAMES_FOR_DOWNLOAD;
+        public static final String[] DISCRETE_SITE_COLUMN_NAMES_FOR_SPREADSHEET;
+        public static final String[] DAILY_SITE_COLUMN_NAMES_FOR_SPREADSHEET;
 	public static final String DEFAULT_DAILY_SITE_SQL = "" // this is for consistent formatting
-			+ " select s.*, "
+			+ " select "
+                        + DEFAULT_SITE_COLUMN_NAMES_FOR_DOWNLOAD
 			+ "   NVL(y.sample_years,0) as sample_years "
 			+ " from sedmap.DAILY_STATIONS_DL s "
 			+ " left join ( "
@@ -48,7 +127,8 @@ public class JdbcFetcher extends Fetcher {
 			+ " where sample_years > 0 and ";
 
 	static final String DEFAULT_DISCRETE_SITE_SQL = ""
-			+ " select s.*, "
+			+ " select "
+                        + DEFAULT_SITE_COLUMN_NAMES_FOR_DOWNLOAD
 			+ "   NVL(y.sample_count,0) as sample_count "
 			+ " from sedmap.DISCRETE_STATIONS_DL s "
 			+ " left join ( "
@@ -117,9 +197,16 @@ public class JdbcFetcher extends Fetcher {
 		Results      rs = new Results();
 
 		try {
-			String     tableName = getDataTable(descriptor);
-			List<Column> columns = getTableMetadata(tableName);
-			String        header = formatter.fileHeader(columns, HeaderType.SITE);
+                    List<String> columnNames;
+                    if (descriptor.contains("daily")) {
+                        columnNames = Arrays.asList(DAILY_SITE_COLUMN_NAMES_FOR_SPREADSHEET);
+                    } else if (descriptor.contains("discrete")) {
+                        columnNames = Arrays.asList(DISCRETE_SITE_COLUMN_NAMES_FOR_SPREADSHEET);
+                    }
+                    else{
+                        throw new UnsupportedOperationException("Unknown descriptor: " + descriptor);
+                    }
+			String        header = formatter.fileHeader(columnNames.iterator(), HeaderType.SITE);
 			String           sql = buildQuery(descriptor, filter);
 			logger.debug(sql);
 			rs = initData(sql);
@@ -161,10 +248,10 @@ public class JdbcFetcher extends Fetcher {
 		String  descriptor = "discrete_data";
 
 		try {
-			String     tableName = getDataTable(descriptor);
-			List<Column> columns = getTableMetadata(tableName);
-			String header = formatter.fileHeader(columns, HeaderType.DISCRETE);
 
+                        String tableName = Fetcher.conf.DATA_TABLES.get(descriptor);
+                        String[] columnNames = Column.getColumnNames(this.getTableMetadata(tableName).iterator());
+			String        header = formatter.fileHeader(Arrays.asList(columnNames).iterator(), HeaderType.DISCRETE);
 			// TODO use IoUtils tmp file creator
 			//			File   tmpFile = File.createTempFile(descriptor + StrUtils.uniqueName(12), formatter.getFileType());
 			//			logger.debug(tmpFile.getAbsolutePath());
