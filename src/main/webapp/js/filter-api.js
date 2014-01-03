@@ -754,7 +754,7 @@ Filters.Option = Filters.extend({
 
 	optionchange: function(e) {
 		// first remove the old filter
-		var el    = e.originalEvent.srcElement
+		var el    = e.originalEvent.srcElement || e.originalEvent.target
 		var oldVal = $(el).data('oldVal')
 		this.removeFilter(oldVal)
 		// then add the new filter
