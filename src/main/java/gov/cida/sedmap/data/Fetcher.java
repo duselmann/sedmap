@@ -43,7 +43,7 @@ public abstract class Fetcher {
 	protected static String NWIS_URL = "http://waterservices.usgs.gov/nwis/dv/?format=_format_&sites=_sites_&startDT=_startDate_&endDT=_endDate_&statCd=00003&parameterCd=00060,80154,80155";
 
 	public static FetcherConfig conf;
-
+        public static final int NUM_NWIS_TRIES = 3;
 
 	protected String getDataTable(String descriptor) {
 		return conf.DATA_TABLES.get(descriptor);
@@ -192,8 +192,23 @@ public abstract class Fetcher {
 	protected BufferedReader fetchNwisData(String urlStr) throws IOException {
 		URL url = new URL(urlStr);
 		URLConnection cn = url.openConnection();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(cn.getInputStream()));
-
+                final int timeout = 30000;//30sec
+                cn.setConnectTimeout(timeout);
+                cn.setReadTimeout(timeout);
+                
+                BufferedReader reader = null;
+                int nwisTriesCount = 0;
+                while(null == reader && nwisTriesCount < NUM_NWIS_TRIES){
+                    try{
+                        reader = new BufferedReader(new InputStreamReader(cn.getInputStream()));
+                    }
+                    catch(IOException e){
+                        if(nwisTriesCount == NUM_NWIS_TRIES -1){
+                            throw e;
+                        }
+                    }
+                    nwisTriesCount++;
+                }
 		return reader;
 	}
 
