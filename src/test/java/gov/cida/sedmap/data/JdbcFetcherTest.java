@@ -187,7 +187,7 @@ public class JdbcFetcherTest {
 
                 assertTrue("file should contain general header text", actual.contains(HeaderType.GENERAL.header));
                 assertTrue("file should contain site header text", actual.contains(HeaderType.SITE.header));
-                
+
 		assertEquals("expect three rows of data", 3, StrUtils.occurrences("123456789", actual));
 		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567891", actual));
 		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567892", actual));

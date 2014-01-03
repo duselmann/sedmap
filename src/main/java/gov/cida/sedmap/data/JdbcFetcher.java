@@ -207,6 +207,7 @@ public class JdbcFetcher extends Fetcher {
                         throw new UnsupportedOperationException("Unknown descriptor: " + descriptor);
                     }
 			String        header = formatter.fileHeader(columnNames.iterator(), HeaderType.SITE);
+
 			String           sql = buildQuery(descriptor, filter);
 			logger.debug(sql);
 			rs = initData(sql);

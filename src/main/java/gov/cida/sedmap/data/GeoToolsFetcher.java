@@ -63,7 +63,7 @@ public class GeoToolsFetcher extends Fetcher {
                                 String[] columnNames = Column.getColumnNames(columns.iterator());
                                 Iterator<String> columnNamesIter = Arrays.asList(columnNames).iterator();
 				String header = formatter.fileHeader(columnNamesIter, HeaderType.SITE);
-				tmp.write(header);
+		tmp.write(header);
 
 				while (reader.hasNext()) {
 					FeatureValueIterator values = new FeatureValueIterator(reader.next());

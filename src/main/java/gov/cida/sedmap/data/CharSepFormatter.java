@@ -59,6 +59,7 @@ public class CharSepFormatter implements Formatter {
 	public String fileHeader(List<Column> columns) throws SQLException {
             List<String> columnNames = Arrays.asList(Column.getColumnNames(columns.iterator()));
             return columnHeaders(columnNames.iterator());
+
 	}
 	@Override
 	public String fileRow(Iterator<String> values) throws SQLException {
@@ -113,6 +114,7 @@ public class CharSepFormatter implements Formatter {
             header.append(HeaderType.GENERAL.header);
         }
         header.append(headerType.header);
+
         return header.toString();
     }
 }
