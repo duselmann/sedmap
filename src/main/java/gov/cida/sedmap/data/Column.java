@@ -1,5 +1,8 @@
 package gov.cida.sedmap.data;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+
 public class Column {
 	public final String name;
 	public final int    type;
@@ -13,5 +16,14 @@ public class Column {
 
 		this.nullable = nullable;
 	}
+        public static String[] getColumnNames(Iterator<Column> columns){
+            LinkedList<String> colNames = new LinkedList<>();
+            while(columns.hasNext()){
+                Column col = columns.next();
+                colNames.add(col.name);
+            }
+            String[] columnNames = colNames.toArray(new String[0]);
+            return (columnNames);
+        }
 
 }

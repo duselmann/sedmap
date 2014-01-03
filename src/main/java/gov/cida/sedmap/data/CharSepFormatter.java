@@ -3,6 +3,8 @@ package gov.cida.sedmap.data;
 import gov.cida.sedmap.io.IoUtils;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -13,21 +15,6 @@ public class CharSepFormatter implements Formatter {
 	private final String TYPE;
 	private final String SEPARATOR;
         
-        private static final String GENERAL_HEADER_FILENAME = "/general-header.txt";
-        private static final String SITE_HEADER_FILENAME = "/site-header.txt";
-        private static final String DISCRETE_HEADER_FILENAME = "/discrete-header.txt";
-        private static final String DAILY_HEADER_FILENAME = "/daily-header.txt";
-        
-        public static final String GENERAL_HEADER;
-        public static final String SITE_HEADER;
-        public static final String DISCRETE_HEADER;
-        public static final String DAILY_HEADER;
-        static {
-            GENERAL_HEADER = IoUtils.readTextResource(GENERAL_HEADER_FILENAME);
-            SITE_HEADER = IoUtils.readTextResource(SITE_HEADER_FILENAME);
-            DISCRETE_HEADER = IoUtils.readTextResource(DISCRETE_HEADER_FILENAME);
-            DAILY_HEADER = IoUtils.readTextResource(DAILY_HEADER_FILENAME);
-        }
 
 	public CharSepFormatter(String contentType, String separator, String type) {
 		CONTENT_TYPE = contentType;
@@ -68,23 +55,11 @@ public class CharSepFormatter implements Formatter {
 		return line;
 	}
 
-
 	@Override
 	public String fileHeader(List<Column> columns) throws SQLException {
-		StringBuilder header = new StringBuilder();
-                
-		String sep = "";
-		for (Column col : columns) {
-			header.append(sep).append(col.name);
-			sep = SEPARATOR;
-		}
-		header.append( IoUtils.LINE_SEPARATOR );
-
-		return header.toString();
+            List<String> columnNames = Arrays.asList(Column.getColumnNames(columns.iterator()));
+            return columnHeaders(columnNames.iterator());
 	}
-
-
-
 	@Override
 	public String fileRow(Iterator<String> values) throws SQLException {
 		StringBuilder row = new StringBuilder();
@@ -107,25 +82,39 @@ public class CharSepFormatter implements Formatter {
 		return row.toString();
 	}
 
-    @Override
-    public String fileHeader(List<Column> columns, HeaderType headerType) throws SQLException {
-        StringBuilder header = new StringBuilder();
-        header.append(GENERAL_HEADER);
-        String typeSpecificHeader = "";
-        switch (headerType) {
-            case DAILY:
-                typeSpecificHeader = DAILY_HEADER;
-                break;
-            case DISCRETE:
-                typeSpecificHeader = DISCRETE_HEADER;
-                break;
 
-            case SITE:
-                typeSpecificHeader = SITE_HEADER;
-                break;
+    public String columnHeaders(Iterator<String> columns) {
+    		StringBuilder columnHeaders = new StringBuilder();
+
+		String sep = "";
+		while(columns.hasNext()){
+                        String column = columns.next();
+			columnHeaders.append(sep).append(column);
+			sep = SEPARATOR;
+		}
+		columnHeaders.append( IoUtils.LINE_SEPARATOR );
+
+		return columnHeaders.toString();
+    }
+
+    @Override
+    public String fileHeader(Iterator<String> columns, HeaderType headerType) throws SQLException {
+        StringBuilder header = new StringBuilder();
+        header.append(fileHeader(headerType));
+        header.append(columnHeaders(columns));
+        return header.toString();
+    }
+
+    @Override
+    public String fileHeader(HeaderType headerType) throws SQLException {
+        StringBuilder header = new StringBuilder();
+        
+        if(HeaderType.GENERAL != headerType){
+            //prepend header iff requested header type is not General
+            header.append(HeaderType.GENERAL.header);
         }
-        header.append(typeSpecificHeader);
-        header.append(fileHeader(columns));
+        header.append(headerType.header);
+
         return header.toString();
     }
 }
