@@ -44,6 +44,7 @@ public abstract class Fetcher {
 
 	public static FetcherConfig conf;
         public static final int NUM_NWIS_TRIES = 3;
+        public static final String NWIS_SITE_DEMARCATOR = "##########";
 
 	protected String getDataTable(String descriptor) {
 		return conf.DATA_TABLES.get(descriptor);
@@ -87,8 +88,7 @@ public abstract class Fetcher {
 		url = url.replace("_endDate_",   endDate);
 
 		// we need to include the second header line for rdb format
-		int headerLines    = formatter instanceof RdbFormatter ?2 :1;
-		boolean needHeader = true;
+		
 		int readLineCountAfterComments = 0;
                 String sitesUrl = null;
 		// open temp file
@@ -119,16 +119,23 @@ public abstract class Fetcher {
 							readLineCountAfterComments = 0;
 							continue;
 						}
-						if (readLineCountAfterComments++<2) {
-							if (needHeader) {
-								if (readLineCountAfterComments==1) {
-									line = reconditionLine(line);
-								}
-								needHeader = readLineCountAfterComments < headerLines;
-							} else {
-								continue;
-							}
-						}
+                                                //include column headers for the next site
+                                                if(0 == readLineCountAfterComments){
+                                                        readLineCountAfterComments++;
+                                                        
+                                                        //insert demarcator
+                                                        tmp.write(NWIS_SITE_DEMARCATOR);
+                                                        tmp.write(IoUtils.LINE_SEPARATOR);
+                                                        
+                                                        //make column names human-readable
+                                                        line = reconditionLine(line);
+                                                }
+                                                //exclude NWIS row following column headers for each site
+                                                else if(1 == readLineCountAfterComments){
+                                                        readLineCountAfterComments++;
+                                                        continue;
+                                                }
+                                               
 						// translate from NWIS RDB format to requested format
 						line = formatter.transform(line, rdb);
 						tmp.write(line);
@@ -180,6 +187,7 @@ public abstract class Fetcher {
 
 
 	protected String reconditionLine(String line) {
+                //NB: order of replacements is important. Change with caution.
 		line = line.replaceAll("\\d\\d_00060_00003_cd", "DAILY_FLOW_QUAL");
 		line = line.replaceAll("\\d\\d_00060_00003",    "DAILY_FLOW");
 		line = line.replaceAll("\\d\\d_80155_00003_cd", "DAILY_SSL_QUAL");
