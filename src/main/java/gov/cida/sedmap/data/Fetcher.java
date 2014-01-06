@@ -44,7 +44,12 @@ public abstract class Fetcher {
 
 	public static FetcherConfig conf;
         public static final int NUM_NWIS_TRIES = 3;
-        public static final String NWIS_SITE_DEMARCATOR = "##########";
+        public static final String NWIS_SITE_DEMARCATOR = "" 
+                + "############################################################"
+                + IoUtils.LINE_SEPARATOR
+                + "# NEW_SITE"
+                + IoUtils.LINE_SEPARATOR
+                + "############################################################";
 
 	protected String getDataTable(String descriptor) {
 		return conf.DATA_TABLES.get(descriptor);
