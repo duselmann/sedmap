@@ -107,4 +107,17 @@ public class BaseHandler implements FileDownloadHandler {
 		return this; //chain
 	}
 
+
+	@Override
+	public boolean isAlive() {
+		if (out == null) {
+			return false;
+		}
+		try {
+			out.flush();
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
 }

@@ -62,5 +62,8 @@ public class EmailLinkHandler extends ZipHandler {
 		this.errorId = errorId;
 	}
 
-
+	@Override
+	public boolean isAlive() {
+		return true;
+	}
 }

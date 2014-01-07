@@ -1,6 +1,8 @@
 package gov.cida.sedmap.data;
 
 import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.util.SessionUtil;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -37,6 +39,10 @@ public class FetcherConfig {
 	List<String>              DATA_TYPES;
 	List<String>              DATA_VALUES;
 
+	protected static final String NWIS_URL_ENV     = "sedmap/NWIS_URL";
+	protected static final String NWIS_URL_DEFAULT = "http://137.227.232.147/nwis/dv/?format=_format_&sites=_sites_&startDT=_startDate_&endDT=_endDate_&statCd=00003&parameterCd=00060,80154,80155";
+	protected static String nwisUrl;
+
 	protected String jndiDS = "java:comp/env/jdbc/sedmapDS";
 
 
@@ -54,6 +60,8 @@ public class FetcherConfig {
 	// this prevents concurrency issues
 	public FetcherConfig init() {
 		logger.info("Static Fetcher initialization.");
+		nwisUrl = SessionUtil.lookup(NWIS_URL_ENV, NWIS_URL_DEFAULT);
+
 		FIELD_TRANSLATIONS = configFieldTranslaions();
 		FILE_FORMATS       = configFormats();
 		DATA_TABLES        = configTables();

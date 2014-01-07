@@ -15,5 +15,6 @@ public interface FileDownloadHandler extends Closeable {
 	FileDownloadHandler write(byte[] data) throws IOException;
 	FileDownloadHandler write(byte[] data, int length) throws IOException;
 	FileDownloadHandler write(String data) throws IOException;
+	boolean isAlive();
 
 }

@@ -40,7 +40,6 @@ public abstract class Fetcher {
 
 	private static final Logger logger = Logger.getLogger(Fetcher.class);
 
-	protected static String NWIS_URL = "http://137.227.232.147/nwis/dv/?format=_format_&sites=_sites_&startDT=_startDate_&endDT=_endDate_&statCd=00003&parameterCd=00060,80154,80155";
 
 	public static FetcherConfig conf;
 	public static final int NUM_NWIS_TRIES = 3;
@@ -69,7 +68,7 @@ public abstract class Fetcher {
 	protected abstract InputStreamWithFile handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
 			throws IOException, SQLException, NamingException;
 
-	protected InputStreamWithFile handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
+	protected InputStreamWithFile handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter, FileDownloadHandler handler)
 			throws IOException, SQLException, NamingException {
 		if ( !sites.hasNext() ) {
 			// return nothing if there are no sites
@@ -79,7 +78,7 @@ public abstract class Fetcher {
 		// NWIS offers RDB only that is compatible with sedmap needs
 		Formatter rdb = new RdbFormatter();
 		String format = "rdb";
-		String url = NWIS_URL.replace("_format_", format);
+		String url = FetcherConfig.nwisUrl.replace("_format_", format); // this is non-destructive
 
 		// extract expressions from the filter we can handle
 		String yr1 = filter.getViewParam("yr1");
@@ -91,7 +90,7 @@ public abstract class Fetcher {
 
 		url = url.replace("_startDate_", startDate);
 		url = url.replace("_endDate_",   endDate);
-
+		logger.debug("NWIS URL: " + url);
 		// we need to include the second header line for rdb format
 
 		int readLineCountAfterComments = 0;
@@ -101,22 +100,27 @@ public abstract class Fetcher {
 		try {
 			tmp = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());
 			tmp.write(formatter.fileHeader(HeaderType.DAILY));
-			while (sites.hasNext()) {
+			while ( sites.hasNext() ) {
+				if (! handler.isAlive()) {
+					continue;
+				}
 				int batch = 0;
+
 				String sep = "";
 				StringBuilder siteList = new StringBuilder();
-
 				// site list should be in batches of 99 site IDs
 				while (++batch<99 && sites.hasNext()) {
 					siteList.append(sep).append(sites.next());
 					sep=",";
 				}
 				sitesUrl = url.replace("_sites_",   siteList);
+				logger.debug("NWIS site list: " + siteList);
 
 				// fetch the data from NWIS
 				BufferedReader nwis = null;
 				try {
 					nwis = fetchNwisData(sitesUrl);
+					logger.debug("formatting NWIS data");
 
 					String line;
 					while ((line = nwis.readLine()) != null) {
@@ -150,9 +154,8 @@ public abstract class Fetcher {
 					IoUtils.quiteClose(nwis);
 				}
 			}
-		}
-		catch(Exception e){
-			if(null != tmp){
+		} catch (Exception e) {
+			if (null != tmp) {
 				StringBuilder errMsgBuilder = new StringBuilder();
 				tmp.deleteFile();
 				tmp = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());
@@ -182,8 +185,7 @@ public abstract class Fetcher {
 				tmp.write(errMsg);
 				logger.error(errMsg, e);
 			}
-		}
-		finally {
+		} finally {
 			IoUtils.quiteClose(tmp);
 		}
 
@@ -204,6 +206,7 @@ public abstract class Fetcher {
 
 
 	protected BufferedReader fetchNwisData(String urlStr) throws IOException {
+		logger.debug("fetching NWIS data");
 		URL url = new URL(urlStr);
 		URLConnection cn = url.openConnection();
 		//		final int timeout = 60000;//60sec
@@ -212,12 +215,11 @@ public abstract class Fetcher {
 
 		BufferedReader reader = null;
 		int nwisTriesCount = 0;
-		while(null == reader && nwisTriesCount < NUM_NWIS_TRIES){
-			try{
+		while (null == reader && nwisTriesCount < NUM_NWIS_TRIES){
+			try {
 				reader = new BufferedReader(new InputStreamReader(cn.getInputStream()));
-			}
-			catch(IOException e){
-				if(nwisTriesCount == NUM_NWIS_TRIES -1){
+			} catch (IOException e) {
+				if (nwisTriesCount == NUM_NWIS_TRIES -1) {
 					throw e;
 				}
 			}
@@ -239,7 +241,9 @@ public abstract class Fetcher {
 		handler.beginWritingFiles(); // start writing files
 
 		for (String site  : conf.DATA_TYPES) { // check for daily and discrete
-			if ( ! dataTypes.contains(site) ) continue;
+			if ( ! dataTypes.contains(site)  ||  ! handler.isAlive()) {
+				continue;
+			}
 
 			String    ogcXml = getFilter(req, site);
 			AbstractFilter aFilter = OgcUtils.ogcXmlToFilter(ogcXml);
@@ -252,7 +256,9 @@ public abstract class Fetcher {
 			filter.putViewParam("yr2", "2100", yr2);
 
 			for (String value : conf.DATA_VALUES) { // check for sites and data
-				if ( ! dataTypes.contains(value) ) continue;
+				if ( ! dataTypes.contains(site)  ||  ! handler.isAlive()) {
+					continue;
+				}
 
 				StringBuilder   name = new StringBuilder();
 				String    descriptor = name.append(site).append('_').append(value).toString();
@@ -262,7 +268,7 @@ public abstract class Fetcher {
 				try {
 					// TODO this was originally going to be a single call but reality got in the way - could use a refactor
 					if ( "daily_data".equals(descriptor) ) {
-						fileData = handleNwisData(sites.iterator(), filter, formatter);
+						fileData = handleNwisData(sites.iterator(), filter, formatter, handler);
 					} else if ( "discrete_data".equals(descriptor) ) {
 						fileData = handleDiscreteData(sites.iterator(), filter, formatter);
 					} else if (descriptor.contains("sites") ) {
