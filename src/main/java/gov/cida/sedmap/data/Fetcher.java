@@ -43,13 +43,13 @@ public abstract class Fetcher {
 	protected static String NWIS_URL = "http://137.227.232.147/nwis/dv/?format=_format_&sites=_sites_&startDT=_startDate_&endDT=_endDate_&statCd=00003&parameterCd=00060,80154,80155";
 
 	public static FetcherConfig conf;
-        public static final int NUM_NWIS_TRIES = 3;
-        public static final String NWIS_SITE_DEMARCATOR = "" 
-                + "############################################################"
-                + IoUtils.LINE_SEPARATOR
-                + "# NEW_SITE"
-                + IoUtils.LINE_SEPARATOR
-                + "############################################################";
+	public static final int NUM_NWIS_TRIES = 3;
+	public static final String NWIS_SITE_DEMARCATOR = ""
+			+ "############################################################"
+			+ IoUtils.LINE_SEPARATOR
+			+ "# NEW_SITE"
+			+ IoUtils.LINE_SEPARATOR
+			+ "############################################################";
 
 	protected String getDataTable(String descriptor) {
 		return conf.DATA_TABLES.get(descriptor);
@@ -93,14 +93,14 @@ public abstract class Fetcher {
 		url = url.replace("_endDate_",   endDate);
 
 		// we need to include the second header line for rdb format
-		
+
 		int readLineCountAfterComments = 0;
-                String sitesUrl = null;
+		String sitesUrl = null;
 		// open temp file
 		WriterWithFile tmp = null;
 		try {
 			tmp = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());
-                        tmp.write(formatter.fileHeader(HeaderType.DAILY));
+			tmp.write(formatter.fileHeader(HeaderType.DAILY));
 			while (sites.hasNext()) {
 				int batch = 0;
 				String sep = "";
@@ -124,23 +124,23 @@ public abstract class Fetcher {
 							readLineCountAfterComments = 0;
 							continue;
 						}
-                                                //include column headers for the next site
-                                                if(0 == readLineCountAfterComments){
-                                                        readLineCountAfterComments++;
-                                                        
-                                                        //insert demarcator
-                                                        tmp.write(NWIS_SITE_DEMARCATOR);
-                                                        tmp.write(IoUtils.LINE_SEPARATOR);
-                                                        
-                                                        //make column names human-readable
-                                                        line = reconditionLine(line);
-                                                }
-                                                //exclude NWIS row following column headers for each site
-                                                else if(1 == readLineCountAfterComments){
-                                                        readLineCountAfterComments++;
-                                                        continue;
-                                                }
-                                               
+						//include column headers for the next site
+						if(0 == readLineCountAfterComments){
+							readLineCountAfterComments++;
+
+							//insert demarcator
+							tmp.write(NWIS_SITE_DEMARCATOR);
+							tmp.write(IoUtils.LINE_SEPARATOR);
+
+							//make column names human-readable
+							line = reconditionLine(line);
+						}
+						//exclude NWIS row following column headers for each site
+						else if(1 == readLineCountAfterComments){
+							readLineCountAfterComments++;
+							continue;
+						}
+
 						// translate from NWIS RDB format to requested format
 						line = formatter.transform(line, rdb);
 						tmp.write(line);
@@ -151,39 +151,39 @@ public abstract class Fetcher {
 				}
 			}
 		}
-                catch(Exception e){
-                    if(null != tmp){
-                        StringBuilder errMsgBuilder = new StringBuilder();
-                        tmp.deleteFile();
-                        tmp = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());
-                        
-                        errMsgBuilder.append("Error Retrieving Daily Data");
-                        final String newline = "\r\n";  //we always want windows newlines in error messages
-                        errMsgBuilder.append(newline);
-                        if(null != sitesUrl && sitesUrl.length() > 0 ){
-                            errMsgBuilder.append("No data could be retrieved from the following url:");
-                            errMsgBuilder.append(sitesUrl);
-                        }
-                        else{
-                            errMsgBuilder.append("There was an error forming the url for the NWIS web query");
-                        }
-                        errMsgBuilder.append(newline);
-                        errMsgBuilder.append(e.getMessage());
-                        errMsgBuilder.append(newline);
-                        
-                        //get stack trace as a string
-                        StringWriter sw = new StringWriter();
-                        PrintWriter pw = new PrintWriter(sw);
-                        e.printStackTrace(pw);
-                        
-                        errMsgBuilder.append(sw.toString());
-                        String errMsg = errMsgBuilder.toString();
-                        
-                        tmp.write(errMsg);
-                        logger.error(errMsg, e);
-                    }
-                }
-                finally {
+		catch(Exception e){
+			if(null != tmp){
+				StringBuilder errMsgBuilder = new StringBuilder();
+				tmp.deleteFile();
+				tmp = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());
+
+				errMsgBuilder.append("Error Retrieving Daily Data");
+				final String newline = "\r\n";  //we always want windows newlines in error messages
+				errMsgBuilder.append(newline);
+				if(null != sitesUrl && sitesUrl.length() > 0 ){
+					errMsgBuilder.append("No data could be retrieved from the following url:");
+					errMsgBuilder.append(sitesUrl);
+				}
+				else{
+					errMsgBuilder.append("There was an error forming the url for the NWIS web query");
+				}
+				errMsgBuilder.append(newline);
+				errMsgBuilder.append(e.getMessage());
+				errMsgBuilder.append(newline);
+
+				//get stack trace as a string
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+				e.printStackTrace(pw);
+
+				errMsgBuilder.append(sw.toString());
+				String errMsg = errMsgBuilder.toString();
+
+				tmp.write(errMsg);
+				logger.error(errMsg, e);
+			}
+		}
+		finally {
 			IoUtils.quiteClose(tmp);
 		}
 
@@ -192,7 +192,7 @@ public abstract class Fetcher {
 
 
 	protected String reconditionLine(String line) {
-                //NB: order of replacements is important. Change with caution.
+		//NB: order of replacements is important. Change with caution.
 		line = line.replaceAll("\\d\\d_00060_00003_cd", "DAILY_FLOW_QUAL");
 		line = line.replaceAll("\\d\\d_00060_00003",    "DAILY_FLOW");
 		line = line.replaceAll("\\d\\d_80155_00003_cd", "DAILY_SSL_QUAL");
@@ -206,23 +206,23 @@ public abstract class Fetcher {
 	protected BufferedReader fetchNwisData(String urlStr) throws IOException {
 		URL url = new URL(urlStr);
 		URLConnection cn = url.openConnection();
-                final int timeout = 60000;//60sec
-                cn.setConnectTimeout(timeout);
-                cn.setReadTimeout(timeout);
-                
-                BufferedReader reader = null;
-                int nwisTriesCount = 0;
-                while(null == reader && nwisTriesCount < NUM_NWIS_TRIES){
-                    try{
-                        reader = new BufferedReader(new InputStreamReader(cn.getInputStream()));
-                    }
-                    catch(IOException e){
-                        if(nwisTriesCount == NUM_NWIS_TRIES -1){
-                            throw e;
-                        }
-                    }
-                    nwisTriesCount++;
-                }
+		//		final int timeout = 60000;//60sec
+		//		cn.setConnectTimeout(timeout);
+		//		cn.setReadTimeout(timeout);
+
+		BufferedReader reader = null;
+		int nwisTriesCount = 0;
+		while(null == reader && nwisTriesCount < NUM_NWIS_TRIES){
+			try{
+				reader = new BufferedReader(new InputStreamReader(cn.getInputStream()));
+			}
+			catch(IOException e){
+				if(nwisTriesCount == NUM_NWIS_TRIES -1){
+					throw e;
+				}
+			}
+			nwisTriesCount++;
+		}
 		return reader;
 	}
 
