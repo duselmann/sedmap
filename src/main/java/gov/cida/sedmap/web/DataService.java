@@ -84,7 +84,10 @@ public class DataService extends HttpServlet {
 				handler = new EmailLinkHandler(res, tmp, email);
 			}
 
+			long startTime = System.currentTimeMillis();
 			fetcher.doFetch(req, handler);
+			long totalTime = System.currentTimeMillis() - startTime;
+			logger.info(fetcher.toString() + ": Total request time (ms) " + totalTime);
 		} catch (Exception e) {
 			String errorid = null;
 			try {

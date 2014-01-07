@@ -256,6 +256,7 @@ public abstract class Fetcher {
 			filter.putViewParam("yr2", "2100", yr2);
 
 			for (String value : conf.DATA_VALUES) { // check for sites and data
+				long startTime = System.currentTimeMillis();
 				if ( ! dataTypes.contains(site)  ||  ! handler.isAlive()) {
 					continue;
 				}
@@ -305,6 +306,9 @@ public abstract class Fetcher {
 						fileData.deleteFile(); // TODO these files are not deleting. it must still be open?
 					}
 				}
+
+				long totalTime = System.currentTimeMillis() - startTime;
+				logger.info(toString() + ": " +descriptor+ " request time (ms) " + totalTime);
 			}
 		}
 		handler.finishWritingFiles(); // done writing files
