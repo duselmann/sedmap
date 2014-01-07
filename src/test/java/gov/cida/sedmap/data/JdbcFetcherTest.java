@@ -122,7 +122,7 @@ public class JdbcFetcherTest {
 	protected void initJdbcFetcherForDoFetchTesting() {
 		fetcher = new JdbcFetcher(Fetcher.SEDMAP_DS) {
 			@Override
-			protected InputStreamWithFile handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
+			protected InputStreamWithFile handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter, FileDownloadHandler handler)
 					throws IOException, SQLException, NamingException {
 				nwisHandlerCalled = true;
 				return handleData("NWIS", filter, formatter);
@@ -171,7 +171,7 @@ public class JdbcFetcherTest {
 				return new LinkedList<String>().iterator();
 			}
 		};
-                CsvFormatter csvFormatter = new CsvFormatter();
+		CsvFormatter csvFormatter = new CsvFormatter();
 		InputStream in = fetcher.handleSiteData("discrete_sites", filter, csvFormatter);
 		String actual  = IoUtils.readStream(in);
 		//		assertTrue("", new File("discrete_sites.csv"));
@@ -179,15 +179,15 @@ public class JdbcFetcherTest {
 
 		assertNotNull("data should not be null", actual);
 		assertTrue("data should not be empty", actual.trim().length()>0);
-                Iterator<String> colNameIterator = Arrays.asList(JdbcFetcher.DISCRETE_SITE_COLUMN_NAMES_FOR_SPREADSHEET).iterator();
-                String expect = csvFormatter.fileHeader(colNameIterator, HeaderType.SITE);
+		Iterator<String> colNameIterator = Arrays.asList(JdbcFetcher.DISCRETE_SITE_COLUMN_NAMES_FOR_SPREADSHEET).iterator();
+		String expect = csvFormatter.fileHeader(colNameIterator, HeaderType.SITE);
 		System.out.println();
 		System.out.println(actual);
 		assertTrue("file should contain column header row", actual.contains(expect));
 
-                assertTrue("file should contain general header text", actual.contains(HeaderType.GENERAL.header));
-                assertTrue("file should contain site header text", actual.contains(HeaderType.SITE.header));
-                
+		assertTrue("file should contain general header text", actual.contains(HeaderType.GENERAL.header));
+		assertTrue("file should contain site header text", actual.contains(HeaderType.SITE.header));
+
 		assertEquals("expect three rows of data", 3, StrUtils.occurrences("123456789", actual));
 		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567891", actual));
 		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567892", actual));
@@ -209,7 +209,7 @@ public class JdbcFetcherTest {
 				return new LinkedList<String>().iterator();
 			}
 		};
-                RdbFormatter rdbFormatter = new RdbFormatter();
+		RdbFormatter rdbFormatter = new RdbFormatter();
 		InputStream in = fetcher.handleSiteData("discrete_sites", filter, new RdbFormatter());
 		String actual  = IoUtils.readStream(in);
 		System.out.println();
@@ -219,8 +219,8 @@ public class JdbcFetcherTest {
 
 		assertNotNull("data should not be null", actual);
 		assertTrue("data should not be empty", actual.trim().length()>0);
-                Iterator<String> colNameIterator = Arrays.asList(JdbcFetcher.DISCRETE_SITE_COLUMN_NAMES_FOR_SPREADSHEET).iterator();
-                String expect = rdbFormatter.fileHeader(colNameIterator, HeaderType.SITE);
+		Iterator<String> colNameIterator = Arrays.asList(JdbcFetcher.DISCRETE_SITE_COLUMN_NAMES_FOR_SPREADSHEET).iterator();
+		String expect = rdbFormatter.fileHeader(colNameIterator, HeaderType.SITE);
 		assertEquals("file should contain header row", 1, StrUtils.occurrences(expect, actual));
 
 		assertEquals("expect three rows of data", 3, StrUtils.occurrences("123456789", actual));

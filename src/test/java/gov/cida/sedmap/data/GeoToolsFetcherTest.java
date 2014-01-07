@@ -177,7 +177,7 @@ public class GeoToolsFetcherTest {
 	protected void initGeoToolsFetcherForDoFetchTesting() {
 		fetcher = new GeoToolsFetcher() {
 			@Override
-			protected InputStreamWithFile handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
+			protected InputStreamWithFile handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter, FileDownloadHandler handler)
 					throws IOException, SQLException, NamingException {
 				nwisHandlerCalled = true;
 				return handleData("NWIS", filter, formatter);
@@ -228,9 +228,9 @@ public class GeoToolsFetcherTest {
 		System.out.println(actual);
 		assertTrue("file should contain column header row", actual.contains(expect));
 
-                assertTrue("file should contain general header text", actual.contains(HeaderType.GENERAL.header));
-                assertTrue("file should contain site header text", actual.contains(HeaderType.SITE.header));
-                
+		assertTrue("file should contain general header text", actual.contains(HeaderType.GENERAL.header));
+		assertTrue("file should contain site header text", actual.contains(HeaderType.SITE.header));
+
 
 		assertEquals("expect three rows of data", 3, StrUtils.occurrences("123456789", actual));
 		assertEquals("expect each row once", 1, StrUtils.occurrences("1234567891", actual));
