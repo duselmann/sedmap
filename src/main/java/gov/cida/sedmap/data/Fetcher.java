@@ -102,7 +102,7 @@ public abstract class Fetcher {
 			tmp.write(formatter.fileHeader(HeaderType.DAILY));
 			while ( sites.hasNext() ) {
 				if (! handler.isAlive()) {
-					continue;
+					break;
 				}
 				int batch = 0;
 
@@ -163,11 +163,10 @@ public abstract class Fetcher {
 				errMsgBuilder.append("Error Retrieving Daily Data");
 				final String newline = "\r\n";  //we always want windows newlines in error messages
 				errMsgBuilder.append(newline);
-				if(null != sitesUrl && sitesUrl.length() > 0 ){
+				if (null != sitesUrl && sitesUrl.length() > 0 ) {
 					errMsgBuilder.append("No data could be retrieved from the following url:");
 					errMsgBuilder.append(sitesUrl);
-				}
-				else{
+				} else {
 					errMsgBuilder.append("There was an error forming the url for the NWIS web query");
 				}
 				errMsgBuilder.append(newline);

@@ -113,11 +113,11 @@ public class BaseHandler implements FileDownloadHandler {
 		if (out == null) {
 			return false;
 		}
-		try {
-			out.flush();
-		} catch (Exception e) {
-			return false;
-		}
+		//		try {
+		//			out.flush();
+		//		} catch (Exception e) {
+		//			return false;
+		//		}
 		return true;
 	}
 }
