@@ -3,7 +3,6 @@ package gov.cida.sedmap.data;
 import gov.cida.sedmap.io.IoUtils;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -14,7 +13,7 @@ public class CharSepFormatter implements Formatter {
 	private final String FILE_TYPE;
 	private final String TYPE;
 	private final String SEPARATOR;
-        
+
 
 	public CharSepFormatter(String contentType, String separator, String type) {
 		CONTENT_TYPE = contentType;
@@ -57,8 +56,8 @@ public class CharSepFormatter implements Formatter {
 
 	@Override
 	public String fileHeader(List<Column> columns) throws SQLException {
-            List<String> columnNames = Arrays.asList(Column.getColumnNames(columns.iterator()));
-            return columnHeaders(columnNames.iterator());
+		List<String> columnNames = Arrays.asList(Column.getColumnNames(columns.iterator()));
+		return columnHeaders(columnNames.iterator());
 	}
 	@Override
 	public String fileRow(Iterator<String> values) throws SQLException {
@@ -83,38 +82,38 @@ public class CharSepFormatter implements Formatter {
 	}
 
 
-    public String columnHeaders(Iterator<String> columns) {
-    		StringBuilder columnHeaders = new StringBuilder();
+	public String columnHeaders(Iterator<String> columns) {
+		StringBuilder columnHeaders = new StringBuilder();
 
 		String sep = "";
 		while(columns.hasNext()){
-                        String column = columns.next();
+			String column = columns.next();
 			columnHeaders.append(sep).append(column);
 			sep = SEPARATOR;
 		}
 		columnHeaders.append( IoUtils.LINE_SEPARATOR );
 
 		return columnHeaders.toString();
-    }
+	}
 
-    @Override
-    public String fileHeader(Iterator<String> columns, HeaderType headerType) throws SQLException {
-        StringBuilder header = new StringBuilder();
-        header.append(fileHeader(headerType));
-        header.append(columnHeaders(columns));
-        return header.toString();
-    }
+	@Override
+	public String fileHeader(Iterator<String> columns, HeaderType headerType) throws SQLException {
+		StringBuilder header = new StringBuilder();
+		header.append(fileHeader(headerType));
+		header.append(columnHeaders(columns));
+		return header.toString();
+	}
 
-    @Override
-    public String fileHeader(HeaderType headerType) throws SQLException {
-        StringBuilder header = new StringBuilder();
-        
-        if(HeaderType.GENERAL != headerType){
-            //prepend header iff requested header type is not General
-            header.append(HeaderType.GENERAL.header);
-        }
-        header.append(headerType.header);
+	@Override
+	public String fileHeader(HeaderType headerType) throws SQLException {
+		StringBuilder header = new StringBuilder();
 
-        return header.toString();
-    }
+		if(HeaderType.GENERAL != headerType){
+			//prepend header iff requested header type is not General
+			header.append(HeaderType.GENERAL.header);
+		}
+		header.append(headerType.header);
+
+		return header.toString();
+	}
 }
