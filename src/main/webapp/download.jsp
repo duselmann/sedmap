@@ -36,5 +36,15 @@
             <input id="DL-cancel" type="button" class="download" value="Cancel"> 
         </div>
     </div>
+    <form id="dlf_form" action="data" method="post" target="dlf_iframe" style="display:none;">
+        <input type="text" value="" name="format"      id="dlf_format">
+        <input type="text" value="" name="email"       id="dlf_email">
+        <input type="text" value="" name="dataTypes"   id="dlf_dataTypes">
+        <input type="text" value="" name="dailyFilter" id="dlf_dailyFilter">
+        <input type="text" value="" name="discreteFilter" id="dlf_discreteFilter">
+        <input type="submit">
+    </form>
+    <iframe id="dlf_iframe" name="dlf_iframe" style="display: none;" ></iframe>
+    
 </div>
 

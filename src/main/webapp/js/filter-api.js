@@ -299,40 +299,41 @@ var Filters = Class.extend({
 				
                 var isData  = $('#DL-sitesOnly:checkbox:checked').length == 0
                 var isFlow  = $('#DL-discreteFlow:checkbox:checked').length != 0
-                var email   = $("#DL-email").val()
-				var urlPart = []
-				var p = 0
-				urlPart[p++] = "/sediment/data?format="
-				urlPart[p++] = $('#DL-format').val()
-                urlPart[p++] = "&email="+ email
-				urlPart[p++] = "&dataTypes=sites_" // always include site info
-				urlPart[p++] = isData  ?"data_"     :""
-				urlPart[p++] = isDaily ?"daily_"    :""
-                urlPart[p++] = isDiscr ?"discrete_" :""
-                urlPart[p++] = isFlow  ?"flow_" :""
-				urlPart[p++] = isDaily ?"&dailyFilter="   +getFilters(_this.parent, DAILY)    :""
-				urlPart[p++] = isDiscr ?"&discreteFilter="+getFilters(_this.parent, DISCRETE) :""
-				var url = urlPart.join("")
-				//console.log(url)
+                
+                var data    = {url:'data'}
+                data.email  = $("#DL-email").val()
+                data.format = $('#DL-format').val()
+                data.dataTypes  = sites_" // always include site info
+                data.dataTypes += isData  ?"data_"     :""
+                data.dataTypes += isDaily ?"daily_"    :""
+                data.dataTypes += isDiscr ?"discrete_" :""
+                data.dataTypes += isFlow  ?"flow_" :""
+                data.dailyFilter    = isDaily ?getFilters(_this.parent, DAILY)    :""
+                data.discreteFilter = isDiscr ?getFilters(_this.parent, DISCRETE) :""
+                
                 $('#DL-msg').html("request sent")
-				if (email.indexOf('@') === -1) {
-					window.location.href = url
-                    closeDL();
+				if (data.email.indexOf('@') === -1) {
+                    $('#dlf_email').val(data.email)
+                    $('#dlf_format').val(data.format)
+                    $('#dlf_dataTypes').val(data.dataTypes)
+                    $('#dlf_dailyFilter').val(data.dailyFilter)
+                    $('#dlf_discreteFilter').val(data.discreteFilter)
+                    $('#DL-msg').html('working, please wait...')
+				    $('#dlf_form').submit()
 				} else {
-				    $.get(url, function(data) {
-				        $('#DL-msg').html(data)
-				        clearDelay('#DL-msg')
-				        closeDL();
- 				    }).done(function(data){
+				    $.post(url, data).done( function(data) {
 				    	$('#DL-msg').html(data)
                         clearDelay('#DL-msg')
-                        closeDL();
-				    }).fail(function(data){
+                        closeDL()
+				    }).fail(function(data) {
 				    	$('#DL-msg').html(data)
 				    });
 				}
 			})
-			
+            $('#dlf_iframe').load(function(e){
+                closeDL()
+            })
+            
 			$(_this.parent).on('childchange',updateFilterScroll)
 		})
 	},
