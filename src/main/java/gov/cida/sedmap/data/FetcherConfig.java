@@ -40,7 +40,7 @@ public class FetcherConfig {
 	List<String>              DATA_VALUES;
 
 	protected static final String NWIS_URL_ENV     = "sedmap/NWIS_URL";
-	protected static final String NWIS_URL_DEFAULT = "http://137.227.232.147/nwis/dv/?format=_format_&sites=_sites_&startDT=_startDate_&endDT=_endDate_&statCd=00003&parameterCd=00060,80154,80155";
+	protected static final String NWIS_URL_DEFAULT = "http://waterservices.usgs.gov/nwis/dv/?format=_format_&sites=_sites_&startDT=_startDate_&endDT=_endDate_&statCd=00003&parameterCd=00060,80154,80155";
 	protected static String nwisUrl;
 
 	protected String jndiDS = "java:comp/env/jdbc/sedmapDS";
