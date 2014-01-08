@@ -303,7 +303,7 @@ var Filters = Class.extend({
                 var data    = {url:'data'}
                 data.email  = $("#DL-email").val()
                 data.format = $('#DL-format').val()
-                data.dataTypes  = sites_" // always include site info
+                data.dataTypes  = "sites_" // always include site info
                 data.dataTypes += isData  ?"data_"     :""
                 data.dataTypes += isDaily ?"daily_"    :""
                 data.dataTypes += isDiscr ?"discrete_" :""
@@ -320,19 +320,18 @@ var Filters = Class.extend({
                     $('#dlf_discreteFilter').val(data.discreteFilter)
                     $('#DL-msg').html('working, please wait...')
 				    $('#dlf_form').submit()
-				} else {
-				    $.post(url, data).done( function(data) {
-				    	$('#DL-msg').html(data)
+                    closeDL()
+                } else {
+                    $.post(url, data).done( function(data) {
+                        $('#DL-msg').html(data)
                         clearDelay('#DL-msg')
                         closeDL()
-				    }).fail(function(data) {
-				    	$('#DL-msg').html(data)
-				    });
-				}
-			})
-            $('#dlf_iframe').load(function(e){
-                closeDL()
+                    }).fail(function(data) {
+                        $('#DL-msg').html(data)
+                    });
+                }
             })
+
             
 			$(_this.parent).on('childchange',updateFilterScroll)
 		})
