@@ -331,7 +331,7 @@ function initFilters() {
         parent:'#filterDiv', 
         group:'#Data-Characteristic',
         label:'Year Range:',
-        min:1900,
+        min:1896,
         max:new Date().getFullYear(),
         pattern: /^\d+$/,
         patternMsg: "Expecting a positive number",
