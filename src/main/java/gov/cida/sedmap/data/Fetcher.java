@@ -270,7 +270,17 @@ public abstract class Fetcher {
 					if ( "daily_data".equals(descriptor) ) {
 						fileData = handleNwisData(sites.iterator(), filter, formatter, handler);
 					} else if ( "discrete_data".equals(descriptor) ) {
+						// NSM-227 new requirement to also download daily data for discrete if daily is not requested
+						// this hack is terrible, see the above TODO about refactoring
+						if (alsoFlow  &&  ! dataTypes.contains("daily") ) {
+							logger.info("Fetching discrete site flow");
+							InputStreamWithFile discreteFlow = handleNwisData(sites.iterator(), filter, formatter, handler);
+							if ( discreteFlow != null && !sites.isEmpty() ) {
+								handler.writeFile(formatter.getContentType(), "discrete_flow"+formatter.getFileType(), discreteFlow);
+							}
+						}
 						fileData = handleDiscreteData(sites.iterator(), filter, formatter);
+
 					} else if (descriptor.contains("sites") ) {
 						fileData = handleSiteData(descriptor, filter, formatter);
 						List<String> descriptorSites = makeSiteIterator(fileData, formatter);

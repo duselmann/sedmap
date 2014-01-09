@@ -267,8 +267,6 @@ public class JdbcFetcher extends Fetcher {
 						sitesClause.append(join).append("'").append(sites.next()).append("'");
 						join=",";
 					}
-					logger.debug(sitesClause.toString());
-
 					String sql = getQuery(descriptor);
 					sql=sql.replace("_siteList_", sitesClause.toString() );
 					logger.debug(sql);
