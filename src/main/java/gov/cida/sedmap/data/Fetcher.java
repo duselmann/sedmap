@@ -251,7 +251,7 @@ public abstract class Fetcher {
 			@SuppressWarnings("unchecked") // fyi: for some reason this is not require for all jdks
 			String yr2 = OgcUtils.removeFilter(aFilter, "year", PropertyIsLessThanOrEqualTo.class,    PropertyIsLessThan.class);
 			FilterWithViewParams filter = new FilterWithViewParams(aFilter);
-			filter.putViewParam("yr1", "1900", yr1);
+			filter.putViewParam("yr1", "1850", yr1);
 			filter.putViewParam("yr2", "2100", yr2);
 
 			for (String value : conf.DATA_VALUES) { // check for sites and data
