@@ -129,7 +129,7 @@
             <h3><a href="helpQuick.jsp">Click here to view the Quick Start guide.</a></h3>
             <p>
                 The purpose of the USGS sediment portal is to aid in the access and interpretation of USGS discrete and daily suspended-sediment and related data.  The USGS National Water Information System (NWIS) is the original source of all daily and discrete suspended-sediment data presented in the portal, though some suspended-sediment data hosted by NWIS are not provided via this portal.
-                See the <a href="helpGuide.jsp">User Guide</a> as well as a series of youtube demonstrations (<a href=http://www.youtube.com/watch?v=kXvlKzqSpzI>Demo 1</a>, <a href=http://www.youtube.com/watch?v=V6FHRZv14MQ>Demo 2</a>, <a href=http://www.youtube.com/watch?v=CBFSsxsY-_M>Demo 3</a>) for more information about the data presented or for instructions on site navigation.
+                See the <a href="helpGuide.jsp">User Guide</a> as well as a series of video demonstrations (<a href=http://www.youtube.com/watch?v=kXvlKzqSpzI>Demo 1</a>, <a href=http://www.youtube.com/watch?v=V6FHRZv14MQ>Demo 2</a>, <a href=http://www.youtube.com/watch?v=CBFSsxsY-_M>Demo 3</a>) for more information about the data presented or for instructions on site navigation.
             </p>
             <p>
                 <em>
