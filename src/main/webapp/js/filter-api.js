@@ -322,6 +322,8 @@ var Filters = Class.extend({
 				    $('#dlf_form').submit()
                     closeDL()
                 } else {
+                    var url = data.url
+                    data.url = ''
                     $.post(url, data).done( function(data) {
                         $('#DL-msg').html(data)
                         clearDelay('#DL-msg')
