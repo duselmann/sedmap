@@ -313,6 +313,7 @@ var Filters = Class.extend({
                 
                 $('#DL-msg').html("request sent")
 				if (data.email.indexOf('@') === -1) {
+				/* disable until server issue resolved
                     $('#dlf_email').val(data.email)
                     $('#dlf_format').val(data.format)
                     $('#dlf_dataTypes').val(data.dataTypes)
@@ -321,6 +322,8 @@ var Filters = Class.extend({
                     $('#DL-msg').html('working, please wait...')
 				    $('#dlf_form').submit()
                     closeDL()
+                */    
+                    $('#DL-msg').html('Please enter email address. A link will be sent.')
                 } else {
                     var url = data.url
                     data.url = ''
