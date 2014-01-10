@@ -53,6 +53,25 @@
     </properties>
     
 
+        <scm>
+                <connection>scm:git:https://github.com/USGS-CIDA/sedmap.git</connection>
+                <developerConnection>scm:git:ssh://git@github.com/USGS-CIDA/sedmap.git</developerConnection>
+                <url>https://github.com/USGS-CIDA/sedmap</url>
+        </scm>
+        
+        <distributionManagement>
+                <repository>
+                        <id>cida-releases</id>
+                        <name>CIDA Releases</name>
+                        <url>http://internal.cida.usgs.gov/maven/content/repositories/cida-releases/</url>
+                </repository>
+                <snapshotRepository>
+                        <id>cida-snapshots</id>
+                        <name>CIDA Snapshots</name>
+                        <url>http://internal.cida.usgs.gov/maven/content/repositories/cida-snapshots/</url>
+                </snapshotRepository>
+        </distributionManagement>
+        
     <repositories>
         <repository>
 	        <id>maven2</id>
