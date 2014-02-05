@@ -5,7 +5,7 @@
     
     <head>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" >
-        
+        <meta name="google-site-verification" content="RIM1jcVM_GCYDz0SivW1kUhog3SNhVAgoA8A0SFWfQM" />
     
         <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
         <link rel="icon" href="favicon.ico" type="image/x-icon" />
