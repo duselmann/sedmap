@@ -38,6 +38,24 @@
         <script type="text/javascript" src="js/jquery/jquery-1.10.2.min.js"></script>
         <script type="text/javascript" src="js/openlayers/OpenLayers.js"></script>
         <script type="text/javascript" src="js/utils.js"></script>
+        <!-- Google Analytics Setup -->
+	<script type="text/javascript" async="" src="http://www.google-analytics.com/ga.js"></script>
+	<script type="text/javascript" async="" src="http://www.google-analytics.com/ga.js"></script>
+	<script type="text/javascript">
+		   var _gaq = _gaq || [];
+		   _gaq.push(['_setAccount', 'UA-46483138-2']);
+		  _gaq.push (['_gat._anonymizeIp']);
+		  _gaq.push(['_trackPageview']);
+    
+
+		 (function() {
+        		  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        		  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        		  var scripts = document.getElementsByTagName('script');
+        		  var s = scripts[scripts.length-1]; s.parentNode.insertBefore(ga, s);
+			 })();
+
+	</script>
     </head>
     
     <body>
