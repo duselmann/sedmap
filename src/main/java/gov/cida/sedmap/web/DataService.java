@@ -58,6 +58,13 @@ public class DataService extends HttpServlet {
 
 
 	@Override
+	/**
+	 * Download Data UI initialization call
+	 * 
+	 * 	Currently it requires the email field to be populated.  Will extend this
+	 * 	so that if it is not available we'll do the download inline and offer
+	 * 	it up to the client.
+	 */
 	protected void doPost(HttpServletRequest req, HttpServletResponse res)
 			throws ServletException, IOException {
 		logger.debug("doPost");
@@ -85,7 +92,14 @@ public class DataService extends HttpServlet {
 			}
 
 			long startTime = System.currentTimeMillis();
-			fetcher.doFetch(req, handler);
+			fetcher.doFetch(req, handler);					// If this is an "email" handler then 
+															// the internal workings CLOSE the client
+															// response connection and releases the
+															// browser but continues execution.  
+															// This is important as it looks like
+															// this is threaded from a client POV but
+															// in reality all we did was close the
+															// client stream.
 			long totalTime = System.currentTimeMillis() - startTime;
 			logger.info(fetcher.toString() + ": Total request time (ms) " + totalTime);
 		} catch (Exception e) {
