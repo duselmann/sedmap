@@ -8,6 +8,7 @@ import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.io.util.StringValueIterator;
 import gov.cida.sedmap.ogc.FilterWithViewParams;
 import gov.cida.sedmap.ogc.OgcUtils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,14 +20,20 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.geotools.filter.AbstractFilter;
 import org.opengis.filter.PropertyIsGreaterThan;
@@ -43,13 +50,17 @@ public abstract class Fetcher {
 
 	public static FetcherConfig conf;
 	public static final int NUM_NWIS_TRIES = 3;
-	public static final String NWIS_SITE_DEMARCATOR = ""
-			+ "############################################################"
-			+ IoUtils.LINE_SEPARATOR
-			+ "# NEW_SITE"
-			+ IoUtils.LINE_SEPARATOR
-			+ "############################################################";
-
+	private static final List<String> DEFAULT_DAILY_DATA_COLUMN_NAMES = new ArrayList<String>(Arrays.asList(
+		"agency_cd",
+		"site_no",
+		"datetime",
+		"DAILY_FLOW",
+		"DAILY_FLOW_QUAL",
+		"DAILY_SSC",
+		"DAILY_SSC_QUAL",
+		"DAILY_SSL",
+		"DAILY_SSL_QUAL"));
+	
 	protected String getDataTable(String descriptor) {
 		return conf.DATA_TABLES.get(descriptor);
 	}
@@ -97,6 +108,7 @@ public abstract class Fetcher {
 		String sitesUrl = null;
 		// open temp file
 		WriterWithFile tmp = null;
+		
 		try {
 			tmp = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());
 			tmp.write(formatter.fileHeader(HeaderType.DAILY));
@@ -122,7 +134,70 @@ public abstract class Fetcher {
 					nwis = fetchNwisData(sitesUrl);
 					logger.debug("formatting NWIS data");
 
+					/**
+					 * Change for JIRA NSM-249
+					 * 
+					 * 		We need to combine all sites into one giant datablock and also
+					 * 		include all possible headers.  The headers defined are:
+					 * 
+					 * 			agency_cd, site_no, datetime, DAILY_FLOW, DAILY_FLOW_QUAL, DAILY_SSC, DAILY_SSC_QUAL, DAILY_SSL, DAILY_SSL_QUAL
+					 * 
+					 * 		If a site does not contain a value for one of these columns then
+					 * 		the value is left empty (no value... nothing).
+					 * 
+					 *  	We will add a comment to the comment block that states:
+					 *  
+					 *  		"Missing data (empty values for a column) indicates that these data were not present within the USGS National Water Information System"
+					 *  
+					 *  	Logic:
+					 *  
+					 *  		Since we need to print out all columns for every site, we must
+					 *  		read each site's columns, put it into the format of the columns
+					 *  		requested (using empty values for columns missing) and then
+					 *  		input the values as we see them.
+					 *  
+					 *  		The list DEFAULT_DAILY_DATA_COLUMN_NAMES contains all of the
+					 *  		necessary headers required for the daily_data results in the
+					 *  		order they need to be placed.
+					 *  
+					 *  		The following map currentHeaderValueMapping will be used to
+					 *  		record each line's value to the appropriate header for each
+					 *  		value found.
+					 *  
+					 *  		At the beginning of each site's data block, we will record
+					 *  		the site's resulting header in a list in the order in which it
+					 *  		was returned in the request.
+					 *  
+					 *  		Then, as we iterate through each result row of the site's data,
+					 *  		we will associate the correct value to the correct header for
+					 *  		that specific header list and then add the value to the overall
+					 *  		currentHeaderValueMapping so we can correctly place the line's
+					 *  		value in the correct overall spot in the datablock.
+					 *  
+					 *  		Subsequently, each time we see a new Site we will null out all
+					 *  		values in the map because we don't know which columns are 
+					 *  		for that site until we parse it.
+					 */
+					Map<String, String> currentHeaderValueMapping = new HashMap<String, String>();
+					StringBuilder columnHeader = new StringBuilder();
+					Iterator<String> columnItr = DEFAULT_DAILY_DATA_COLUMN_NAMES.iterator();
+					while(columnItr.hasNext()) {
+						String column = columnItr.next();
+						columnHeader.append(column);
+						
+						if(columnItr.hasNext()) {
+							columnHeader.append(formatter.getSeparator());
+						}
+						
+						/**
+						 * Now lets add the header to the overall header mapping
+						 */
+						currentHeaderValueMapping.put(column, null);
+					}
+					
+					List<String> currentHeaderNames = new ArrayList<String>();
 					String line;
+					boolean columnsWritten = false;
 					while ((line = nwis.readLine()) != null) {
 						if (line.startsWith("#")) {
 							readLineCountAfterComments = 0;
@@ -131,13 +206,40 @@ public abstract class Fetcher {
 						//include column headers for the next site
 						if(0 == readLineCountAfterComments){
 							readLineCountAfterComments++;
-
-							//insert demarcator
-							tmp.write(NWIS_SITE_DEMARCATOR);
-							tmp.write(IoUtils.LINE_SEPARATOR);
-
+							
+							if(!columnsWritten) {
+								/**
+								 * This is the first site found in the resulting
+								 * data.  It is also the first time we have seen
+								 * column headers which means we need to write them
+								 * all out in order.
+								 */
+								String headerLine = columnHeader.toString();
+								columnsWritten = true;
+								
+								tmp.write(headerLine);
+								tmp.write(IoUtils.LINE_SEPARATOR);
+							} 
+							
 							//make column names human-readable
-							line = reconditionLine(line);
+							String currentHeaderline = reconditionLine(line);
+							
+							// Now lets save this site's columns so we can
+							// correctly place the values in the correct
+							// spots when writing out the line
+							currentHeaderNames = new ArrayList<String>(Arrays.asList(currentHeaderline.split(formatter.getSeparator())));
+							
+							// Now what we need to do is null out all of the
+							// values for the current headerMapping that are 
+							// NOT a part of this site's results
+							for(String columnKey : DEFAULT_DAILY_DATA_COLUMN_NAMES) {
+								currentHeaderValueMapping.put(columnKey, null);
+							}
+							
+							// We dont need to write anything as we're only
+							// saving the current site's headers for this
+							// result
+							continue;
 						}
 						//exclude NWIS row following column headers for each site
 						else if(1 == readLineCountAfterComments){
@@ -146,8 +248,64 @@ public abstract class Fetcher {
 						}
 
 						// translate from NWIS RDB format to requested format
-						line = formatter.transform(line, rdb);
-						tmp.write(line);
+						String formattedRawline = formatter.transform(line, rdb);
+						
+						// We now have the values in the order in which they belong
+						// to their original currentHeaderNames list.  We need to
+						// split them and then add them to the currentHeaderValueMapping
+						// accordingly.
+						String[] values =formattedRawline.split(formatter.getSeparator());
+						if(values.length != currentHeaderNames.size()) {
+							logger.error("Daily Data Parsing ERROR: The number of values in the line [" + values + "] does not equate to the number of column headers we have for this line [" + currentHeaderNames + "].  Skipping line...");
+							continue;
+						}
+						
+						// Now loop through our values, associate them with the line's header
+						// column name in currentHeaderNames and then put the value in the
+						// currentHeaderValueMapping value for that header key.
+						for(int i = 0; i < values.length; i++) {
+							String value = values[i];
+							
+							// Check to see if the index is out of bounds of the current header list
+							if(currentHeaderNames.size() < i) {
+								logger.error("Daily Data Parsing ERROR: The headers for this line [" + currentHeaderNames + "] do not contain a value at value index [" + i + "].  Skipping line...");
+								continue;
+							}
+							
+							// Get the header name for this value index
+							String headerKey = currentHeaderNames.get(i);
+							
+							// Make sure this header name exists as a key in the map 
+							if(!currentHeaderValueMapping.containsKey(headerKey)) {
+								logger.error("Daily Data Parsing ERROR: The header for this  [" + headerKey + "] at value index [" + i + "] is not present in the current header mapping.  Skipping line...");
+								continue;
+							}
+							
+							// Now put the value for this header into the map at this key position
+							currentHeaderValueMapping.put(headerKey, value);
+						}
+						
+						// We have now parsed the entire result row and associated each
+						// value with its correct header key mapping.  Now we have to
+						// loop through the original DEFAULT_DAILY_DATA_COLUMN_NAMES
+						// list and create an entry for each value that is in the map
+						// for each header.  If the value is null, we just keep it empty.
+						StringBuffer finalResult = new StringBuffer();
+						Iterator<String> dailyDataItr = DEFAULT_DAILY_DATA_COLUMN_NAMES.iterator();
+						while(dailyDataItr.hasNext()) {
+							String column = dailyDataItr.next();
+							String value = currentHeaderValueMapping.get(column);
+							
+							if(value != null) {
+								finalResult.append(value);
+							}
+							
+							if(dailyDataItr.hasNext()) {
+								finalResult.append(formatter.getSeparator());
+							}
+						}
+						
+						tmp.write(finalResult.toString());
 						tmp.write(IoUtils.LINE_SEPARATOR);
 					}
 				} finally {
@@ -232,13 +390,28 @@ public abstract class Fetcher {
 			throws ServletException, IOException {
 		logger.debug("doFetch");
 
-		String    dataTypes = getDataTypes(req);
-		Formatter formatter = getFormatter(req);
-		boolean   alsoFlow  = getDiscreteFlow(req);
+		String    dataTypes = getDataTypes(req);			// Search Filter(s)
+		Formatter formatter = getFormatter(req);			// Download Choice
+		boolean   alsoFlow  = getDiscreteFlow(req);			// Download Choice
 		List<String> sites  = new LinkedList<String>();
 
-		handler.beginWritingFiles(); // start writing files
+		/**
+		 * We will start writing the files here.
+		 * 
+		 * 	Important:  If this handler is an email handler we actually close
+		 * 				the client's response output stream so that the browser
+		 * 				can continue and not be blocked by this execution thread.
+		 */
+		handler.beginWritingFiles();
 
+		/**
+		 * Future improvement.
+		 * 
+		 * 		Its possible to have 4 datasources to contact in order to get
+		 * 		what we need.  The following for loop is serial meaning it
+		 * 		does one at a time.  We can improve this by threading the 
+		 * 		datasource calls so they all go off at the same time.
+		 */
 		for (String site  : conf.DATA_TYPES) { // check for daily and discrete
 			if ( ! dataTypes.contains(site)  ||  ! handler.isAlive()) {
 				continue;
@@ -265,6 +438,7 @@ public abstract class Fetcher {
 				String      filename = descriptor + formatter.getFileType();
 
 				InputStreamWithFile fileData = null;
+								
 				try {
 					// TODO this was originally going to be a single call but reality got in the way - could use a refactor
 					if ( "daily_data".equals(descriptor) ) {
@@ -290,6 +464,7 @@ public abstract class Fetcher {
 							}
 						}
 					}
+					
 					// if we found some sites or data then append it to the collection
 					if ( fileData != null && !sites.isEmpty() ) {
 						handler.writeFile(formatter.getContentType(), filename, fileData);

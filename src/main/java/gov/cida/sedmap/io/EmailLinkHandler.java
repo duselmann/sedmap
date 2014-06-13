@@ -26,6 +26,12 @@ public class EmailLinkHandler extends ZipHandler {
 
 	@Override
 	public FileDownloadHandler beginWritingFiles() throws IOException {
+		/**
+		 * We close the clients response connection here to simulate spawning
+		 * another process.  In actuality, the browser gets a "close" after
+		 * "acquisition commenced" is written and continues on its merry way
+		 * while THIS thread (whoever called this method) continues execution.
+		 */
 		resp.setContentType( getContentType() );
 		resp.getOutputStream().write("acquisition commenced".getBytes());
 		resp.getOutputStream().flush();

@@ -26,7 +26,7 @@ public class GeoserverProxy extends ProxyServlet {
 
 	public static final String NHD_ENV_SERVER = "sedmap/nhdServer";
 	public static final String NHD_ENV_PATH   = "sedmap/nhdPath";
-	public static final String SED_ENV_SERVER = "sedmap/sedServer";
+	public static final String SED_ENV_SERVER = "sedmap/sedServer";	// This is our GeoServer instance
 
 	private String NHD_SERVER = "http://cida-wiwsc-wsdev.er.usgs.gov:8080";
 	private String NHD_PATH   = "/geoserver/NHDPlusFlowlines/wms";

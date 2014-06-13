@@ -10,4 +10,5 @@
 "# DAILY_SSL   Suspended-sediment load, mean daily   tons/day  "
 "# DAILY_SSL_QUAL   Suspended-sediment load data qualifier  ""A"" indicates data are approved for publication; ""P"" indicates data are provisional and subject to revision  "
 #
+# Missing data (empty values in a column) indicates that this data field was not present within the USGS National Water Information System
 #
