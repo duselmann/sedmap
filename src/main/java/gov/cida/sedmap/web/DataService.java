@@ -171,7 +171,9 @@ public class DataService extends HttpServlet {
 						 */
 						logger.error("Exception in DataService:" +  e.getMessage());
 						logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-						ErrUtils.handleExceptionResponseServices(res, new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR)));						
+						SedmapException exception = new SedmapException(OGCExceptionCode.NoApplicableCode, e);
+						exception.setExceptionMessage(SedmapException.GENERIC_ERROR);
+						ErrUtils.handleExceptionResponseServices(res, exception);						
 					}
 				}
 			} catch (Exception t) {

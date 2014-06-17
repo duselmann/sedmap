@@ -82,5 +82,9 @@ public class SedmapException extends Exception {
 
 	public String getExceptionMessage() {
 		return exceptionMessage;
-	}	
+	}
+
+	public void setExceptionMessage(String exceptionMessage) {
+		this.exceptionMessage = exceptionMessage;
+	}
 }

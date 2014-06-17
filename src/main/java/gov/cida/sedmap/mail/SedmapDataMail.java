@@ -11,7 +11,8 @@ import org.apache.log4j.Logger;
 public class SedmapDataMail {
 	private static final Logger logger = Logger.getLogger(SedmapDataMail.class);
 	
-	public static final String ADMIN_ERROR_EMAIL	  = "SedimentPortal_HELP@usgs.gov";
+	//public static final String ADMIN_ERROR_EMAIL	  = "SedimentPortal_HELP@usgs.gov";
+	public static final String ADMIN_ERROR_EMAIL	  = "prusso@usgs.gov";
 
 	protected static final String MSG_ENV_KEY         = "sedmap/email/body";
 	protected static final String MSG_DEFAULT         = "\nYour data file is ready for download.\n\nClick on the link below to commence download.\n\nYour file will be retained for 7 days.\n\n";
