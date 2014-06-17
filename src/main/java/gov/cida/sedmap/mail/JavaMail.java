@@ -27,6 +27,10 @@ public class JavaMail {
 
 		properties  = new Properties();
 		properties.setProperty("mail.smtp.host", MAIL_HOST);
+		
+		String key= "mail.smtp.localhost"; 
+		String prop= properties.getProperty(key); 
+		if (prop== null) properties.put(key, "localhost"); 
 
 	}
 

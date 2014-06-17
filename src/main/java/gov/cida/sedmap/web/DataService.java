@@ -154,6 +154,7 @@ public class DataService extends HttpServlet {
 				if (handler instanceof EmailLinkHandler) {
 					errorid = ErrUtils.handleExceptionResponse(req,res,e);
 					((EmailLinkHandler)handler).setErrorId(errorid);
+					((EmailLinkHandler)handler).setExceptionThrown(e);
 					handler.finishWritingFiles();
 				} else {
 					if(e instanceof SedmapException) {

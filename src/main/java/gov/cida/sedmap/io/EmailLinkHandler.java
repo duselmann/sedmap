@@ -22,6 +22,7 @@ public class EmailLinkHandler extends ZipHandler {
 	protected String emailAddr;
 	protected final File file;
 	protected String errorId;
+	protected Exception exceptionThrown;
 
 
 	public EmailLinkHandler(HttpServletResponse res, File file, String email) throws FileNotFoundException {
@@ -69,7 +70,7 @@ public class EmailLinkHandler extends ZipHandler {
 
 			mailer.sendFileMessage(emailAddr, fileId);
 		} else {
-			mailer.sendErrorMessage(emailAddr, getErrorId());
+			mailer.sendErrorMessage(emailAddr, getErrorId(), getExceptionThrown());
 		}
 		return this; //chain
 	}
@@ -85,6 +86,14 @@ public class EmailLinkHandler extends ZipHandler {
 
 	public void setErrorId(String errorId) {
 		this.errorId = errorId;
+	}
+
+	public Exception getExceptionThrown() {
+		return exceptionThrown;
+	}
+
+	public void setExceptionThrown(Exception exceptionThrown) {
+		this.exceptionThrown = exceptionThrown;
 	}
 
 	@Override

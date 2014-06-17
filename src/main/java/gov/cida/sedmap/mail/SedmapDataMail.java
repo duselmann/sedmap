@@ -1,11 +1,17 @@
 package gov.cida.sedmap.mail;
 
-import org.apache.log4j.Logger;
-
 import gov.cida.sedmap.io.util.SessionUtil;
+import gov.cida.sedmap.io.util.exceptions.SedmapException;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import org.apache.log4j.Logger;
 
 public class SedmapDataMail {
 	private static final Logger logger = Logger.getLogger(SedmapDataMail.class);
+	
+	public static final String ADMIN_ERROR_EMAIL	  = "SedimentPortal_HELP@usgs.gov";
 
 	protected static final String MSG_ENV_KEY         = "sedmap/email/body";
 	protected static final String MSG_DEFAULT         = "\nYour data file is ready for download.\n\nClick on the link below to commence download.\n\nYour file will be retained for 7 days.\n\n";
@@ -54,14 +60,34 @@ public class SedmapDataMail {
 
 
 
-	public boolean sendErrorMessage(String emailAddr, String errorId) {
+	public boolean sendErrorMessage(String emailAddr, String errorId, Exception e) {
 		logger.debug("sendMail error attempt "+ emailAddr +":"+ errorId);
 
 		String msgText = ERR_BODY+errorId+"\n";
+		String adminText = "Sediment Data Portal Error to user [" + emailAddr + "].\n\nError text sent to user: \n\n********************" + msgText + "\n********************\n\nFull Stack Trace:\n\n";
+		
+		if(e == null) {
+			adminText += "-- No stack trace available --";
+		} else {
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			
+			if(e instanceof SedmapException) {
+				((SedmapException) e).getOriginalException().printStackTrace(pw);
+			}
+			
+			adminText += sw.toString();
+		}
 
+		notifyAdminOfError("Sediment Portal Error - [" + SUBJECT + "]", adminText);
+		
 		JavaMail mailer = new JavaMail();
-		// TODO send support an email in production
-		// mailer.sendMail(SUBJECT, SENDER_ADDR, SENDER_NAME, SENDER_ADDR, msgText);
 		return mailer.sendMail(SUBJECT, SENDER_ADDR, SENDER_NAME, emailAddr, msgText);
+	}
+	
+	public void notifyAdminOfError(String subject, String message) {
+		JavaMail mailer = new JavaMail();
+		mailer.sendMail(subject, SENDER_ADDR, SENDER_NAME, ADMIN_ERROR_EMAIL, message);
 	}
 }
