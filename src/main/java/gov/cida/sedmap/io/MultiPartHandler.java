@@ -1,6 +1,5 @@
 package gov.cida.sedmap.io;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletResponse;
@@ -16,7 +15,7 @@ public class MultiPartHandler extends BaseHandler {
 	}
 
 	@Override
-	public FileDownloadHandler startNewFile(String contentType, String filename) throws IOException {
+	public FileDownloadHandler startNewFile(String contentType, String filename) throws Exception {
 		super.startNewFile(contentType, filename);
 
 		out.write(BOUNDARY_TAG.getBytes());
@@ -31,7 +30,7 @@ public class MultiPartHandler extends BaseHandler {
 	}
 
 	@Override
-	public FileDownloadHandler finishWritingFiles() throws IOException {
+	public FileDownloadHandler finishWritingFiles() throws Exception {
 		out.write(BOUNDARY_TAG.getBytes());
 		String endBndry = BOUNDARY_TAG + "--";
 		out.write(IoUtils.LINE_SEPARATOR.getBytes());

@@ -2,6 +2,8 @@ package gov.cida.sedmap.ogc;
 
 
 import gov.cida.sedmap.io.util.StrUtils;
+import gov.cida.sedmap.io.util.exceptions.SedmapException;
+import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -68,7 +70,7 @@ public class OgcUtils {
 	}
 
 
-	public static AbstractFilter ogcXmlToFilter(String ogcXml) {
+	public static AbstractFilter ogcXmlToFilter(String ogcXml) throws Exception {
 		if (StrUtils.isEmpty(ogcXml)) {
 			return OgcUtils.ALL_FILTER;
 		}
@@ -81,19 +83,19 @@ public class OgcUtils {
 			Filter filter = (Filter) parser.parse( ogcStream );
 			return (AbstractFilter)filter;
 		} catch (Exception e) {
-			// 			throws IOException, SAXException, ParserConfigurationException
-			// TODO handle the exceptions
-			throw new RuntimeException(e);
+			logger.error(e.getMessage());
+			logger.error("Due to internal exception caught, throwing InvalidParameterValue OGC error for error handling on the client side.");
+			throw new SedmapException(OGCExceptionCode.InvalidParameterValue, new Exception("Failed to parse OGC.  " + e.getLocalizedMessage()));
 		}
 	}
 
-	public static String ogcXmlToParameterQueryWherClause(String ogcXml) {
+	public static String ogcXmlToParameterQueryWherClause(String ogcXml) throws Exception {
 		logger.debug("ogcXml2Sql");
 		// parse the OGC filter
 		Filter filter = ogcXmlToFilter(ogcXml);
 		return ogcXmlToParameterQueryWhereClause(filter);
 	}
-	public static String ogcXmlToParameterQueryWhereClause(Filter filter) {
+	public static String ogcXmlToParameterQueryWhereClause(Filter filter) throws Exception {
 		// convert to SQL
 		String sql="";
 		if (isAllFilter(filter)) {
@@ -115,26 +117,30 @@ public class OgcUtils {
 
 			sql = buf.getBuffer().toString();
 		} catch (FilterToSQLException e) {
-			throw new RuntimeException("Failed to convert to SQL",e);
+			logger.error("Failed to convert to SQL.  Exception is: " + e.getMessage());
+			logger.error("Due to internal exception caught, throwing OperationNotSupported OGC error for error handling on the client side.");
+			throw new SedmapException(OGCExceptionCode.OperationNotSupported, new Exception("Failed to parse OGC.  " + e.getLocalizedMessage()));
 		}
 
 		return sql;
 	}
 
 
-	protected static void checkForInvalidChars(String sql) {
+	protected static void checkForInvalidChars(String sql) throws Exception {
 		logger.debug("checkForInvalidChars");
 
 		for (char invalid : INVALID_CHARS) {
 			if (sql.indexOf(invalid)>=0) {
-				throw new RuntimeException("found invalid char in query string - '" +invalid+ "' - \"" +sql+ "\"");
+				logger.error("found invalid char in query string - '" +invalid+ "' - \"" +sql+ "\"");
+				logger.error("Due to internal exception caught, throwing InvalidParameterValue OGC error for error handling on the client side.");
+				throw new SedmapException(OGCExceptionCode.InvalidParameterValue, new Exception("Failed to parse OGC.  Found invalid char in query string - '" +invalid+ "' - \"" +sql+ "\""));
 			}
 		}
 	}
 
 
 	// TODO if the translation becomes too much more complex - look into Sql Filter geotools API
-	protected static String sqlTranslation(String query) {
+	protected static String sqlTranslation(String query) throws Exception {
 		logger.debug("sqlTranslation");
 		checkForInvalidChars(query);
 
@@ -158,13 +164,21 @@ public class OgcUtils {
 
 
 
-	public static DataStore jndiOracleDataStore(String jndiName) throws IOException {
+	public static DataStore jndiOracleDataStore(String jndiName) throws Exception {
 		Map<String, Object> dataStoreEnv = new HashMap<String, Object>();
 		// dataStoreEnv.put( JDBCDataStoreFactory.SCHEMA.getName(), "sedmap"); // OPTIONAL
 		dataStoreEnv.put( JDBCDataStoreFactory.DBTYPE.getName(), "oracle");
 		dataStoreEnv.put( JDBCDataStoreFactory.EXPOSE_PK.getName(), true);
 		dataStoreEnv.put( JDBCJNDIDataStoreFactory.JNDI_REFNAME.getName(), jndiName);
-		DataStore store =  DataStoreFinder.getDataStore(dataStoreEnv);
+		
+		DataStore store;
+		try {
+			store =  DataStoreFinder.getDataStore(dataStoreEnv);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			logger.error("Due to internal exception caught, throwing ResourceNotFound OGC error for error handling on the client side.");
+			throw new SedmapException(OGCExceptionCode.ResourceNotFound, new Exception(SedmapException.GENERIC_ERROR));
+		}
 
 		return store;
 	}
@@ -172,12 +186,12 @@ public class OgcUtils {
 
 
 	public static JDBCFeatureReader executeQuery(DataStore store, String tableName, Filter filter, String ... properties)
-			throws IOException {
+			throws Exception {
 		Transaction trans = new DefaultTransaction("read-only");
 		return executeQuery(trans, store, tableName, filter, properties);
 	}
 	public static JDBCFeatureReader executeQuery(Transaction trans, DataStore store, String tableName, Filter filter, String ... properties)
-			throws IOException {
+			throws Exception {
 		Query query;
 		if (properties.length==0) {
 			query = new Query(tableName, filter);
@@ -185,7 +199,16 @@ public class OgcUtils {
 			query = new Query(tableName, filter, properties);
 		}
 
-		JDBCFeatureReader reader = (JDBCFeatureReader) store.getFeatureReader(query, trans);
+		JDBCFeatureReader reader;
+		
+		try {
+			reader = (JDBCFeatureReader) store.getFeatureReader(query, trans);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
+			throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR));
+		}
+		
 		return reader;
 	}
 

@@ -4,6 +4,8 @@ import gov.cida.sedmap.io.InputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.WriterWithFile;
 import gov.cida.sedmap.io.util.StrUtils;
+import gov.cida.sedmap.io.util.exceptions.SedmapException;
+import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
 import gov.cida.sedmap.ogc.FilterLiteralIterator;
 import gov.cida.sedmap.ogc.FilterWithViewParams;
 import gov.cida.sedmap.ogc.OgcUtils;
@@ -189,7 +191,7 @@ public class JdbcFetcher extends Fetcher {
 
 	@Override
 	protected InputStreamWithFile handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
-			throws IOException, SQLException, NamingException {
+			throws IOException, SQLException, NamingException, Exception {
 
 		InputStreamWithFile fileData = null;
 		FileWriter tmpw = null;
@@ -203,7 +205,7 @@ public class JdbcFetcher extends Fetcher {
 				columnNames = Arrays.asList(DISCRETE_SITE_COLUMN_NAMES_FOR_SPREADSHEET);
 			}
 			else{
-				throw new UnsupportedOperationException("Unknown descriptor: " + descriptor);
+				throw new SedmapException(OGCExceptionCode.OperationNotSupported, new UnsupportedOperationException("Unknown descriptor: " + descriptor));
 			}
 			String        header = formatter.fileHeader(columnNames.iterator(), HeaderType.SITE);
 			String           sql = buildQuery(descriptor, filter);
@@ -226,7 +228,7 @@ public class JdbcFetcher extends Fetcher {
 			fileData = new InputStreamWithFile(tmp);
 
 		} catch (FilterToSQLException e) {
-			throw new SQLException("Failed to convert filter to sql where clause.",e);
+			throw new SedmapException(OGCExceptionCode.InvalidParameterValue, new SQLException("Failed to convert filter to sql where clause.",e));
 		} finally {
 			IoUtils.quiteClose(tmpw, rs.rs, rs.ps, rs.cn);
 			// TODO maybe close fileData?
@@ -236,7 +238,7 @@ public class JdbcFetcher extends Fetcher {
 	}
 	@Override
 	protected InputStreamWithFile handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
-			throws IOException, SQLException, NamingException {
+			throws Exception {
 		if ( !sites.hasNext() ) {
 			// return nothing if there are no sites
 			return null;
@@ -295,7 +297,7 @@ public class JdbcFetcher extends Fetcher {
 	}
 
 
-	protected String buildQuery(String descriptor, FilterWithViewParams filter) throws FilterToSQLException {
+	protected String buildQuery(String descriptor, FilterWithViewParams filter) throws Exception {
 		//		FilterToSQL trans = new FilterToSQL();
 		//		trans.setInline(true);
 
@@ -331,14 +333,18 @@ public class JdbcFetcher extends Fetcher {
 
 
 
-	protected Results initData(String sql) throws NamingException, SQLException {
+	protected Results initData(String sql) throws NamingException, SQLException, Exception {
 		Results r = new Results();
 
 		try {
 			Context ctx = getContext();
 			DataSource ds = (DataSource) ctx.lookup(jndiDS);
 			r.cn = ds.getConnection();
-
+		} catch (SQLException e) {
+			throw new SedmapException(OGCExceptionCode.ResourceNotFound, e);
+		}
+		
+		try {
 			r.ps = r.cn.prepareStatement(sql);
 		} catch (SQLException e) {
 			logger.error(e);
@@ -350,7 +356,7 @@ public class JdbcFetcher extends Fetcher {
 
 		return r;
 	}
-	protected Results getData(Results r, FilterWithViewParams filter, boolean doFilterValues) throws NamingException, SQLException {
+	protected Results getData(Results r, FilterWithViewParams filter, boolean doFilterValues) throws NamingException, SQLException, Exception {
 		try {
 			int index = 1;
 			for (String value : filter) {
@@ -373,7 +379,7 @@ public class JdbcFetcher extends Fetcher {
 			r.rs = r.ps.executeQuery();
 		} catch (SQLException e) {
 			logger.error(e);
-			throw e;
+			throw new SedmapException(OGCExceptionCode.InvalidParameterValue, new Exception(e.getMessage()));
 		} catch (Exception e) {
 			logger.error(e);
 			e.printStackTrace();

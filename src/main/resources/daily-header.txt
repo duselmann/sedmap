@@ -1,4 +1,3 @@
-"# Not all sites contain all types of requested data, therefore data column headers are unique to each site. The appropriate column headers for a site are provided above the data. A change in column headers is indicated by a break in the values with NEW_SITE."
 # Field name  Field description  Units
 # agency_cd  USGS site identifier    
 # site_no  USGS site name    

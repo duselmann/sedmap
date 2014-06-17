@@ -10,15 +10,20 @@ import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.ZipHandler;
 import gov.cida.sedmap.io.util.ErrUtils;
 import gov.cida.sedmap.io.util.StrUtils;
+import gov.cida.sedmap.io.util.exceptions.SedmapException;
+import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 
 
@@ -64,6 +69,18 @@ public class DataService extends HttpServlet {
 	 * 	Currently it requires the email field to be populated.  Will extend this
 	 * 	so that if it is not available we'll do the download inline and offer
 	 * 	it up to the client.
+	 * 
+	 * 
+	 * ERROR HANDLING:
+	 * 
+	 * When the request is a direct download we will respond with OGC XML error
+	 * response.  If its a parameter or filter issue we will (hopefully) respond
+	 * with a good enough message that the user can fix it themselves.
+	 * 
+	 * If its an internal error (i.e. file I/O, database connectivity etc) we do
+	 * not want the user to know internal messages so we will respond with a
+	 * generic error. 
+	 * 
 	 */
 	protected void doPost(HttpServletRequest req, HttpServletResponse res)
 			throws ServletException, IOException {
@@ -84,31 +101,77 @@ public class DataService extends HttpServlet {
 
 			String email = req.getParameter("email");
 			if ( StrUtils.isEmpty(email) ) {
-				handler = new ZipHandler(res, res.getOutputStream());
+				/**
+				 * JIRA NSM-82 and NSM-251
+				 * To use direct download ability with error handling, we cannot
+				 * use the response output stream until we have something to 
+				 * hand back to the user.  We need to build our own I/O and then
+				 * when we have something to give back to the user, use the response.
+				 */
+				File   tmp = null;
+				try {
+					tmp = File.createTempFile("download_data_" + StrUtils.uniqueName(12), ".zip");
+					handler = new ZipHandler(res, new FileOutputStream(tmp));
+					
+					long startTime = System.currentTimeMillis();
+					fetcher.doFetch(req, handler);
+					long totalTime = System.currentTimeMillis() - startTime;
+					logger.info(fetcher.toString() + ": Total request time (ms) " + totalTime);
+					
+					/**
+					 * If all is successful we now stream the file to the response
+					 */
+					res.setContentType( handler.getContentType() );
+					res.getOutputStream().write(Files.readAllBytes(tmp.toPath()));
+					res.getOutputStream().flush();
+					res.getOutputStream().close();					
+				} finally {
+					if(tmp != null) {
+						tmp.delete();
+					}
+				}
 			} else {
 				File   tmp = File.createTempFile("data_" + StrUtils.uniqueName(12), ".zip");
+				
 				logger.debug(tmp.getAbsolutePath());
 				handler = new EmailLinkHandler(res, tmp, email);
+				
+				long startTime = System.currentTimeMillis();
+				fetcher.doFetch(req, handler);					// This is an "email" handler then 
+																// the internal workings CLOSE the client
+																// response connection and releases the
+																// browser but continues execution.  
+																// This is important as it looks like
+																// this is threaded from a client POV but
+																// in reality all we did was close the
+																// client stream.
+				long totalTime = System.currentTimeMillis() - startTime;
+				logger.info(fetcher.toString() + ": Total request time (ms) " + totalTime);
 			}
-
-			long startTime = System.currentTimeMillis();
-			fetcher.doFetch(req, handler);					// If this is an "email" handler then 
-															// the internal workings CLOSE the client
-															// response connection and releases the
-															// browser but continues execution.  
-															// This is important as it looks like
-															// this is threaded from a client POV but
-															// in reality all we did was close the
-															// client stream.
-			long totalTime = System.currentTimeMillis() - startTime;
-			logger.info(fetcher.toString() + ": Total request time (ms) " + totalTime);
 		} catch (Exception e) {
 			String errorid = null;
 			try {
-				errorid = ErrUtils.handleExceptionResponse(req,res,e);
 				if (handler instanceof EmailLinkHandler) {
+					errorid = ErrUtils.handleExceptionResponse(req,res,e);
 					((EmailLinkHandler)handler).setErrorId(errorid);
 					handler.finishWritingFiles();
+				} else {
+					if(e instanceof SedmapException) {
+						ErrUtils.handleExceptionResponseServices(res, (SedmapException)e);
+					} else {
+						/**
+						 * This is not a sedmap exception.  We must
+						 * create a SedmapException to respond with a legitimate
+						 * xml response.
+						 * 
+						 * Since there really is no way to accurately determine
+						 * what a value is, we'll just set it to NoApplicableCode
+						 * and let the ErrUtils deal with it.
+						 */
+						logger.error("Exception in DataService:" +  e.getMessage());
+						logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
+						ErrUtils.handleExceptionResponseServices(res, new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR)));						
+					}
 				}
 			} catch (Exception t) {
 				logger.error(t);

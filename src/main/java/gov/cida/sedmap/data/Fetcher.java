@@ -4,8 +4,11 @@ import gov.cida.sedmap.io.FileDownloadHandler;
 import gov.cida.sedmap.io.InputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.WriterWithFile;
+import gov.cida.sedmap.io.util.ErrUtils;
 import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.io.util.StringValueIterator;
+import gov.cida.sedmap.io.util.exceptions.SedmapException;
+import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
 import gov.cida.sedmap.ogc.FilterWithViewParams;
 import gov.cida.sedmap.ogc.OgcUtils;
 
@@ -27,7 +30,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
@@ -72,12 +74,12 @@ public abstract class Fetcher {
 	}
 
 
-	public abstract Fetcher initJndiJdbcStore(String jndiJdbc) throws IOException;
+	public abstract Fetcher initJndiJdbcStore(String jndiJdbc) throws IOException, Exception;
 
 	protected abstract InputStreamWithFile handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
-			throws IOException, SQLException, NamingException;
+			throws IOException, SQLException, NamingException, Exception;
 	protected abstract InputStreamWithFile handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
-			throws IOException, SQLException, NamingException;
+			throws IOException, SQLException, NamingException, Exception;
 
 	protected InputStreamWithFile handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter, FileDownloadHandler handler)
 			throws IOException, SQLException, NamingException {
@@ -362,7 +364,7 @@ public abstract class Fetcher {
 	}
 
 
-	protected BufferedReader fetchNwisData(String urlStr) throws IOException {
+	protected BufferedReader fetchNwisData(String urlStr) throws Exception {
 		logger.debug("fetching NWIS data");
 		URL url = new URL(urlStr);
 		URLConnection cn = url.openConnection();
@@ -377,7 +379,9 @@ public abstract class Fetcher {
 				reader = new BufferedReader(new InputStreamReader(cn.getInputStream()));
 			} catch (IOException e) {
 				if (nwisTriesCount == NUM_NWIS_TRIES -1) {
-					throw e;
+					logger.error(e.getMessage());
+					logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
+					throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR));
 				}
 			}
 			nwisTriesCount++;
@@ -387,7 +391,7 @@ public abstract class Fetcher {
 
 
 	public void doFetch(HttpServletRequest req, FileDownloadHandler handler)
-			throws ServletException, IOException {
+			throws Exception {
 		logger.debug("doFetch");
 
 		String    dataTypes = getDataTypes(req);			// Search Filter(s)
@@ -470,10 +474,13 @@ public abstract class Fetcher {
 						handler.writeFile(formatter.getContentType(), filename, fileData);
 					}
 				} catch (Exception e) {
-					String msg = "failed to fetch from DB";
-					logger.error(msg);
-					logger.error(e);
-					throw new ServletException(msg, e);
+					if(e instanceof SedmapException) {
+						throw e;
+					} else {
+						logger.error("Failed to fetch from the Database.  Exception is:" +  e.getMessage());
+						logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
+						throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR));
+					}
 				} finally {
 					IoUtils.quiteClose(fileData);
 					if (fileData != null) {
