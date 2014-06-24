@@ -486,11 +486,17 @@ function downloadShow() {
     var dailyFilters = getFilters(filterDiv, DAILY);
     var discreteFilters = getFilters(filterDiv, DISCRETE);
     var doDownload = function () {
+    	$('#DL-msg').hide();
+    	
         var isDaily = layers[DAILY].visibility
         var isDiscr = layers[DISCRETE].visibility
-
-        $("#DL-daily").prop('checked', isDaily)
-        $("#DL-discrete").prop('checked', isDiscr)
+        
+        $("#DL-daily").prop('checked', isDaily);
+        $("#DL-discrete").prop('checked', isDiscr);
+        $('#DL-directdownload').prop('checked', false);
+        $('#DL-downloadprogress').hide();
+        $('#DL-download').show();
+        
         //$("#DL-discreteFlow").prop('checked', isDiscr)
 
         $(".blackoverlay").fadeIn("slow")

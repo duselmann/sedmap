@@ -411,10 +411,13 @@ public abstract class Fetcher {
 		/**
 		 * Future improvement.
 		 * 
-		 * 		Its possible to have 4 datasources to contact in order to get
-		 * 		what we need.  The following for loop is serial meaning it
+		 * 		Its possible to have multiple datasources to contact in order to get
+		 * 		what we need.  The following for-loop is serial meaning it
 		 * 		does one at a time.  We can improve this by threading the 
 		 * 		datasource calls so they all go off at the same time.
+		 * 
+		 * 		Unfortunately, some of the calls rely on a previous datasource's
+		 * 		response.  So at most we can cut the logic in half.
 		 */
 		for (String site  : conf.DATA_TYPES) { // check for daily and discrete
 			if ( ! dataTypes.contains(site)  ||  ! handler.isAlive()) {
@@ -423,9 +426,7 @@ public abstract class Fetcher {
 
 			String    ogcXml = getFilter(req, site);
 			AbstractFilter aFilter = OgcUtils.ogcXmlToFilter(ogcXml);
-			@SuppressWarnings("unchecked") // fyi: for some reason this is not require for all jdks
 			String yr1 = OgcUtils.removeFilter(aFilter, "year", PropertyIsGreaterThanOrEqualTo.class, PropertyIsGreaterThan.class);
-			@SuppressWarnings("unchecked") // fyi: for some reason this is not require for all jdks
 			String yr2 = OgcUtils.removeFilter(aFilter, "year", PropertyIsLessThanOrEqualTo.class,    PropertyIsLessThan.class);
 			FilterWithViewParams filter = new FilterWithViewParams(aFilter);
 			filter.putViewParam("yr1", "1850", yr1);

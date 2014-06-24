@@ -4,9 +4,11 @@ import gov.cida.sedmap.data.DataFileMgr;
 import gov.cida.sedmap.data.Fetcher;
 import gov.cida.sedmap.data.FetcherConfig;
 import gov.cida.sedmap.data.JdbcFetcher;
+import gov.cida.sedmap.data.TimeOutFetcher;
 import gov.cida.sedmap.io.EmailLinkHandler;
 import gov.cida.sedmap.io.FileDownloadHandler;
 import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.TimeOutHandler;
 import gov.cida.sedmap.io.ZipHandler;
 import gov.cida.sedmap.io.util.ErrUtils;
 import gov.cida.sedmap.io.util.StrUtils;
@@ -33,7 +35,7 @@ public class DataService extends HttpServlet {
 	private static final Logger logger = Logger.getLogger(DataService.class);
 
 	private static final long serialVersionUID = 1L;
-
+	
 	protected String jndiDS = "java:comp/env/jdbc/sedmapDS";
 
 
@@ -64,13 +66,6 @@ public class DataService extends HttpServlet {
 
 	@Override
 	/**
-	 * Download Data UI initialization call
-	 * 
-	 * 	Currently it requires the email field to be populated.  Will extend this
-	 * 	so that if it is not available we'll do the download inline and offer
-	 * 	it up to the client.
-	 * 
-	 * 
 	 * ERROR HANDLING:
 	 * 
 	 * When the request is a direct download we will respond with OGC XML error
@@ -96,11 +91,16 @@ public class DataService extends HttpServlet {
 		}
 
 		FileDownloadHandler handler = null;
-		try {
-			Fetcher fetcher = new JdbcFetcher(jndiDS);
-
+		try {			
 			String email = req.getParameter("email");
-			if ( StrUtils.isEmpty(email) ) {
+			
+			boolean doDownload = false;
+			String directDownload = req.getParameter("directDownload");
+			if((directDownload != null) && (directDownload.equals("true"))) {
+				doDownload = true;
+			}
+			
+			if ( doDownload ) {
 				/**
 				 * JIRA NSM-82 and NSM-251
 				 * To use direct download ability with error handling, we cannot
@@ -108,39 +108,87 @@ public class DataService extends HttpServlet {
 				 * hand back to the user.  We need to build our own I/O and then
 				 * when we have something to give back to the user, use the response.
 				 */
-				File   tmp = null;
-				try {
-					tmp = File.createTempFile("download_data_" + StrUtils.uniqueName(12), ".zip");
+				
+				/**
+				 * JIRA NSM-251
+				 * 
+				 * 	In order to accomplish direct download and deal with the fact that
+				 * 	we have a WAF timeout issue, we can only do UI requests when an email
+				 * 	is given.  We have a validation on the UI to force an email but to
+				 * 	realistically provide a Web Service we should not enforce this
+				 *  requirement here.  If we do not get an email, we will then write
+				 *  the resulting zip file contents directly to the request stream without
+				 *  a consideration of the WAF timeout.
+				 *  
+				 *  If we DO get an email, then we will do our timeout logic which doesn't
+				 *  return the zip contents but a link to the zip created OR a message saying
+				 *  we have exceeded our processing time and an email will be sent w/ the
+				 *  file link.
+				 */
+				if((email == null) || (email.equals(""))) {
+					/**
+					 * We do not have an email so we will attempt to process the request
+					 * and stream back the file to the client response.
+					 */
+					File   tmp = null;
+					tmp = File.createTempFile("data_" + StrUtils.uniqueName(12), ".zip");
 					handler = new ZipHandler(res, new FileOutputStream(tmp));
 					
+					Fetcher fetcher = new JdbcFetcher(jndiDS);
+						
 					long startTime = System.currentTimeMillis();
 					fetcher.doFetch(req, handler);
 					long totalTime = System.currentTimeMillis() - startTime;
 					logger.info(fetcher.toString() + ": Total request time (ms) " + totalTime);
-					
+						
 					/**
-					 * If all is successful we now stream the file to the response
+					 * The fetch was successful we now stream the file to the response
 					 */
 					res.setContentType( handler.getContentType() );
 					res.getOutputStream().write(Files.readAllBytes(tmp.toPath()));
 					res.getOutputStream().flush();
 					res.getOutputStream().close();					
-				} finally {
-					if(tmp != null) {
-						tmp.delete();
-					}
+				} else {
+					/**
+					 * This is a UI direct download request.  In order to make it
+					 * work as efficiently as possible, we will reply to the client
+					 * stream with a link to the file when it is actually finished just
+					 * like we do in the email handler.  This makes the UI easy to
+					 * code such that we just wait for a response from the server
+					 * on the UI side and test the response content for either a file
+					 * download link, a flag stating the time has exceeded or an
+					 * OGC error message.
+					 * 
+					 * If we exceed our timeout limit while processing, we will reply
+					 * to the stream with a string of TimeOutFetcher.TIME_EXCEEDED_RESPONSE
+					 */
+					File   tmp = null;
+					tmp = File.createTempFile("data_" + StrUtils.uniqueName(12), ".zip");
+					handler = new TimeOutHandler(res, tmp, email);
+						
+					Fetcher fetcher = new TimeOutFetcher(jndiDS);
+						
+					long startTime = System.currentTimeMillis();
+					fetcher.doFetch(req, handler);
+					long totalTime = System.currentTimeMillis() - startTime;
+					logger.info(fetcher.toString() + ": Total request time (ms) " + totalTime);
 				}
 			} else {
+				/**
+				 * This is an email download request.
+				 */
 				File   tmp = File.createTempFile("data_" + StrUtils.uniqueName(12), ".zip");
 				
 				logger.debug(tmp.getAbsolutePath());
 				handler = new EmailLinkHandler(res, tmp, email);
 				
+				Fetcher fetcher = new JdbcFetcher(jndiDS);
+				
 				long startTime = System.currentTimeMillis();
-				fetcher.doFetch(req, handler);					// This is an "email" handler then 
+				fetcher.doFetch(req, handler);					// This is an "email" handler then
 																// the internal workings CLOSE the client
 																// response connection and releases the
-																// browser but continues execution.  
+																// browser but continues execution.
 																// This is important as it looks like
 																// this is threaded from a client POV but
 																// in reality all we did was close the
@@ -166,14 +214,15 @@ public class DataService extends HttpServlet {
 						 * xml response.
 						 * 
 						 * Since there really is no way to accurately determine
-						 * what a value is, we'll just set it to NoApplicableCode
-						 * and let the ErrUtils deal with it.
+						 * what a value is, we'll just set it to NoApplicableCode,
+						 * set the message to a Generic one and then let the
+						 * ErrUtils deal with it.
 						 */
 						logger.error("Exception in DataService:" +  e.getMessage());
 						logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
 						SedmapException exception = new SedmapException(OGCExceptionCode.NoApplicableCode, e);
 						exception.setExceptionMessage(SedmapException.GENERIC_ERROR);
-						ErrUtils.handleExceptionResponseServices(res, exception);						
+						ErrUtils.handleExceptionResponseServices(res, exception);
 					}
 				}
 			} catch (Exception t) {
