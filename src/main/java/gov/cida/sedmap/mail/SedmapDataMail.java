@@ -12,8 +12,7 @@ public class SedmapDataMail {
 	private static final Logger logger = Logger.getLogger(SedmapDataMail.class);
 	
 	public static final String ADMIN_EMAIL_KEY	      = "sedmap/email/admin";
-	//public static final String ADMIN_EMAIL	        = "SedimentPortal_HELP@usgs.gov";
-	public static final String ADMIN_EMAIL_DEFAULT 	  = "prusso@usgs.gov";
+	public static final String ADMIN_EMAIL_DEFAULT	  = "SedimentPortal_HELP@usgs.gov";
 	public static final String ADMIN_EMAIL;
 
 	protected static final String MSG_ENV_KEY         = "sedmap/email/body";
