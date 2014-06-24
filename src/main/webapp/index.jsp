@@ -144,17 +144,23 @@
         <div id="noFiltersConfirmation" title="Large Download Confirmation" class="hidden"> 
             <p>No filters have been applied. All data for all sites will be downloaded for the data types selected.</p>
         </div>
-        <div id="splashContent" class="hidden" title="USGS Sediment Data Portal">
-            <h3><a href="helpQuick.jsp">Click here to view the Quick Start guide.</a></h3>
-            <p>
-                The purpose of the USGS sediment portal is to aid in the access and interpretation of USGS discrete and daily suspended-sediment and related data.  The USGS National Water Information System (NWIS) is the original source of all daily and discrete suspended-sediment data presented in the portal, though some suspended-sediment data hosted by NWIS are not provided via this portal.
-                See the <a href="helpGuide.jsp">User Guide</a> as well as a series of video demonstrations (<a href="http://www.youtube.com/watch?v=kXvlKzqSpzI">Demo 1</a>, <a href="http://www.youtube.com/watch?v=V6FHRZv14MQ">Demo 2</a>, <a href="http://www.youtube.com/watch?v=CBFSsxsY-_M">Demo 3</a>) for more information about the data presented or for instructions on site navigation.
-            </p>
-            <p>
-                <em>
-Although this program has been developed by the USGS, no warranty, expressed or implied, is made by the USGS or the United States Government as to the accuracy and functioning of the program and related program material nor shall the fact of distribution constitute any such warranty, and no responsibility is assumed by the USGS in connection therewith.
-                </em>
-            </p>
+        <div id="splashContent" class="hidden" title="Welcome to the USGS Sediment Data Portal">
+        	  <p style="font-size: 12px;">
+        	  	Use the USGS sediment data portal to find and interpret USGS discrete and daily suspended-sediment as well as related data. 
+        	  </p>
+        	  <h3>Data Source</h3>
+        	  <p style="margin-top: -12px;font-size: 12px;">
+        	  	The USGS National Water Information System (NWIS) is the original source of all daily and discrete suspended-sediment data presented in the portal, though some suspended-sediment data hosted by NWIS are not provided via this portal. 
+        	  </p>
+        	  <h3>Help</h3>
+            <p style="margin-top: -12px;font-size: 12px;">
+            	Get information about the data presented or for instructions on site navigation
+		  </p>
+		  <ul style="margin-top: -8px;">
+            	<li>See <a href="helpGuide.jsp">User Guide</a></li>
+            	<li>View video demonstrations (<a href="http://www.youtube.com/watch?v=kXvlKzqSpzI">Demo 1</a>, <a href="http://www.youtube.com/watch?v=V6FHRZv14MQ">Demo 2</a>, <a href="http://www.youtube.com/watch?v=CBFSsxsY-_M">Demo 3</a>)</li>
+            </ul>
+            <h3 style="float: right;margin-right: 15px;margin-top: 10px;"><a href="helpQuick.jsp">> > > Click for Quick Start guide.</a></h3>
         </div>
         <jsp:include page="siteLegend.jsp"/>
         <jsp:include page="download.jsp"/>
