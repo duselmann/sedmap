@@ -333,7 +333,13 @@ public class OgcUtilsTests {
 
 	@Test
 	public void test_ogcXml2Filter_simple_v1_0() {
-		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_0);
+		Filter filter;
+		try {
+			filter = OgcUtils.ogcXmlToFilter(ogc_v1_0);
+		} catch (Exception e) {
+			fail(e.getMessage());
+			return;
+		}
 
 		String expected = "[ Site_Id >= 5 ]";
 		String actual   = filter.toString();
@@ -344,7 +350,13 @@ public class OgcUtilsTests {
 	@Test
 	public void test_ogcXml2Sql_simple_v1_0() {
 		String expected = "\"Site_Id\" >= ?";
-		String actual   = OgcUtils.ogcXmlToParameterQueryWherClause(ogc_v1_0);
+		String actual;
+		try {
+			actual = OgcUtils.ogcXmlToParameterQueryWherClause(ogc_v1_0);
+		} catch (Exception e) {
+			fail(e.getMessage());
+			return;
+		}
 
 		assertEquals("Testing conversion from toString to SQL", expected, actual);
 	}
@@ -416,19 +428,34 @@ public class OgcUtilsTests {
 	public void test_invalidChars_openParentheses() {
 		String qry = "[ foo=( ]";
 
-		OgcUtils.checkForInvalidChars(qry);
+		try {
+			OgcUtils.checkForInvalidChars(qry);
+		} catch (Exception e) {
+			fail(e.getMessage());
+			return;
+		}
 	}
 	@Test(expected=RuntimeException.class)
 	public void test_invalidChars_closedParentheses() {
 		String qry = "[ foo=) ]";
 
-		OgcUtils.checkForInvalidChars(qry);
+		try {
+			OgcUtils.checkForInvalidChars(qry);
+		} catch (Exception e) {
+			fail(e.getMessage());
+			return;
+		}
 	}
 	@Test(expected=RuntimeException.class)
 	public void test_invalidChars_semicolon() {
 		String qry = "[ foo=dfsdf; ]";
 
-		OgcUtils.checkForInvalidChars(qry);
+		try {
+			OgcUtils.checkForInvalidChars(qry);
+		} catch (Exception e) {
+			fail(e.getMessage());
+			return;
+		}
 	}
 
 
@@ -436,7 +463,13 @@ public class OgcUtilsTests {
 	public void test_sqlTranslation_Brakets2parentheses() {
 		String query  = "[ ]";
 		String expect = "( )";
-		String actual = OgcUtils.sqlTranslation(query);
+		String actual;
+		try {
+			actual = OgcUtils.sqlTranslation(query);
+		} catch (Exception e) {
+			fail(e.getMessage());
+			return;
+		}
 
 		assertEquals("square brackets replaced with parentheses", expect, actual);
 	}
@@ -445,7 +478,13 @@ public class OgcUtilsTests {
 	public void test_sqlTranslation_isLike2like() {
 		String query  = " is like ";
 		String expect = " like ";
-		String actual = OgcUtils.sqlTranslation(query);
+		String actual;
+		try {
+			actual = OgcUtils.sqlTranslation(query);
+		} catch (Exception e) {
+			fail(e.getMessage());
+			return;
+		}
 
 		assertEquals("remove 'is' from 'is like'", expect, actual);
 	}
@@ -455,7 +494,13 @@ public class OgcUtilsTests {
 	public void test_sqlTranslation_wildcard2string() {
 		String query  = " bar* ";
 		String expect = " 'bar%' ";
-		String actual = OgcUtils.sqlTranslation(query);
+		String actual;
+		try {
+			actual = OgcUtils.sqlTranslation(query);
+		} catch (Exception e) {
+			fail(e.getMessage());
+			return;
+		}
 
 		assertEquals("convert wildcard from bar* to 'bar%' ", expect, actual);
 	}

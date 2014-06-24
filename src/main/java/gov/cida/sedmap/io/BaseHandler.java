@@ -1,5 +1,8 @@
 package gov.cida.sedmap.io;
 
+import gov.cida.sedmap.io.util.exceptions.SedmapException;
+import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,7 +12,10 @@ import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+
 public class BaseHandler implements FileDownloadHandler {
+	private static final Logger logger = Logger.getLogger(BaseHandler.class);
 
 	public static final String BOUNDARY_TAG = "--AMZ90RFX875LKMFasdf09DDFF3";
 	public static final String MULTI_PART_CONTENT_TYPE = "multipart/x-mixed-replace;boundary="
@@ -32,18 +38,39 @@ public class BaseHandler implements FileDownloadHandler {
 	}
 
 	@Override
-	public FileDownloadHandler write(byte[] data) throws IOException {
-		out.write(data);
+	public FileDownloadHandler write(byte[] data) throws Exception {
+		try {
+			out.write(data);
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+			logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
+			throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR));
+		}
+		
 		return this; //chain
 	}
 	@Override
-	public FileDownloadHandler write(byte[] data, int length) throws IOException {
-		out.write(data, 0, length);
+	public FileDownloadHandler write(byte[] data, int length) throws Exception {
+		try {
+			out.write(data, 0, length);
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+			logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
+			throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR));
+		}
+		
 		return this; //chain
 	}
 	@Override
-	public FileDownloadHandler write(String data) throws IOException {
-		this.write(data.getBytes());
+	public FileDownloadHandler write(String data) throws Exception {
+		try {
+			this.write(data.getBytes());
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+			logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
+			throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR));
+		}
+		
 		return this; //chain
 	}
 
@@ -54,20 +81,27 @@ public class BaseHandler implements FileDownloadHandler {
 
 
 	@Override
-	public FileDownloadHandler beginWritingFiles() throws IOException {
-		resp.setContentType( getContentType() );
+	public FileDownloadHandler beginWritingFiles() throws Exception {
+		try {
+			resp.setContentType( getContentType() );
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
+			throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR));
+		}
+		
 		return this; //chain
 	}
 
 
 	@Override
-	public FileDownloadHandler startNewFile(String contentType, String filename) throws IOException {
+	public FileDownloadHandler startNewFile(String contentType, String filename) throws Exception {
 		return this; //chain
 	}
 
 
 	@Override
-	public FileDownloadHandler writeFile(String contentType, String filename, InputStream fileData) throws IOException {
+	public FileDownloadHandler writeFile(String contentType, String filename, InputStream fileData) throws Exception {
 
 		try {
 			startNewFile(contentType, filename);
@@ -84,6 +118,10 @@ public class BaseHandler implements FileDownloadHandler {
 			}
 			write(IoUtils.LINE_SEPARATOR);
 			endNewFile();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
+			throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR));
 		} finally {
 			IoUtils.quiteClose(fileData);
 		}
@@ -93,17 +131,23 @@ public class BaseHandler implements FileDownloadHandler {
 
 
 	@Override
-	public FileDownloadHandler endNewFile() throws IOException {
+	public FileDownloadHandler endNewFile() throws Exception {
 		// place holder for book-ending
 		return this; //chain
 	}
 
 
 	@Override
-	public FileDownloadHandler finishWritingFiles() throws IOException {
+	public FileDownloadHandler finishWritingFiles() throws Exception {
 		// if the container handles this then it does not have to be in a finally block
-		out.flush();
-		out.close();
+		try {
+			out.flush();
+			out.close();
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+			logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
+			throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR));
+		}
 		return this; //chain
 	}
 

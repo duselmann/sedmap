@@ -259,7 +259,7 @@ var Filters = Class.extend({
     },
 
 	
-	checkAndInitParentGroup : function() {
+	checkAndInitParentGroup : function() {		
 		// if there is no group yet and needed then make it
 		if ( this.group !== this.parent && $(this.group).length === 0 ) {
 			// use the group el without the # for jquery
@@ -287,12 +287,16 @@ var Filters = Class.extend({
             $('.clearFilter').click(function(){clearFilters(_this.parent)})
 			$('.applyFilter').click(function(){applyFilters(_this.parent)})
 			
-			$('#DL-download').click(function(){
+			$('#DL-download').click(function(e){
+				$('#DL-msg').hide()
+				
 				// TODO re-factor to a callback of some fashion
 				var isDaily = $('#DL-daily:checkbox:checked').length != 0
 				var isDiscr = $('#DL-discrete:checkbox:checked').length != 0
+				var isDownload = $('#DL-directdownload:checkbox:checked').length != 0
 				
 				if (!isDaily && !isDiscr) {
+					$('#DL-msg').show()
                     $('#DL-msg').html("Please select a data set.")
 				    return
 				}
@@ -303,6 +307,7 @@ var Filters = Class.extend({
                 var data    = {url:'data'}
                 data.email  = $("#DL-email").val()
                 data.format = $('#DL-format').val()
+                data.directDownload = isDownload ? "true" : "false"
                 data.dataTypes  = "sites_" // always include site info
                 data.dataTypes += isData  ?"data_"     :""
                 data.dataTypes += isDaily ?"daily_"    :""
@@ -322,18 +327,56 @@ var Filters = Class.extend({
                     $('#DL-msg').html('working, please wait...')
 				    $('#dlf_form').submit()
                     closeDL()
-                */    
-                    $('#DL-msg').html('Please enter email address. A link will be sent.')
+                */  
+					if(data.directDownload == "true") {
+						$('#DL-msg').html('An email address is required. A link will be sent if the process takes too long.')
+					} else {
+						$('#DL-msg').html('Please enter an email address. A link will be sent when the process is finished.')
+					}
+					
+					$('#DL-msg').show()
                 } else {
                     var url = data.url
                     data.url = ''
-                    $.post(url, data).done( function(data) {
-                        $('#DL-msg').html(data)
-                        clearDelay('#DL-msg')
-                        closeDL()
-                    }).fail(function(data) {
-                        $('#DL-msg').html(data)
-                    });
+                    if(data.directDownload == "true") {
+                    	$('#DL-download').hide();
+                    	$('#DL-downloadprogress').show();
+                    	
+                    	// Show progress bar and when recieved "finished" signal
+                    	// from server show launch the download link
+                    	$.post(url, data).done( function(data) {
+                    		if(data === "time_exceeded") {
+	                        	$('#DL-msg').html("The download is taking too long.  You will receive an email when the process is completed.")
+	                        	$('#DL-msg').show()
+                    		} else if(data.indexOf("download?file") >= 0) {
+                    			// We got a file link back, lets download it to
+                    			// the user
+                    			var url = location.protocol + '//' + window.location.host + data;
+                    			downloadSedmapFile(url);
+                    			closeDL();
+                    		} else {
+                    			// We got something other than what we were expecting.
+                    			// Its most likely an OGC message (error) back to the user
+                    			$('#DL-msg').html(data)
+    	                        $('#DL-msg').show()
+                    		}
+                    		
+                    		$('#DL-downloadprogress').hide();
+	                    }).fail(function(data) {
+	                        $('#DL-msg').html(data)
+	                        $('#DL-msg').show()
+	                    });
+    				} else {
+	                    $.post(url, data).done( function(data) {
+	                        $('#DL-msg').html(data)
+	                        $('#DL-msg').show()
+	                        clearDelay('#DL-msg')
+	                        closeDL()
+	                    }).fail(function(data) {
+	                        $('#DL-msg').html(data)
+	                        $('#DL-msg').show()
+	                    });
+    				}
                 }
             })
 
@@ -858,6 +901,8 @@ Filters.Option = Filters.extend({
 
 // called when 'childchange' triggered 
 function updateFilterScroll(e) {
+	$('#DL-msg').hide()
+	
 	var childHeight = 0
 	$(e.target).children().each(function(i,child) {
 		childHeight += $(child).height()
@@ -871,3 +916,14 @@ function updateFilterScroll(e) {
 	}
 }
 
+function downloadSedmapFile(url) {
+	var hiddenIFrameID = 'hiddenDownloader',
+	    iframe = document.getElementById(hiddenIFrameID);
+	if (iframe === null) {
+	    iframe = document.createElement('iframe');
+	    iframe.id = hiddenIFrameID;
+	    iframe.style.display = 'none';
+	    document.body.appendChild(iframe);
+	}
+	iframe.src = url;
+}

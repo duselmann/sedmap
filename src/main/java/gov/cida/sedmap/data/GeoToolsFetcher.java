@@ -38,7 +38,7 @@ public class GeoToolsFetcher extends Fetcher {
 	 */
 
 	@Override
-	public Fetcher initJndiJdbcStore(String jndiJdbc) throws IOException {
+	public Fetcher initJndiJdbcStore(String jndiJdbc) throws Exception {
 		store = OgcUtils.jndiOracleDataStore(jndiJdbc);
 		return this;
 	}
@@ -48,7 +48,7 @@ public class GeoToolsFetcher extends Fetcher {
 
 	@Override
 	protected InputStreamWithFile handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
-			throws IOException, SQLException, NamingException {
+			throws IOException, SQLException, NamingException, Exception {
 		InputStreamWithFile fileData = null;
 
 		JDBCFeatureReader reader = null;

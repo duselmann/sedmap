@@ -19,7 +19,13 @@ public class FilterWrapperIteratorTests {
 
 	@Test
 	public void test_singleValue() {
-		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_0);
+		Filter filter;
+		try {
+			filter = OgcUtils.ogcXmlToFilter(ogc_v1_0);
+		} catch (Exception e) {
+			fail(e.getMessage());
+			return;
+		}
 		FilterWrapperDepthFirstIterator fwi = new FilterWrapperDepthFirstIterator(filter);
 
 		assertTrue("Expect hasNext true with one entry",fwi.hasNext());
@@ -31,7 +37,13 @@ public class FilterWrapperIteratorTests {
 	}
 	@Test
 	public void test_multipleValues() {
-		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
+		Filter filter;
+		try {
+			filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
+		} catch (Exception e) {
+			fail(e.getMessage());
+			return;
+		}
 		FilterWrapperDepthFirstIterator fwi = new FilterWrapperDepthFirstIterator(filter);
 
 		assertTrue("Expect hasNext true for multiple entries",fwi.hasNext());

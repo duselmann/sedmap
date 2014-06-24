@@ -27,7 +27,7 @@ public class RawHandler extends BaseHandler {
 	}
 
 	@Override
-	public FileDownloadHandler beginWritingFiles() throws IOException {
+	public FileDownloadHandler beginWritingFiles() throws Exception {
 		super.beginWritingFiles();
 		resp.addHeader("Content-Disposition", "attachment; filename=data.zip");
 		resp.addHeader("Content-Length", ""+file.length());
