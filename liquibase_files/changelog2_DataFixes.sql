@@ -47,7 +47,7 @@ Update site_ref Set State = 'PR' where huc_basin_name = 'Puerto Rico';
 Update site_ref Set State = 'VI' where site_no = '50292600';
 Update site_ref Set State = 'VI' where site_no = '50294000';
 
-
+/*
 --changeset duselman:updateMissingSNAME
 Update site_ref Set sname ='YANTIC RIVER AT YANTIC, CT.' where site_no ='01127500';
 Update site_ref Set sname ='SCANTIC R AT BROAD BROOK, CT.' where site_no ='01184500';
@@ -298,5 +298,6 @@ Update site_ref Set sname ='QUEBRADA CAIMITO NR JUNCOS, PR' where site_no ='5005
 Update site_ref Set sname ='QUEBRADA MAMEY NR GURABO, PR' where site_no ='50056900';
 Update site_ref Set sname ='LAMESHUR BAY GUT AT LAMESHUR BAY, ST. JOHN  USVI' where site_no ='50292600';
 Update site_ref Set sname ='FISH BAY GUT AT FISH BAY, ST. JOHN USVI' where site_no ='50294000';
-Update site_ref Set sname ='PECOS RIVER AT PUERTO DE LUNA, NM' where site_no ='08383400';
+Update site_ref Set sname ='PECOS RIVER AT PUERTO DE LUNA, NM' where site_no ='08383400;
+*/
 
