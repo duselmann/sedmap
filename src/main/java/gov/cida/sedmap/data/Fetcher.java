@@ -103,7 +103,7 @@ public abstract class Fetcher {
 
 		url = url.replace("_startDate_", startDate);
 		url = url.replace("_endDate_",   endDate);
-		logger.debug("NWIS URL: " + url);
+		logger.debug("NWIS PRE-SITE URL: " + url);
 		// we need to include the second header line for rdb format
 
 		int readLineCountAfterComments = 0;
@@ -133,6 +133,7 @@ public abstract class Fetcher {
 				// fetch the data from NWIS
 				BufferedReader nwis = null;
 				try {
+					logger.debug("NWIS PURE URL: " + sitesUrl);
 					nwis = fetchNwisData(sitesUrl);
 					logger.debug("formatting NWIS data");
 
@@ -256,9 +257,13 @@ public abstract class Fetcher {
 						// to their original currentHeaderNames list.  We need to
 						// split them and then add them to the currentHeaderValueMapping
 						// accordingly.
-						String[] values =formattedRawline.split(formatter.getSeparator());
+						String[] values =formattedRawline.split(formatter.getSeparator(), -1);
 						if(values.length != currentHeaderNames.size()) {
-							logger.error("Daily Data Parsing ERROR: The number of values in the line [" + values + "] does not equate to the number of column headers we have for this line [" + currentHeaderNames + "].  Skipping line...");
+							logger.error("Daily Data Parsing ERROR: The number of values in the line [" + Arrays.toString(values) + "] SIZE (" + values.length + 
+									") does not equate to the number of column headers we have for this line [" + currentHeaderNames + "] SIZE (" + currentHeaderNames.size() +
+									"\nLINE BEFORE TRANSFORM:\n[" + line + "]\n" +
+									"\nLINE AFTER  TRANSFORM:\n[" + formattedRawline + "]\n" +
+									").  Skipping line...");
 							continue;
 						}
 						
