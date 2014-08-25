@@ -336,10 +336,10 @@ var Filters = Class.extend({
 					
 					$('#DL-msg').show()
                 } else {
-                    var url = data.url
-                    data.url = ''
+                    var url = data.url;
+                    data.url = '';
+                    $('#DL-download').hide();
                     if(data.directDownload == "true") {
-                    	$('#DL-download').hide();
                     	$('#DL-downloadprogress').show();
                     	
                     	// Show progress bar and when recieved "finished" signal
@@ -353,7 +353,7 @@ var Filters = Class.extend({
                     			// the user
                     			var url = location.protocol + '//' + window.location.host + data;
                     			downloadSedmapFile(url);
-                    			closeDL();
+                    			closeDL(1);
                     		} else {
                     			// We got something other than what we were expecting.
                     			// Its most likely an OGC message (error) back to the user

@@ -9,9 +9,10 @@
 
     
 <div class="menubar">
-    <div class="menu">
+    <div class="menu" style="width: 115px;">
         <div class="header">HELP</div>
-        <div class="item"><a onclick="openUrlInNewTab('helpQuick.jsp')" href="#">Quick Start...</a></div>
-        <div class="item"><a onclick="openUrlInNewTab('helpGuide.jsp')" href="#">User Guide...</a></div>
+        <div class="item" style="width: 114px;"><a onclick="openUrlInNewTab('helpQuick.jsp')" href="#">Quick Start...</a></div>
+        <div class="item" style="width: 114px;"><a onclick="openUrlInNewTab('helpGuide.jsp')" href="#">User Guide...</a></div>
+        <div class="item" style="width: 114px;"><a onclick="openUrlInNewTab('helpWebServices.jsp')" href="#">Web Services...</a></div>
     </div>
 </div>
