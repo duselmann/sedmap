@@ -472,10 +472,16 @@ function initFilters() {
 
 
 
-function closeDL() {
+function closeDL(timeout) {
+	if(typeof timeout === "undefined") {
+		timeout = 5000;
+	} else if(isNaN(timeout)) {
+		timeout = 5000;
+	}
+	
     setTimeout(function(){
         $(".blackoverlay").fadeOut("slow")
-    },5000)
+    },timeout)
 }
 
 
@@ -493,7 +499,7 @@ function downloadShow() {
         
         $("#DL-daily").prop('checked', isDaily);
         $("#DL-discrete").prop('checked', isDiscr);
-        $('#DL-directdownload').prop('checked', false);
+        //$('#DL-directdownload').prop('checked', false);
         $('#DL-downloadprogress').hide();
         $('#DL-download').show();
         

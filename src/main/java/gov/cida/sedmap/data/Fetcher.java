@@ -4,7 +4,6 @@ import gov.cida.sedmap.io.FileDownloadHandler;
 import gov.cida.sedmap.io.InputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.WriterWithFile;
-import gov.cida.sedmap.io.util.ErrUtils;
 import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.io.util.StringValueIterator;
 import gov.cida.sedmap.io.util.exceptions.SedmapException;
@@ -33,7 +32,6 @@ import java.util.Map;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;

@@ -13,8 +13,8 @@ var DEFAULT_CIDA_PROJECTION = 'EPSG:900913'//projection for our own map services
 var map // this will be your main openlayers handle
 var format     = 'image/png'; // your default wms return type. 
 var projectUrl = '/sediment/map/'; // your project server. 
-var arcgisUrl  = 'http://services.arcgisonline.com/ArcGIS/rest/services/'; // ArcGIS server. 
-var nlcdUrl    = 'http://raster.nationalmap.gov/ArcGIS/services/TNM_LandCover/MapServer/WMSServer'; // NLCD server ?request=GetCapabilities&service=WMS&version=1.3.0
+var arcgisUrl  = 'http://services.arcgisonline.com/ArcGIS/rest/services/'; // ArcGIS server.
+var nlcdUrl    = 'http://raster.nationalmap.gov/arcgis/services/LandCover/USGS_EROS_LandCover_NLCD/MapServer/WMSServer'; // NLCD server ?request=GetCapabilities&service=WMS
 var flowUrl    = '/sediment/flow/'; // url to the flow proxy point
 
 var layers = {}
