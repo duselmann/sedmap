@@ -228,7 +228,9 @@ public abstract class Fetcher {
 							// Now lets save this site's columns so we can
 							// correctly place the values in the correct
 							// spots when writing out the line
-							currentHeaderNames = new ArrayList<String>(Arrays.asList(currentHeaderline.split(formatter.getSeparator())));
+							// Since the NWIS data always comes in rdb format, we use that formatter's line separator to determine
+							// how we split the lines.
+							currentHeaderNames = new ArrayList<String>(Arrays.asList(currentHeaderline.split(rdb.getSeparator(), -1)));
 							
 							// Now what we need to do is null out all of the
 							// values for the current headerMapping that are 
@@ -259,7 +261,7 @@ public abstract class Fetcher {
 						if(values.length != currentHeaderNames.size()) {
 							logger.error("Daily Data Parsing ERROR: The number of values in the line [" + Arrays.toString(values) + "] SIZE (" + values.length + 
 									") does not equate to the number of column headers we have for this line [" + currentHeaderNames + "] SIZE (" + currentHeaderNames.size() +
-									"\nLINE BEFORE TRANSFORM:\n[" + line + "]\n" +
+									")\nLINE BEFORE TRANSFORM:\n[" + line + "]\n" +
 									"\nLINE AFTER  TRANSFORM:\n[" + formattedRawline + "]\n" +
 									").  Skipping line...");
 							continue;
