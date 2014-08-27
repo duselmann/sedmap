@@ -63,7 +63,7 @@
         <!--  jsp:include page="components/application-overlay.jsp">< /jsp:include -->
 
         <div class="container-fluid">
-            <div class="row-fluid" id="header-row">
+            <div class="row-fluid" id="header-row" style="min-width: 1388px;">
                 <jsp:include page="template/USGSHeader.jsp">
                     <jsp:param name="relPath" value="" />
                     <jsp:param name="header-class" value="" />
