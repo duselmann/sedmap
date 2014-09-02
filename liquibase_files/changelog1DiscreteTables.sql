@@ -21,7 +21,7 @@ ALTER TABLE SEDMAP.DISCRETE_SITES ADD (
 GRANT SELECT ON SEDMAP.DISCRETE_SITES TO SEDUSER;
 
 insert into discrete_sites
-select distinct "site_no" from SRC_ALLSSC_DATACOMBINED_61114;
+select distinct site_no from SRC_ALLSSC_DATACOMBINED_71714;
 --rollback Drop table discrete_sites;
 
 
@@ -72,7 +72,7 @@ CREATE TABLE SEDMAP.DISCRETE_SAMPLE_FACT
   PH             VARCHAR2(255 BYTE),
   PHLAB          VARCHAR2(255 BYTE),
   END_DATE       date,
-  END_TIME       VARCHAR2(4 BYTE));
+  END_TIME       VARCHAR2(5 BYTE));
 
  ALTER TABLE SEDMAP.DISCRETE_SAMPLE_FACT ADD (
   CONSTRAINT DISCRETE_SAMPLE_FACT_U01
@@ -91,7 +91,7 @@ insert into discrete_sample_fact
 select
 site_no,
   station_nm,
-  TO_DATE(substr(datetime,1,19),  'YYYY-MM-DD HH24:MI:SS'),
+  TO_DATE(datetime,  'YYYY-MM-DD HH24:MI:SS'),
   dcomment,
   icomment,
   SSC ,
@@ -132,8 +132,8 @@ site_no,
   DSS ,
   pH,
   pHlab,
-  TO_DATE(end_date, 'MM/DD/YYYY'),
+  TO_DATE(end_date, 'YYYY-MM-DD'),
   end_time 
-   from SRC_ALLSSC_DATACOMBINED_61114;
+   from SRC_ALLSSC_DATACOMBINED_71714;
 
 --rollback Drop table discrete_sample_fact;  
