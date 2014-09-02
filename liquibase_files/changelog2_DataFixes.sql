@@ -43,6 +43,7 @@ update site_ref set sname = upper(sname);
 Update site_ref Set State = 'GU' where site_no = '16809600';
 Update site_ref Set State = 'GU' where site_no = '16854500'; 
 Update site_ref Set State = 'GU' where site_no = '16858000';
+Update site_ref Set State = 'GU' where site_no = '16865000';
 Update site_ref Set State = 'PR' where huc_basin_name = 'Puerto Rico';
 Update site_ref Set State = 'VI' where site_no = '50292600';
 Update site_ref Set State = 'VI' where site_no = '50294000';
