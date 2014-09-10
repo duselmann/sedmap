@@ -47,7 +47,5 @@ select "site_no",
   "nhdp90",
   "nhdp95",
   "nhdp99"
-   from SRC_SSC_SITE_INFO_8_27_13
-where "site_no" not in
-(select "x" from SRC_ACTUAL_LOST_SITE_11_26_13);
+   from SRC_SSC_SITE_INFO_782014;
 --rollback Drop table flow_exceedance;

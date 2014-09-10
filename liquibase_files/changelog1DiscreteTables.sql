@@ -21,9 +21,7 @@ ALTER TABLE SEDMAP.DISCRETE_SITES ADD (
 GRANT SELECT ON SEDMAP.DISCRETE_SITES TO SEDUSER;
 
 insert into discrete_sites
-select distinct "site_no" from SRC_ALLSSCDATA_12_20_13
-where "site_no" not in 
-(select "site_no" from SRC_AJM_EXCESS_SITES_11_26_13);
+select distinct site_no from SRC_ALLSSC_DATACOMBINED_71714;
 --rollback Drop table discrete_sites;
 
 
@@ -74,7 +72,7 @@ CREATE TABLE SEDMAP.DISCRETE_SAMPLE_FACT
   PH             VARCHAR2(255 BYTE),
   PHLAB          VARCHAR2(255 BYTE),
   END_DATE       date,
-  END_TIME       VARCHAR2(4 BYTE));
+  END_TIME       VARCHAR2(5 BYTE));
 
  ALTER TABLE SEDMAP.DISCRETE_SAMPLE_FACT ADD (
   CONSTRAINT DISCRETE_SAMPLE_FACT_U01
@@ -90,15 +88,15 @@ GRANT SELECT ON SEDMAP.DISCRETE_SAMPLE_FACT TO SEDUSER;
   
 
 insert into discrete_sample_fact
-select 
-"site_no",
-  "station_nm",
-  TO_DATE("Datetime",  'YYYY-MM-DD HH24:MI:SS'),
-  "dcomment",
-  "icomment",
+select
+site_no,
+  station_nm,
+  TO_DATE(datetime,  'YYYY-MM-DD HH24:MI:SS'),
+  dcomment,
+  icomment,
   SSC ,
-  "Dailyflow",
-  "Instflow",
+  Dailyflow,
+  Instflow,
   GH,
   P2,
   P4,
@@ -109,34 +107,33 @@ select
   P125,
   P250,
   P500,
-  "P1milli",
-  "P2milli",
+  P1milli,
+  P2milli,
   LOI,
   TSS,
   SS ,
-  "Agencycode",
-  "Sampmethod",
-  "Samplepurpose",
-  "Samptype",
-  "Numbersamppts",
-  "Width" ,
-  "Velocity",
-  "Turb70",
-  "Turb76",
-  "Turb61028",
-  "Turb63675",
-  "Turb63676",
-  "Turb63680",
-  "TempC",
-  "TempairC",
+  Agencycode,
+  Sampmethod,
+  Samplepurpose,
+  Samptype,
+  Numbersamppts,
+  Width ,
+  Velocity,
+  Turb70,
+  Turb76,
+  Turb61028,
+  Turb63675,
+  Turb63676,
+  Turb63680,
+  TempC,
+  TempairC,
   SC,
-  "Sclab",
+  Sclab,
   DSS ,
-  "pH",
-  "pHlab",
-  TO_DATE("end_date", 'MM/DD/YYYY'),
-  "end_time" 
-   from SRC_ALLSSCDATA_12_20_13
- where "site_no" not in 
-(select "site_no" from SRC_AJM_EXCESS_SITES_11_26_13);
+  pH,
+  pHlab,
+  TO_DATE(end_date, 'YYYY-MM-DD'),
+  end_time 
+   from SRC_ALLSSC_DATACOMBINED_71714;
+
 --rollback Drop table discrete_sample_fact;  
