@@ -9,7 +9,7 @@ select s.*, b.basin_ids basin_no, s.eco_l2_code eco_l2_cod
 from sedmap.site_ref s
 left outer join sedmap.site_basin b on s.site_no=b.site_no;
 grant select on SITE_REF_BASIN to seduser;
---  drop view SITE_REF_BASIN;
+-- rollback drop view SITE_REF_BASIN;
 
 
 --changeset duselman:CreateDiscreteStationsView
@@ -22,7 +22,7 @@ where exists (select 1
             from sedmap.discrete_sites i 
             where s.SITE_NO=i.SITE_NO);
 grant select on DISCRETE_STATIONS to seduser;
---  drop view DISCRETE_STATIONS;
+-- rollback drop view DISCRETE_STATIONS;
 
 
 --changeset duselman:CreateDailyStationsView
@@ -39,7 +39,7 @@ where exists (select 1
             from sedmap.daily_sites i 
             where s.SITE_NO=i.SITE_NO);
 grant select on daily_stations to seduser;
---  drop view daily_stations;
+-- rollback drop view daily_stations;
 
             
             
@@ -66,7 +66,7 @@ select s.*,
      group by SITE_NO) f 
   on (f.SITE_NO = s.SITE_NO);
 grant select on SITE_INFO to seduser;
---  drop view SITE_INFO;
+-- rollback drop view SITE_INFO;
 
 
 --changeset duselman:ecoRegion1View
@@ -74,21 +74,21 @@ create or replace view sedmap.ECO1NAMES as
 select distinct ECO_L1_NAME ECO_NAME from sedmap.site_ref 
 where ECO_L1_NAME is not null order by 1;
 grant select on ECO1NAMES to seduser;
---  drop view ECO1NAMES;
+-- rollback drop view ECO1NAMES;
 
 --changeset duselman:ecoRegion2View
 create or replace view sedmap.ECO2NAMES as
 select distinct ECO_L2_NAME ECO_NAME from sedmap.site_ref 
 where ECO_L2_NAME is not null order by 1;
 grant select on ECO2NAMES to seduser;
---  drop view ECO2NAMES;
+-- rollback drop view ECO2NAMES;
 
 --changeset duselman:ecoRegion3View
 create or replace view sedmap.ECO3NAMES as
 select distinct ECO_L3_NAME ECO_NAME from sedmap.site_ref 
 where ECO_L3_NAME is not null order by 1;
 grant select on ECO3NAMES to seduser;
---  drop view ECO3NAMES;
+-- rollback drop view ECO3NAMES;
 
 
 
@@ -150,7 +150,7 @@ from DISCRETE_STATIONS s
 left join sedmap.flow_exceedance f on s.site_no=f.site_no;
 
 grant select on DISCRETE_STATIONS_DL to seduser;
---  drop view DISCRETE_STATIONS_DL;
+-- rollback drop view DISCRETE_STATIONS_DL;
 
 
 
@@ -212,4 +212,4 @@ from DAILY_STATIONS s
 left join sedmap.flow_exceedance f on s.site_no=f.site_no;
 
 grant select on DAILY_STATIONS_DL to seduser;
---  drop view DAILY_STATIONS_DL;
+-- rollback drop view DAILY_STATIONS_DL;

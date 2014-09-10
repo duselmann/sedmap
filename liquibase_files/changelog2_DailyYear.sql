@@ -127,4 +127,6 @@ insert into daily_year select SITE_NO,2009 from daily_years yrs where yrs."2009"
 insert into daily_year select SITE_NO,2010 from daily_years yrs where yrs."2010" is not null;
 insert into daily_year select SITE_NO,2011 from daily_years yrs where yrs."2011" is not null;
 insert into daily_year select SITE_NO,2012 from daily_years yrs where yrs."2012" is not null;
+insert into daily_year select SITE_NO,2013 from daily_years yrs where yrs."2013" is not null;
+insert into daily_year select SITE_NO,2014 from daily_years yrs where yrs."2014" is not null;
 -- rollback truncate table daily_year;
