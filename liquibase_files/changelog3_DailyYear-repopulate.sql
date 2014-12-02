@@ -2,12 +2,8 @@
 
 --This is for the sedmap schema
 
---changeset duselman:trucateDailyYearTable
- truncate table daily_year;
--- rollback --not revertable;
-
-
 --changeset duselman:re-PopulateDailyYearTableFromDailyYears
+ truncate table daily_year;
 -- insert into daily_year select SITE_NO,1900 from daily_years yrs where yrs."1900" is not null and yrs."1900" >0;
 -- insert into daily_year select SITE_NO,1901 from daily_years yrs where yrs."1901" is not null and yrs."1901" >0;
 -- insert into daily_year select SITE_NO,1902 from daily_years yrs where yrs."1902" is not null and yrs."1902" >0;
