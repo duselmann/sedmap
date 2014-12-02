@@ -1,3 +1,4 @@
 liquibase.properties
 notes.txt
 .project
+/bin/
