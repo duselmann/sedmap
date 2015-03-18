@@ -33,7 +33,7 @@ public class TimeOutFetcher extends Fetcher {
 	protected static final long TIMEOUT_SLEEP;
 	
 	protected static final String KILL_THREAD_ENV_KEY = "sedmap/timoutfetcher/killthread";
-	protected static final long KILL_THREAD_DEFAULT = 1000 * 60 * 60; // 1 hour
+	protected static final long KILL_THREAD_DEFAULT = 1000 * 60 * 60 * 3; // 3 hour
 	protected static final long KILL_THREAD;
 		
 	static {
@@ -46,6 +46,13 @@ public class TimeOutFetcher extends Fetcher {
 	
 	public TimeOutFetcher(String jndiJdbc) {
 		this.jdbcFetcher = new JdbcFetcher(jndiJdbc);
+		
+		/**
+		 * Debug logging
+		 */
+		logger.info("REQUEST TIMEOUT = [" + TIMEOUT + "]");
+		logger.info("TIMEOUT_SLEEP   = [" + TIMEOUT_SLEEP + "]");
+		logger.info("KILL_THREAD     = [" + KILL_THREAD + "]");
 	}
 
 	@Override
