@@ -145,7 +145,7 @@ select "site_no",
   to_number(CLAY)  ,
   to_number(SAND) ,
   to_number(SILT)
-   from SRC_SSC_SITE_INFO_782014;
+   from SRC_SSC_SITE_INFO_73115;
 
 update site_ref set GEOM_LL = mdsys.sdo_geometry(2001,8307,mdsys.sdo_point_type
 (longitude,latitude,null),null,null); 
