@@ -21,7 +21,7 @@ ALTER TABLE SEDMAP.DAILY_SITES ADD (
 GRANT SELECT ON SEDMAP.DAILY_SITES TO SEDUSER;
 
 insert into daily_sites
-select distinct site_no from SRC_DAILY_SSLINVENTORY_61214;
+select distinct site_no from SRC_DAILY_SSLINVENTORY_72915;
 --rollback Drop table daily_sites;
 
 
@@ -166,7 +166,7 @@ select site_no,
   min_ssl_year,
   max_ssl_year,
   count_unique ,
-  "1908",
+  null,
   "1909",
   "1910",
   "1911",
@@ -273,6 +273,6 @@ select site_no,
   "2012",
   "2013",
   "2014"
-   from SRC_DAILY_SSLINVENTORY_61214;
+   from SRC_DAILY_SSLINVENTORY_72915;
  --rollback Drop table daily_years;    
   
