@@ -37,7 +37,6 @@ CREATE TABLE SEDMAP.DAILY_YEARS
   MIN_SSL_YEAR          VARCHAR2(255 BYTE),
   MAX_SSL_YEAR          VARCHAR2(255 BYTE),
   COUNT_UNIQUE_SSL_YRS  VARCHAR2(255 BYTE),
-  "1908"                VARCHAR2(255 BYTE),
   "1909"                VARCHAR2(255 BYTE),
   "1910"                VARCHAR2(255 BYTE),
   "1911"                VARCHAR2(255 BYTE),
@@ -143,7 +142,8 @@ CREATE TABLE SEDMAP.DAILY_YEARS
   "2011"                VARCHAR2(255 BYTE),
   "2012"                VARCHAR2(255 BYTE),
   "2013"                VARCHAR2(255 BYTE),
-  "2014"                VARCHAR2(255 BYTE)
+  "2014"                VARCHAR2(255 BYTE),
+  "2015"                VARCHAR2(255 BYTE)
 );
 
 ALTER TABLE SEDMAP.DAILY_YEARS ADD (
@@ -166,7 +166,6 @@ select site_no,
   min_ssl_year,
   max_ssl_year,
   count_unique ,
-  null,
   "1909",
   "1910",
   "1911",
@@ -272,7 +271,8 @@ select site_no,
   "2011",
   "2012",
   "2013",
-  "2014"
+  "2014",
+  "2015"
    from SRC_DAILY_SSLINVENTORY_72915;
  --rollback Drop table daily_years;    
   
