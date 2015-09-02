@@ -5,7 +5,7 @@
 --changeset duselman:trimEcoRegion1
 update site_ref set ECO_L1_NAME=trim(ECO_L1_NAME)
 where ECO_L1_NAME<>trim(ECO_L1_NAME);
---rollback update site_ref set set ECO_L1_NAME=trim(ECO_L1_NAME) where ECO_L1_NAME<>trim(ECO_L1_NAME);
+--rollback update site_ref set ECO_L1_NAME=trim(ECO_L1_NAME) where ECO_L1_NAME<>trim(ECO_L1_NAME);
 
 --changeset duselman:trimEcoRegion2
 update site_ref set ECO_L2_NAME=trim(ECO_L2_NAME)
