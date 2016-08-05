@@ -47,5 +47,5 @@ select "site_no",
   "nhdp90",
   "nhdp95",
   "nhdp99"
-   from SRC_SSC_SITE_INFO_73115;
+   from SRC_SSC_SITE_INFO_7252016;
 --rollback Drop table flow_exceedance;

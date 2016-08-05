@@ -110,14 +110,14 @@ CREATE INDEX SM_SITE_GEOM_LL_SP_IDX
   CLAY  ,
   SAND ,
   SILT)  
-select "site_no",
-  "sname" ,
-  "lat"   ,
-  "long"  ,
+select site_no,
+  sname ,
+  lat   ,
+  "LONG"  ,
   NULL,
-  to_number("nwisda1"),
-  "state_name" ,
-  "county_name" ,
+  to_number(nwisda1),
+  state_name ,
+  county_name ,
   ECO_L3_CODE,
   ECO_L3_NAME,
   ECO_L2_CODE,
@@ -145,7 +145,7 @@ select "site_no",
   to_number(CLAY)  ,
   to_number(SAND) ,
   to_number(SILT)
-   from SRC_SSC_SITE_INFO_73115;
+   from SRC_SSC_SITE_INFO_7252016;
 
 update site_ref set GEOM_LL = mdsys.sdo_geometry(2001,8307,mdsys.sdo_point_type
 (longitude,latitude,null),null,null); 

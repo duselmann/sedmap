@@ -21,7 +21,7 @@ ALTER TABLE SEDMAP.DAILY_SITES ADD (
 GRANT SELECT ON SEDMAP.DAILY_SITES TO SEDUSER;
 
 insert into daily_sites
-select distinct site_no from SRC_DAILY_SSLINVENTORY_72915;
+select distinct site_no from SRC_DAILY_SSLINVENTORY_7222016;
 --rollback Drop table daily_sites;
 
 
@@ -273,6 +273,6 @@ select site_no,
   "2013",
   "2014",
   "2015"
-   from SRC_DAILY_SSLINVENTORY_72915;
+   from SRC_DAILY_SSLINVENTORY_7222016;
  --rollback Drop table daily_years;    
   
