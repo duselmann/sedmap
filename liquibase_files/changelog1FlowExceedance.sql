@@ -31,21 +31,21 @@ ALTER TABLE SEDMAP.FLOW_EXCEEDANCE ADD (
 GRANT SELECT ON SEDMAP.FLOW_EXCEEDANCE TO SEDUSER;
 
 insert into flow_exceedance
-select "site_no",
-  "nhdp1",
-  "nhdp5",
-  "nhdp10",
-  "nhdp20",
-  "nhdp25",
-  "nhdp30",
-  "nhdp40",
-  "nhdp50",
-  "nhdp60",
-  "nhdp70",
-  "nhdp75",
-  "nhdp80",
-  "nhdp90",
-  "nhdp95",
-  "nhdp99"
+select site_no,
+  nhdp1,
+  nhdp5,
+  nhdp10,
+  nhdp20,
+  nhdp25,
+  nhdp30,
+  nhdp40,
+  nhdp50,
+  nhdp60,
+  nhdp70,
+  nhdp75,
+  nhdp80,
+  nhdp90,
+  nhdp95,
+  nhdp99
    from SRC_SSC_SITE_INFO_7252016;
 --rollback Drop table flow_exceedance;
