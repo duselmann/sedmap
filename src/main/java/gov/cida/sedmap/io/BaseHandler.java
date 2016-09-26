@@ -44,7 +44,7 @@ public class BaseHandler implements FileDownloadHandler {
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 			logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-			throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR));
+			throw new SedmapException(OGCExceptionCode.NoApplicableCode, e);
 		}
 		
 		return this; //chain
@@ -56,7 +56,7 @@ public class BaseHandler implements FileDownloadHandler {
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 			logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-			throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR));
+			throw new SedmapException(OGCExceptionCode.NoApplicableCode, e);
 		}
 		
 		return this; //chain
@@ -68,7 +68,7 @@ public class BaseHandler implements FileDownloadHandler {
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 			logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-			throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR));
+			throw new SedmapException(OGCExceptionCode.NoApplicableCode, e);
 		}
 		
 		return this; //chain
@@ -87,7 +87,7 @@ public class BaseHandler implements FileDownloadHandler {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-			throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR));
+			throw new SedmapException(OGCExceptionCode.NoApplicableCode, e);
 		}
 		
 		return this; //chain
@@ -121,7 +121,7 @@ public class BaseHandler implements FileDownloadHandler {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-			throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR));
+			throw new SedmapException(OGCExceptionCode.NoApplicableCode, e);
 		} finally {
 			IoUtils.quiteClose(fileData);
 		}
@@ -146,7 +146,7 @@ public class BaseHandler implements FileDownloadHandler {
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 			logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-			throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR));
+			throw new SedmapException(OGCExceptionCode.NoApplicableCode, e);
 		}
 		return this; //chain
 	}

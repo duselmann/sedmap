@@ -85,7 +85,7 @@ public class OgcUtils {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			logger.error("Due to internal exception caught, throwing InvalidParameterValue OGC error for error handling on the client side.");
-			throw new SedmapException(OGCExceptionCode.InvalidParameterValue, new Exception("Failed to parse OGC.  " + e.getLocalizedMessage()));
+			throw new SedmapException(OGCExceptionCode.InvalidParameterValue, new Exception("Failed to parse OGC.",e));
 		}
 	}
 
@@ -119,7 +119,7 @@ public class OgcUtils {
 		} catch (FilterToSQLException e) {
 			logger.error("Failed to convert to SQL.  Exception is: " + e.getMessage());
 			logger.error("Due to internal exception caught, throwing OperationNotSupported OGC error for error handling on the client side.");
-			throw new SedmapException(OGCExceptionCode.OperationNotSupported, new Exception("Failed to parse OGC.  " + e.getLocalizedMessage()));
+			throw new SedmapException(OGCExceptionCode.OperationNotSupported, new Exception("Failed to parse OGC.",e));
 		}
 
 		return sql;
@@ -177,7 +177,7 @@ public class OgcUtils {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			logger.error("Due to internal exception caught, throwing ResourceNotFound OGC error for error handling on the client side.");
-			throw new SedmapException(OGCExceptionCode.ResourceNotFound, new Exception(SedmapException.GENERIC_ERROR));
+			throw new SedmapException(OGCExceptionCode.ResourceNotFound, e);
 		}
 
 		return store;
@@ -206,7 +206,7 @@ public class OgcUtils {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-			throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR));
+			throw new SedmapException(OGCExceptionCode.NoApplicableCode, e);
 		}
 		
 		return reader;

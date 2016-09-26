@@ -386,7 +386,7 @@ public abstract class Fetcher {
 				if (nwisTriesCount == NUM_NWIS_TRIES -1) {
 					logger.error(e.getMessage());
 					logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-					throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR));
+					throw new SedmapException(OGCExceptionCode.NoApplicableCode, e);
 				}
 			}
 			nwisTriesCount++;
@@ -485,7 +485,7 @@ public abstract class Fetcher {
 					} else {
 						logger.error("Failed to fetch from the Database.  Exception is:" +  e.getMessage());
 						logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-						throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR));
+						throw new SedmapException(OGCExceptionCode.NoApplicableCode, e);
 					}
 				} finally {
 					IoUtils.quiteClose(fileData);

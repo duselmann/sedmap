@@ -379,7 +379,7 @@ public class JdbcFetcher extends Fetcher {
 			r.rs = r.ps.executeQuery();
 		} catch (SQLException e) {
 			logger.error(e);
-			throw new SedmapException(OGCExceptionCode.InvalidParameterValue, new Exception(e.getMessage()));
+			throw new SedmapException(OGCExceptionCode.InvalidParameterValue, e);
 		} catch (Exception e) {
 			logger.error(e);
 			e.printStackTrace();
