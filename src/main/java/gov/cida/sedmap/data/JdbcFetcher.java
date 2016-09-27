@@ -376,10 +376,12 @@ public class JdbcFetcher extends Fetcher {
 					}
 				}
 			}
+			logger.info("executeQuery: start");
 			r.rs = r.ps.executeQuery();
+			logger.info("executeQuery: finish");
 		} catch (SQLException e) {
-			logger.error(e);
-			throw new SedmapException(OGCExceptionCode.InvalidParameterValue, new Exception(e.getMessage()));
+			logger.error("executeQuery: error", e);
+			throw new SedmapException(OGCExceptionCode.InvalidParameterValue, e);
 		} catch (Exception e) {
 			logger.error(e);
 			e.printStackTrace();
