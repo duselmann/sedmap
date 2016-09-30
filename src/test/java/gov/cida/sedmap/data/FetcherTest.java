@@ -89,6 +89,16 @@ public class FetcherTest {
 
 		assertEquals("expect line columns headings replaced", expect, actual);
 	}
+	@Test
+	public void reconditionLine_additionalDigits() throws Exception {
+		String line = "agency_cd	site_no	datetime	33316_00060_00003	33306_00060_00003_cd	33302_80154_00003	33302_80154_00003_cd	33303_80155_00003	33303_80155_00003_cd";
+		String expect = "agency_cd	site_no	datetime	DAILY_FLOW	DAILY_FLOW_QUAL	DAILY_SSC	DAILY_SSC_QUAL	DAILY_SSL	DAILY_SSL_QUAL";
+		String actual = dss.reconditionLine(line);
+		System.out.println(line);
+		System.out.println(actual);
+
+		assertEquals("expect line columns headings replaced", expect, actual);
+	}
 
 
 	//	@Test
