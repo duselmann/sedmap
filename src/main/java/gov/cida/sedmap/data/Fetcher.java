@@ -17,8 +17,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.SQLException;
@@ -199,16 +197,16 @@ public abstract class Fetcher {
 					List<String> currentHeaderNames = new ArrayList<String>();
 					String line;
 					boolean columnsWritten = false;
-					while ((line = nwis.readLine()) != null) {
-						if (line.startsWith("#")) {
+					while ( (line = nwis.readLine()) != null ) {
+						if ( line.startsWith("#") ) {
 							readLineCountAfterComments = 0;
 							continue;
 						}
-						//include column headers for the next site
-						if(0 == readLineCountAfterComments){
+						// include column headers for the next site
+						if (0 == readLineCountAfterComments) {
 							readLineCountAfterComments++;
 							
-							if(!columnsWritten) {
+							if ( ! columnsWritten) {
 								/**
 								 * This is the first site found in the resulting
 								 * data.  It is also the first time we have seen
@@ -235,7 +233,7 @@ public abstract class Fetcher {
 							// Now what we need to do is null out all of the
 							// values for the current headerMapping that are 
 							// NOT a part of this site's results
-							for(String columnKey : DEFAULT_DAILY_DATA_COLUMN_NAMES) {
+							for (String columnKey : DEFAULT_DAILY_DATA_COLUMN_NAMES) {
 								currentHeaderValueMapping.put(columnKey, null);
 							}
 							
@@ -245,7 +243,7 @@ public abstract class Fetcher {
 							continue;
 						}
 						//exclude NWIS row following column headers for each site
-						else if(1 == readLineCountAfterComments){
+						else if (1 == readLineCountAfterComments) {
 							readLineCountAfterComments++;
 							continue;
 						}
@@ -270,11 +268,11 @@ public abstract class Fetcher {
 						// Now loop through our values, associate them with the line's header
 						// column name in currentHeaderNames and then put the value in the
 						// currentHeaderValueMapping value for that header key.
-						for(int i = 0; i < values.length; i++) {
+						for (int i = 0; i < values.length; i++) {
 							String value = values[i];
 							
 							// Check to see if the index is out of bounds of the current header list
-							if(currentHeaderNames.size() < i) {
+							if (currentHeaderNames.size() < i) {
 								logger.error("Daily Data Parsing ERROR: The headers for this line [" + currentHeaderNames + "] do not contain a value at value index [" + i + "].  Skipping line...");
 								continue;
 							}
@@ -283,7 +281,7 @@ public abstract class Fetcher {
 							String headerKey = currentHeaderNames.get(i);
 							
 							// Make sure this header name exists as a key in the map 
-							if(!currentHeaderValueMapping.containsKey(headerKey)) {
+							if ( ! currentHeaderValueMapping.containsKey(headerKey) ) {
 								logger.error("Daily Data Parsing ERROR: The header for this  [" + headerKey + "] at value index [" + i + "] is not present in the current header mapping.  Skipping line...");
 								continue;
 							}
@@ -321,33 +319,29 @@ public abstract class Fetcher {
 			}
 		} catch (Exception e) {
 			if (null != tmp) {
-				StringBuilder errMsgBuilder = new StringBuilder();
-				tmp.deleteFile();
-				tmp = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());
-
-				errMsgBuilder.append("Error Retrieving Daily Data");
+				// first, construct an error message
 				final String newline = "\r\n";  //we always want windows newlines in error messages
+				StringBuilder errMsgBuilder = new StringBuilder();
+				errMsgBuilder.append("Error Retrieving Daily Data");
 				errMsgBuilder.append(newline);
 				if (null != sitesUrl && sitesUrl.length() > 0 ) {
-					errMsgBuilder.append("No data could be retrieved from the following url:");
+					errMsgBuilder.append("There was an error acquiring or processing the data from the url:");
+					errMsgBuilder.append(newline);
 					errMsgBuilder.append(sitesUrl);
 				} else {
 					errMsgBuilder.append("There was an error forming the url for the NWIS web query");
 				}
-				errMsgBuilder.append(newline);
-				errMsgBuilder.append(e.getMessage());
-				errMsgBuilder.append(newline);
-
-				//get stack trace as a string
-				StringWriter sw = new StringWriter();
-				PrintWriter pw = new PrintWriter(sw);
-				e.printStackTrace(pw);
-
-				errMsgBuilder.append(sw.toString());
-				String errMsg = errMsgBuilder.toString();
-
-				tmp.write(errMsg);
-				logger.error(errMsg, e);
+				
+				// second, delete the data file that has an error
+				tmp.deleteFile();
+				// then, create a new file for with an error message
+				try(final WriterWithFile msgFile = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());) {
+					// now, write the message in the new data file
+					msgFile.write( errMsgBuilder.toString() );
+				}
+				
+				// finally, append more for the log
+				logger.error(errMsgBuilder.toString(), e);
 			}
 		} finally {
 			IoUtils.quiteClose(tmp);
