@@ -257,11 +257,12 @@ public abstract class Fetcher {
 						// accordingly.
 						String[] values =formattedRawline.split(formatter.getSeparator(), -1);
 						if(values.length != currentHeaderNames.size()) {
-							logger.error("Daily Data Parsing ERROR: The number of values in the line [" + Arrays.toString(values) + "] SIZE (" + values.length + 
-									") does not equate to the number of column headers we have for this line [" + currentHeaderNames + "] SIZE (" + currentHeaderNames.size() +
-									")\nLINE BEFORE TRANSFORM:\n[" + line + "]\n" +
-									"\nLINE AFTER  TRANSFORM:\n[" + formattedRawline + "]\n" +
-									").  Skipping line...");
+							// TODO this is too noisy and requires a new story to address it,
+//							logger.error("Daily Data Parsing ERROR: The number of values in the line [" + Arrays.toString(values) + "] SIZE (" + values.length + 
+//									") does not equate to the number of column headers we have for this line [" + currentHeaderNames + "] SIZE (" + currentHeaderNames.size() +
+//									")\nLINE BEFORE TRANSFORM:\n[" + line + "]\n" +
+//									"\nLINE AFTER  TRANSFORM:\n[" + formattedRawline + "]\n" +
+//									").  Skipping line...");
 							continue;
 						}
 						
