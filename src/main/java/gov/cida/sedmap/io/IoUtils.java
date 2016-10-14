@@ -35,9 +35,8 @@ public class IoUtils {
 			try {
 				logger.debug("Closing resource. " + o.getClass().getName());
 				if        (o instanceof Connection) {
-					if ( !((Connection)o).isClosed() ) {
+					logger.info("closing a JDBC connection, " + o);
 						((Connection)o).close();
-					}
 				} else if (o instanceof Statement) {
 					if (  !( (Statement)o).isClosed() ) {
 						( (Statement)o).close();
@@ -57,6 +56,9 @@ public class IoUtils {
 				throw e;
 
 			} catch (Exception e) {
+				if (o instanceof Connection) {
+					logger.info("error closing a JDBC connection, " + o);
+				}
 				logger.warn("Failed to close resource. " + o.getClass().getName(), e);
 			}
 		}
