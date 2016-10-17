@@ -40,7 +40,6 @@ import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.factory.GeoTools;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JdbcFetcherTest {
@@ -158,7 +157,6 @@ public class JdbcFetcherTest {
 
 
 	@Test
-	@Ignore
 	public void handleLocalData_csv() throws Exception {
 		fetcher = new JdbcFetcher(Fetcher.SEDMAP_DS) {
 			@Override
@@ -197,7 +195,6 @@ public class JdbcFetcherTest {
 	}
 
 	@Test
-	@Ignore
 	public void handleLocalData_rdb() throws Exception {
 		fetcher = new JdbcFetcher(Fetcher.SEDMAP_DS) {
 			@Override
