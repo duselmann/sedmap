@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -231,7 +230,6 @@ public class JdbcFetcher extends Fetcher {
 		} catch (FilterToSQLException e) {
 			throw new SedmapException(OGCExceptionCode.InvalidParameterValue, new SQLException("Failed to convert filter to sql where clause.",e));
 		} finally {
-			logger.info("trying to close connection " + rs.cn );
 			IoUtils.quiteClose(tmpw, rs.rs, rs.ps, rs.cn);
 			// TODO maybe close fileData?
 		}
@@ -287,7 +285,6 @@ public class JdbcFetcher extends Fetcher {
 					}
 
 				} finally {
-					logger.info("trying to close connection " + rs.cn );
 					IoUtils.quiteClose(rs.rs, rs.ps, rs.cn);
 				}
 			}
@@ -341,15 +338,8 @@ public class JdbcFetcher extends Fetcher {
 
 		try {
 			Context ctx = getContext();
-//			DataSource ds = (DataSource) ctx.lookup(jndiDS);
-//			r.cn = ds.getConnection();
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-			String url = (String) ctx.lookup("java:comp/env/jdbc/sedmapURL");
-			String usr = (String) ctx.lookup("java:comp/env/jdbc/sedmapUSR");
-			String pwd = (String) ctx.lookup("java:comp/env/jdbc/sedmapPWD");
-			r.cn = DriverManager.getConnection(url, usr, pwd);
-			logger.info("created a new JDBC connection, " + r.cn);
-			
+			DataSource ds = (DataSource) ctx.lookup(jndiDS);
+			r.cn = ds.getConnection();
 		} catch (SQLException e) {
 			throw new SedmapException(OGCExceptionCode.ResourceNotFound, e);
 		}
