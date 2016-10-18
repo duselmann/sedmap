@@ -2,6 +2,7 @@ package gov.cida.sedmap.io;
 
 import gov.cida.sedmap.io.util.StrUtils;
 
+import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -95,8 +97,16 @@ public class IoUtils {
 	}
 
 
+	public static WriterWithFile createTmpWriter(String fileName, String extention) throws IOException {
+		File   file = File.createTempFile(fileName +'_'+ StrUtils.uniqueName(12), extention);
+		FileOutputStream out   = new FileOutputStream(file);
+		OutputStreamWriter osw = new OutputStreamWriter(out);
+		WriterWithFile tmp     = new WriterWithFile(osw, file);
+		return tmp;
+	}
 
 	public static WriterWithFile createTmpZipWriter(String fileName, String extention) throws IOException {
+		
 		File   file = File.createTempFile(fileName +'_'+ StrUtils.uniqueName(12), ".zip");
 
 		logger.debug(file.getAbsolutePath());
@@ -127,5 +137,22 @@ public class IoUtils {
     public static String readTextResource() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+
+
+	public static void copy(File sourceFile, WriterWithFile dest) {
+		try (InputStreamWithFile source = createTmpZipStream(sourceFile)) {
+			Reader reader = new InputStreamReader(source);
+			BufferedReader buffered = new BufferedReader(reader);
+			String line;
+			while ( (line = buffered.readLine()) != null ) {
+				dest.write(line);
+				dest.write(LINE_SEPARATOR);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 }
