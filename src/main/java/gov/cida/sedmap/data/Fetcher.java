@@ -342,6 +342,9 @@ public abstract class Fetcher {
 						// check that it is an EOF issue
 						if (ioe.getMessage().contains("EOF")
 						  && batchAttempts < nwisRetryMax) {
+							// clean up and try again
+							IoUtils.quiteClose(nwis, batchTmp);
+							batchTmp.deleteFile();
 							continue;
 						}
 						throw ioe; // we cannot handle other issues here
