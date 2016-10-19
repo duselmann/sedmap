@@ -97,14 +97,6 @@ public class IoUtils {
 	}
 
 
-	public static WriterWithFile createTmpWriter(String fileName, String extention) throws IOException {
-		File   file = File.createTempFile(fileName +'_'+ StrUtils.uniqueName(12), extention);
-		FileOutputStream out   = new FileOutputStream(file);
-		OutputStreamWriter osw = new OutputStreamWriter(out);
-		WriterWithFile tmp     = new WriterWithFile(osw, file);
-		return tmp;
-	}
-
 	public static WriterWithFile createTmpZipWriter(String fileName, String extention) throws IOException {
 		
 		File   file = File.createTempFile(fileName +'_'+ StrUtils.uniqueName(12), ".zip");
