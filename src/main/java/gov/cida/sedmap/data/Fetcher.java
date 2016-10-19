@@ -73,7 +73,7 @@ public abstract class Fetcher {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> T jndiLoockup(String name, T defaultValue) {
+	public <T> T jndiLookup(String name, T defaultValue) {
 		try {
 			Context ctx = getContext();
 			// if this lookup or cast fails then return given default
@@ -94,8 +94,8 @@ public abstract class Fetcher {
 	protected InputStreamWithFile handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter, FileDownloadHandler handler)
 			throws IOException, SQLException, NamingException {
 		
-		int nwisBatchSize = jndiLoockup(NWIS_BATCH_SIZE_PARAM, NWIS_BATCH_SIZE);
-		int nwisRetryMax  = jndiLoockup(NWIS_RETRY_SIZE_PARAM, NUM_NWIS_TRIES);
+		int nwisBatchSize = jndiLookup(NWIS_BATCH_SIZE_PARAM, NWIS_BATCH_SIZE);
+		int nwisRetryMax  = jndiLookup(NWIS_RETRY_SIZE_PARAM, NUM_NWIS_TRIES);
 		
 		if ( !sites.hasNext() ) {
 			// return nothing if there are no sites
