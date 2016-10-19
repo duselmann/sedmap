@@ -1,7 +1,5 @@
 package gov.cida.sedmap.io;
 
-import gov.cida.sedmap.io.util.StrUtils;
-
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -17,7 +16,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+
+import gov.cida.sedmap.io.util.StrUtils;
 
 public class IoUtils {
 
@@ -95,8 +97,8 @@ public class IoUtils {
 	}
 
 
-
 	public static WriterWithFile createTmpZipWriter(String fileName, String extention) throws IOException {
+		
 		File   file = File.createTempFile(fileName +'_'+ StrUtils.uniqueName(12), ".zip");
 
 		logger.debug(file.getAbsolutePath());
@@ -127,5 +129,14 @@ public class IoUtils {
     public static String readTextResource() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+
+
+	public static void copy(File sourceFile, WriterWithFile writer) throws IOException {
+		try (InputStreamWithFile source = createTmpZipStream(sourceFile)) {
+			Reader reader = new InputStreamReader(source);
+			IOUtils.copy(reader, writer);
+		}
+	}
 
 }
