@@ -1,8 +1,5 @@
 package gov.cida.sedmap.io;
 
-import gov.cida.sedmap.io.util.StrUtils;
-
-import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +16,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+
+import gov.cida.sedmap.io.util.StrUtils;
 
 public class IoUtils {
 
@@ -140,18 +140,10 @@ public class IoUtils {
 
 
 
-	public static void copy(File sourceFile, WriterWithFile dest) {
+	public static void copy(File sourceFile, WriterWithFile writer) throws IOException {
 		try (InputStreamWithFile source = createTmpZipStream(sourceFile)) {
 			Reader reader = new InputStreamReader(source);
-			BufferedReader buffered = new BufferedReader(reader);
-			String line;
-			while ( (line = buffered.readLine()) != null ) {
-				dest.write(line);
-				dest.write(LINE_SEPARATOR);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			IOUtils.copy(reader, writer);
 		}
 	}
 
