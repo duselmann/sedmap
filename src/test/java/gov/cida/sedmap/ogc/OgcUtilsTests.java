@@ -2,7 +2,6 @@ package gov.cida.sedmap.ogc;
 
 import static org.junit.Assert.*;
 
-import java.lang.reflect.Field;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -16,7 +15,6 @@ import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.factory.GeoTools;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.JDBCFeatureReader;
 import org.geotools.jdbc.JDBCJNDIDataStoreFactory;
