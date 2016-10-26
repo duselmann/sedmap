@@ -48,6 +48,9 @@ public class DataFileMgr {
 		for (File tempFile : tempFiles) {
 			count+=deleteIfOld(tempFile);
 		}
+		if (count != 0) {
+			logger.info("deleted " +count+ " old files");
+		}
 		return count;
 	}
 
