@@ -373,7 +373,7 @@ public abstract class Fetcher {
 				// second, delete the data file that has an error
 				fullTmp.deleteFile();
 				// then, create a new file for with an error message
-				try(final WriterWithFile msgFile = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());) {
+				try (final WriterWithFile msgFile = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());) {
 					// now, write the message in the new data file
 					msgFile.write( errMsgBuilder.toString() );
 				}

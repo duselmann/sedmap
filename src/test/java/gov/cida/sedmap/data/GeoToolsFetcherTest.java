@@ -144,12 +144,7 @@ public class GeoToolsFetcherTest {
 
 		ds.setMetaData(dbmd);
 
-
 		Fetcher.conf = new FetcherConfig() {
-			@Override
-			protected Context getContext() throws NamingException {
-				return ctx;
-			}
 			@Override
 			protected Map<String,String> configTables() {
 				Map<String,String> tables = new HashMap<String,String>();

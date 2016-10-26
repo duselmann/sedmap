@@ -1,5 +1,18 @@
 package gov.cida.sedmap.web;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+
 import gov.cida.sedmap.data.DataFileMgr;
 import gov.cida.sedmap.data.Fetcher;
 import gov.cida.sedmap.data.FetcherConfig;
@@ -14,19 +27,6 @@ import gov.cida.sedmap.io.util.ErrUtils;
 import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.io.util.exceptions.SedmapException;
 import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
 
 
 
@@ -94,13 +94,9 @@ public class DataService extends HttpServlet {
 		try {			
 			String email = req.getParameter("email");
 			
-			boolean doDownload = false;
 			String directDownload = req.getParameter("directDownload");
-			if((directDownload != null) && (directDownload.equals("true"))) {
-				doDownload = true;
-			}
 			
-			if ( doDownload ) {
+			if ( "true".equalsIgnoreCase(directDownload) ) {
 				/**
 				 * JIRA NSM-82 and NSM-251
 				 * To use direct download ability with error handling, we cannot
@@ -130,9 +126,8 @@ public class DataService extends HttpServlet {
 					 * We do not have an email so we will attempt to process the request
 					 * and stream back the file to the client response.
 					 */
-					File   tmp = null;
 					String zipName = "data_" + StrUtils.uniqueName(12);
-					tmp = File.createTempFile("data_" + StrUtils.uniqueName(12), ".zip");
+					File tmp = File.createTempFile("data_" + StrUtils.uniqueName(12), ".zip");
 					handler = new ZipHandler(res, new FileOutputStream(tmp), zipName);
 					
 					Fetcher fetcher = new JdbcFetcher(jndiDS);

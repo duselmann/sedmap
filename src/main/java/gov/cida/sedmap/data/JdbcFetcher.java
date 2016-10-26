@@ -23,6 +23,7 @@ import org.geotools.data.jdbc.FilterToSQLException;
 import gov.cida.sedmap.io.InputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.WriterWithFile;
+import gov.cida.sedmap.io.util.SessionUtil;
 import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.io.util.exceptions.SedmapException;
 import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
@@ -288,7 +289,7 @@ public class JdbcFetcher extends Fetcher {
 				}
 			}
 		} finally {
-			//tmp.delete(); // TODO not for delayed download
+//			tmp.deleteFile(); // TODO not for delayed download
 			IoUtils.quiteClose(tmp);
 		}
 
@@ -336,8 +337,7 @@ public class JdbcFetcher extends Fetcher {
 		Results r = new Results();
 
 		try {
-			Context ctx = getContext();
-			DataSource ds = (DataSource) ctx.lookup(jndiDS);
+			DataSource ds = SessionUtil.lookupDataSource(jndiDS);
 			r.cn = ds.getConnection();			
 		} catch (NamingException e) {
 			String msg = "Error fetching JDBC data source";

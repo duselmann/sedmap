@@ -138,5 +138,20 @@ public class IoUtils {
 			IOUtils.copy(reader, writer);
 		}
 	}
+	
+	public static void deleteFile(File file) {
+		if (file == null) {
+			return;
+		}
+
+		if (logger.isDebugEnabled()) {
+			String existence = ( ! file.exists() ) ?"(not found) " :"";
+			logger.debug("deleting file "+ existence + file.getAbsolutePath());
+		}
+		
+		if ( ! file.delete() ) {
+			file.deleteOnExit();
+		}
+	}	
 
 }

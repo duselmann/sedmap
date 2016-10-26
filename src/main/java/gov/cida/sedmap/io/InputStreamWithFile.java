@@ -27,12 +27,7 @@ public class InputStreamWithFile extends InputStream {
 
 	public void deleteFile() {
 		IoUtils.quiteClose(this);
-
-		if (file == null) return;
-
-		if ( ! file.delete() ) {
-			file.deleteOnExit();
-		}
+		IoUtils.deleteFile(file);
 	}
 
 	@Override

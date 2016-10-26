@@ -104,12 +104,7 @@ public class JdbcFetcherTest {
 		ds.put("select * from sedmap.DISCRETE_SAMPLE_FACT", new MockResultSet());
 		ds.put("select * from sedmap.DISCRETE_SAMPLE_FACT", new MockRowMetaData());
 
-		Fetcher.conf = new FetcherConfig() {
-			@Override
-			protected Context getContext() throws NamingException {
-				return ctx;
-			}
-		}.init();
+		Fetcher.conf = new FetcherConfig().init();
 		// link ctx to data service for testing
 		fetcher = new JdbcFetcher(Fetcher.SEDMAP_DS);
 

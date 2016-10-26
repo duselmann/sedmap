@@ -12,10 +12,12 @@ import javax.naming.InitialContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 
 import gov.cida.sedmap.io.util.ErrUtils;
+import gov.cida.sedmap.io.util.SessionUtil;
 import gov.usgs.cida.proxy.ProxyServlet;
 
 
@@ -36,15 +38,9 @@ public class GeoserverProxy extends ProxyServlet {
 
 	public GeoserverProxy() {
 		try {
-			InitialContext ctx = new InitialContext();
-			String nhdS = (String) ctx.lookup("java:comp/env/"+NHD_ENV_SERVER);
-			String nhdP = (String) ctx.lookup("java:comp/env/"+NHD_ENV_PATH);
-			String sedS = (String) ctx.lookup("java:comp/env/"+SED_ENV_SERVER);
-
-			// now set the vars so if there is a problem all defaults are used
-			NHD_SERVER  = nhdS;
-			NHD_PATH    = nhdP;
-			SED_SERVER  = sedS;
+			NHD_SERVER = SessionUtil.lookup("java:comp/env/"+NHD_ENV_SERVER, NHD_SERVER);
+			NHD_PATH   = SessionUtil.lookup("java:comp/env/"+NHD_ENV_PATH,   NHD_PATH);
+			SED_SERVER = SessionUtil.lookup("java:comp/env/"+SED_ENV_SERVER, SED_SERVER);
 		} catch (Exception e) {
 			logger.warn("Falling back to default geoservers. NHD:" + NHD_SERVER+NHD_PATH
 					+" and sedmap: " + SED_SERVER, e);

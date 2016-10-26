@@ -115,11 +115,6 @@ public class OgcUtilsTests {
 		ctxenv = new HashMap<String, Object>();
 		ctxenv.put(Fetcher.SEDMAP_DS, ds);
 		ctx    = new MockContext(ctxenv);
-
-		Field geoToolsCtx = GeoTools.class.getDeclaredField("context");
-		geoToolsCtx.setAccessible(true);
-		geoToolsCtx.set(null, ctx);
-
 	}
 
 

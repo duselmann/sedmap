@@ -3,9 +3,13 @@ package gov.cida.sedmap.data;
 import java.io.File;
 import java.io.FilenameFilter;
 
+import org.apache.log4j.Logger;
+
+import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.util.SessionUtil;
 
 public class DataFileMgr {
+	private static final Logger logger = Logger.getLogger(DataFileMgr.class);
 
 	protected static final String PATH_ENV_KEY = "sedmap/data/path";
 	protected static final String PATH_DEFAULT = "/tmp";
@@ -69,7 +73,7 @@ public class DataFileMgr {
 
 	public int deleteIfOld(File file) {
 		if (file.lastModified()+RETAIN_TIME <  System.currentTimeMillis()) {
-			file.delete();
+			IoUtils.deleteFile(file);
 			return 1;
 		}
 		return 0;

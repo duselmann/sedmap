@@ -143,22 +143,12 @@ public class FetcherConfig {
 	}
 
 
-
-	// over-ride-able for testing
-	protected Context getContext() throws NamingException {
-		InitialContext ctx = new InitialContext();
-		return ctx;
-	}
-
-
-
 	protected Map<String, List<Column>> loadTableMetadata() {
 		logger.info("Static Fetcher loadTableMetadata.");
 		Connection cn = null;
 		Statement  st = null;
 		try {
-			Context ctx = getContext();
-			DataSource ds = (DataSource) ctx.lookup(jndiDS);
+			DataSource ds = SessionUtil.lookupDataSource(jndiDS);
 			cn = ds.getConnection();
 			st = cn.createStatement();
 
@@ -198,8 +188,7 @@ public class FetcherConfig {
 		Statement  st = null;
 		ResultSet rs = null;
 		try {
-			Context ctx = getContext();
-			DataSource ds = (DataSource) ctx.lookup(jndiDS);
+			DataSource ds = SessionUtil.lookupDataSource(jndiDS);
 			cn = ds.getConnection();
 			st = cn.createStatement();
 			rs = st.executeQuery("select * from sedmap." +tableName+ " where 0=1");
