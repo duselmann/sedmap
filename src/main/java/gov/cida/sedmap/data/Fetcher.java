@@ -17,7 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -32,6 +31,7 @@ import gov.cida.sedmap.io.FileDownloadHandler;
 import gov.cida.sedmap.io.InputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.WriterWithFile;
+import gov.cida.sedmap.io.util.SessionUtil;
 import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.io.util.StringValueIterator;
 import gov.cida.sedmap.io.util.exceptions.SedmapException;
@@ -67,21 +67,6 @@ public abstract class Fetcher {
 	protected List<Column> getTableMetadata(String tableName) {
 		return conf.getTableMetadata(tableName);
 	}
-	protected Context getContext() throws NamingException {
-		return conf.getContext();
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> T jndiLookup(String name, T defaultValue) {
-		try {
-			Context ctx = getContext();
-			// if this lookup or cast fails then return given default
-			return (T) ctx.lookup(name);
-		} catch (Exception e) {
-			return defaultValue;
-		}
-	}
-	
 
 	public abstract Fetcher initJndiJdbcStore(String jndiJdbc) throws IOException, Exception;
 
@@ -93,8 +78,8 @@ public abstract class Fetcher {
 	protected InputStreamWithFile handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter, FileDownloadHandler handler)
 			throws IOException, SQLException, NamingException {
 		
-		int nwisBatchSize = jndiLookup(NWIS_BATCH_SIZE_PARAM, NWIS_BATCH_SIZE);
-		int nwisRetryMax  = jndiLookup(NWIS_RETRY_SIZE_PARAM, NUM_NWIS_TRIES);
+		int nwisBatchSize = SessionUtil.lookup(NWIS_BATCH_SIZE_PARAM, NWIS_BATCH_SIZE);
+		int nwisRetryMax  = SessionUtil.lookup(NWIS_RETRY_SIZE_PARAM, NUM_NWIS_TRIES);
 		
 		if ( !sites.hasNext() ) {
 			// return nothing if there are no sites
