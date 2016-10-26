@@ -3,7 +3,6 @@ package gov.cida.sedmap.data;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
-import gov.cida.sedmap.data.HeaderType;
 
 public interface Formatter {
 	String getContentType();

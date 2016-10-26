@@ -1,15 +1,5 @@
 package gov.cida.sedmap.data;
 
-import gov.cida.sedmap.io.InputStreamWithFile;
-import gov.cida.sedmap.io.IoUtils;
-import gov.cida.sedmap.io.WriterWithFile;
-import gov.cida.sedmap.io.util.StrUtils;
-import gov.cida.sedmap.io.util.exceptions.SedmapException;
-import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
-import gov.cida.sedmap.ogc.FilterLiteralIterator;
-import gov.cida.sedmap.ogc.FilterWithViewParams;
-import gov.cida.sedmap.ogc.OgcUtils;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -29,6 +19,16 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.jdbc.FilterToSQLException;
+
+import gov.cida.sedmap.io.InputStreamWithFile;
+import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.WriterWithFile;
+import gov.cida.sedmap.io.util.StrUtils;
+import gov.cida.sedmap.io.util.exceptions.SedmapException;
+import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
+import gov.cida.sedmap.ogc.FilterLiteralIterator;
+import gov.cida.sedmap.ogc.FilterWithViewParams;
+import gov.cida.sedmap.ogc.OgcUtils;
 
 public class JdbcFetcher extends Fetcher {
 
@@ -230,8 +230,7 @@ public class JdbcFetcher extends Fetcher {
 		} catch (FilterToSQLException e) {
 			throw new SedmapException(OGCExceptionCode.InvalidParameterValue, new SQLException("Failed to convert filter to sql where clause.",e));
 		} finally {
-			IoUtils.quiteClose(tmpw, rs.rs, rs.ps, rs.cn);
-			// TODO maybe close fileData?
+			IoUtils.quiteClose(tmpw, rs.rs, rs.ps, rs.cn, fileData);
 		}
 
 		return fileData;
@@ -333,25 +332,29 @@ public class JdbcFetcher extends Fetcher {
 
 
 
-	protected Results initData(String sql) throws NamingException, SQLException, Exception {
+	protected Results initData(String sql) throws SedmapException {
 		Results r = new Results();
 
 		try {
 			Context ctx = getContext();
 			DataSource ds = (DataSource) ctx.lookup(jndiDS);
-			r.cn = ds.getConnection();
+			r.cn = ds.getConnection();			
+		} catch (NamingException e) {
+			String msg = "Error fetching JDBC data source";
+			logger.error(msg,e);
+			throw new SedmapException(msg, e);
 		} catch (SQLException e) {
-			throw new SedmapException(OGCExceptionCode.ResourceNotFound, e);
+			String msg = "Error fetching JDBC connection";
+			logger.error(msg,e);
+			throw new SedmapException(msg, e);
 		}
 		
 		try {
 			r.ps = r.cn.prepareStatement(sql);
 		} catch (SQLException e) {
-			logger.error(e);
-			throw e;
-		} catch (Exception e) {
-			logger.error(e);
-			e.printStackTrace();
+			String msg = "Error creating SQL statement on JDBC connection";
+			logger.error(msg,e);
+			throw new SedmapException(msg, e);
 		}
 
 		return r;
@@ -381,10 +384,11 @@ public class JdbcFetcher extends Fetcher {
 			logger.info("executeQuery: finish");
 		} catch (SQLException e) {
 			logger.error("executeQuery: error", e);
-			throw new SedmapException(OGCExceptionCode.InvalidParameterValue, e);
+			throw new SedmapException("Error while querying discrete sites", e);
 		} catch (Exception e) {
-			logger.error(e);
-			e.printStackTrace();
+			String msg = "Non-SQL error when querying or discrete sites.";
+			logger.error(msg, e);
+			throw new SedmapException(msg, e);
 		}
 
 		return r;

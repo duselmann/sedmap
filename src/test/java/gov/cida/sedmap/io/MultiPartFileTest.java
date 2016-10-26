@@ -2,15 +2,14 @@ package gov.cida.sedmap.io;
 
 import static org.junit.Assert.*;
 
-import gov.cida.sedmap.io.FileDownloadHandler;
-import gov.cida.sedmap.io.IoUtils;
-import gov.cida.sedmap.io.MultiPartHandler;
-import gov.cida.sedmap.io.util.StrUtils;
-import gov.cida.sedmap.mock.MockResponse;
 import java.io.ByteArrayOutputStream;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
+
+import gov.cida.sedmap.io.util.StrUtils;
+import gov.cida.sedmap.mock.MockResponse;
 
 public class MultiPartFileTest {
 
@@ -23,7 +22,7 @@ public class MultiPartFileTest {
 		HttpServletResponse   res = new MockResponse(out);
 
 		@SuppressWarnings({ "resource", "unused" })
-		FileDownloadHandler handler = new MultiPartHandler(res, out).beginWritingFiles();
+		FileDownloadHandler handler = new MultiPartHandler(res, out, "TestBeginWritingFiles").beginWritingFiles();
 		assertEquals(MultiPartHandler.MULTI_PART_CONTENT_TYPE, res.getContentType());
 
 		res.getWriter().flush();
@@ -39,7 +38,7 @@ public class MultiPartFileTest {
 		HttpServletResponse   res = new MockResponse(out);
 
 		@SuppressWarnings("resource")
-		FileDownloadHandler handler = new MultiPartHandler(res, out);
+		FileDownloadHandler handler = new MultiPartHandler(res, out, "TestStartNewFile");
 
 		handler.startNewFile("text/csv", "foo.csv");
 		res.getWriter().flush();
@@ -61,7 +60,7 @@ public class MultiPartFileTest {
 		HttpServletResponse   res = new MockResponse(out);
 
 		@SuppressWarnings("resource")
-		FileDownloadHandler handler = new MultiPartHandler(res, out);
+		FileDownloadHandler handler = new MultiPartHandler(res, out, "TestEndNewFile");
 
 		handler.endNewFile();
 		res.getWriter().flush();
@@ -77,7 +76,7 @@ public class MultiPartFileTest {
 		HttpServletResponse   res = new MockResponse(out);
 
 		@SuppressWarnings("resource")
-		FileDownloadHandler handler = new MultiPartHandler(res, out);
+		FileDownloadHandler handler = new MultiPartHandler(res, out, "TestFinishWritingFiles");
 
 		handler.finishWritingFiles();
 		IoUtils.quiteClose(out);

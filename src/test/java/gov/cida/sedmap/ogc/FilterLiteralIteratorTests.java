@@ -1,9 +1,9 @@
 package gov.cida.sedmap.ogc;
 
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 import org.opengis.filter.Filter;
-
-import static org.junit.Assert.*;
 
 public class FilterLiteralIteratorTests {
 

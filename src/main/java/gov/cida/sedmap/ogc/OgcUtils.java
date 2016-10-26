@@ -1,10 +1,6 @@
 package gov.cida.sedmap.ogc;
 
 
-import gov.cida.sedmap.io.util.StrUtils;
-import gov.cida.sedmap.io.util.exceptions.SedmapException;
-import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -34,6 +30,10 @@ import org.geotools.xml.Parser;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.PropertyName;
+
+import gov.cida.sedmap.io.util.StrUtils;
+import gov.cida.sedmap.io.util.exceptions.SedmapException;
+import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
 
 public class OgcUtils {
 
@@ -175,9 +175,9 @@ public class OgcUtils {
 		try {
 			store =  DataStoreFinder.getDataStore(dataStoreEnv);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
-			logger.error("Due to internal exception caught, throwing ResourceNotFound OGC error for error handling on the client side.");
-			throw new SedmapException(OGCExceptionCode.ResourceNotFound, e);
+			String msg = "Error fetching oracle JDBC data source";
+			logger.error(msg,e);
+			throw new SedmapException(msg, e);
 		}
 
 		return store;
@@ -190,8 +190,9 @@ public class OgcUtils {
 		Transaction trans = new DefaultTransaction("read-only");
 		return executeQuery(trans, store, tableName, filter, properties);
 	}
+	
 	public static JDBCFeatureReader executeQuery(Transaction trans, DataStore store, String tableName, Filter filter, String ... properties)
-			throws Exception {
+			throws SedmapException {
 		Query query;
 		if (properties.length==0) {
 			query = new Query(tableName, filter);
@@ -203,10 +204,10 @@ public class OgcUtils {
 		
 		try {
 			reader = (JDBCFeatureReader) store.getFeatureReader(query, trans);
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-			throw new SedmapException(OGCExceptionCode.NoApplicableCode, e);
+		} catch (IOException e) {
+			String msg = "Error getting feature reader";
+			logger.error(msg,e);
+			throw new SedmapException(msg, e);
 		}
 		
 		return reader;

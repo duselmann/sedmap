@@ -2,15 +2,6 @@ package gov.cida.sedmap.io;
 
 import static org.junit.Assert.*;
 
-import gov.cida.sedmap.io.FileDownloadHandler;
-import gov.cida.sedmap.io.IoUtils;
-import gov.cida.sedmap.io.MultiPartHandler;
-import gov.cida.sedmap.io.util.StrUtils;
-import gov.cida.sedmap.mock.MockConnection;
-import gov.cida.sedmap.mock.MockResponse;
-import gov.cida.sedmap.mock.MockResultSet;
-import gov.cida.sedmap.mock.MockStatement;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -19,9 +10,16 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
+
+import gov.cida.sedmap.io.util.StrUtils;
+import gov.cida.sedmap.mock.MockConnection;
+import gov.cida.sedmap.mock.MockResponse;
+import gov.cida.sedmap.mock.MockResultSet;
+import gov.cida.sedmap.mock.MockStatement;
 
 public class IoUtilsTest {
 
@@ -44,7 +42,7 @@ public class IoUtilsTest {
 		HttpServletResponse   res = new MockResponse(out);
 
 		@SuppressWarnings("resource")
-		FileDownloadHandler handler = new MultiPartHandler(res, out);
+		FileDownloadHandler handler = new MultiPartHandler(res, out, "test1");
 
 		handler.writeFile("text/csv", "foo.csv", fileData);
 		res.getWriter().flush();
@@ -74,7 +72,7 @@ public class IoUtilsTest {
 		HttpServletResponse   res = new MockResponse(out);
 
 		@SuppressWarnings("resource")
-		FileDownloadHandler handler = new MultiPartHandler(res, out);
+		FileDownloadHandler handler = new MultiPartHandler(res, out, "test3");
 
 		handler.writeFile("text/csv", "foo1.csv", fileData1);
 		handler.writeFile("text/csv", "foo2.csv", fileData2);

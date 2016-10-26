@@ -1,7 +1,5 @@
 package gov.cida.sedmap.ogc;
 
-import gov.cida.sedmap.io.util.ReflectUtil;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +13,8 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
+
+import gov.cida.sedmap.io.util.ReflectUtil;
 
 
 // this class exists in order to access the protected static methods that test filter type

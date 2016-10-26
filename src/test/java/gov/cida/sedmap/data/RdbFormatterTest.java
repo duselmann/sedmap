@@ -7,14 +7,13 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import gov.cida.sedmap.data.Column;
+import org.junit.Before;
+import org.junit.Test;
+
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.mock.MockDataSource;
 import gov.cida.sedmap.mock.MockResultSet;
 import gov.cida.sedmap.mock.MockRowMetaData;
-
-import org.junit.Before;
-import org.junit.Test;
 
 public class RdbFormatterTest {
 

@@ -1,11 +1,11 @@
 package gov.cida.sedmap.data.agent;
 
-import gov.cida.sedmap.data.JdbcFetcher;
-import gov.cida.sedmap.io.TimeOutHandler;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+
+import gov.cida.sedmap.data.JdbcFetcher;
+import gov.cida.sedmap.io.TimeOutHandler;
 
 public class TimeOutAgent extends Thread {
 	private static final Logger logger = Logger.getLogger(TimeOutAgent.class);

@@ -1,11 +1,11 @@
 package gov.cida.sedmap.mock;
 
-import gov.cida.sedmap.data.Column;
-
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+
+import gov.cida.sedmap.data.Column;
 
 public class MockRowMetaData implements ResultSetMetaData {
 

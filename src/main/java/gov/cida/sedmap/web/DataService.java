@@ -131,8 +131,9 @@ public class DataService extends HttpServlet {
 					 * and stream back the file to the client response.
 					 */
 					File   tmp = null;
+					String zipName = "data_" + StrUtils.uniqueName(12);
 					tmp = File.createTempFile("data_" + StrUtils.uniqueName(12), ".zip");
-					handler = new ZipHandler(res, new FileOutputStream(tmp));
+					handler = new ZipHandler(res, new FileOutputStream(tmp), zipName);
 					
 					Fetcher fetcher = new JdbcFetcher(jndiDS);
 						
@@ -205,7 +206,7 @@ public class DataService extends HttpServlet {
 					((EmailLinkHandler)handler).setExceptionThrown(e);
 					handler.finishWritingFiles();
 				} else {
-					if(e instanceof SedmapException) {
+					if (e instanceof SedmapException) {
 						ErrUtils.handleExceptionResponseServices(res, (SedmapException)e);
 					} else {
 						/**

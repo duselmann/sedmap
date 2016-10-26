@@ -1,12 +1,5 @@
 package gov.cida.sedmap.data;
 
-import gov.cida.sedmap.io.InputStreamWithFile;
-import gov.cida.sedmap.io.IoUtils;
-import gov.cida.sedmap.io.WriterWithFile;
-import gov.cida.sedmap.ogc.FeatureValueIterator;
-import gov.cida.sedmap.ogc.FilterWithViewParams;
-import gov.cida.sedmap.ogc.OgcUtils;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -17,6 +10,13 @@ import javax.naming.NamingException;
 
 import org.geotools.data.DataStore;
 import org.geotools.jdbc.JDBCFeatureReader;
+
+import gov.cida.sedmap.io.InputStreamWithFile;
+import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.WriterWithFile;
+import gov.cida.sedmap.ogc.FeatureValueIterator;
+import gov.cida.sedmap.ogc.FilterWithViewParams;
+import gov.cida.sedmap.ogc.OgcUtils;
 
 // TODO this was left in an unfinished state once it was determined that GeoTools was insufficient
 public class GeoToolsFetcher extends Fetcher {

@@ -1,16 +1,5 @@
 package gov.cida.sedmap.data;
 
-import gov.cida.sedmap.io.FileDownloadHandler;
-import gov.cida.sedmap.io.InputStreamWithFile;
-import gov.cida.sedmap.io.IoUtils;
-import gov.cida.sedmap.io.WriterWithFile;
-import gov.cida.sedmap.io.util.StrUtils;
-import gov.cida.sedmap.io.util.StringValueIterator;
-import gov.cida.sedmap.io.util.exceptions.SedmapException;
-import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
-import gov.cida.sedmap.ogc.FilterWithViewParams;
-import gov.cida.sedmap.ogc.OgcUtils;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,6 +27,16 @@ import org.opengis.filter.PropertyIsGreaterThan;
 import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLessThanOrEqualTo;
+
+import gov.cida.sedmap.io.FileDownloadHandler;
+import gov.cida.sedmap.io.InputStreamWithFile;
+import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.WriterWithFile;
+import gov.cida.sedmap.io.util.StrUtils;
+import gov.cida.sedmap.io.util.StringValueIterator;
+import gov.cida.sedmap.io.util.exceptions.SedmapException;
+import gov.cida.sedmap.ogc.FilterWithViewParams;
+import gov.cida.sedmap.ogc.OgcUtils;
 
 public abstract class Fetcher {
 
@@ -416,10 +415,10 @@ public abstract class Fetcher {
 			try {
 				reader = new BufferedReader(new InputStreamReader(cn.getInputStream()));
 			} catch (IOException e) {
-				if (nwisTriesCount == NUM_NWIS_TRIES -1) {
+				if (nwisTriesCount >= NUM_NWIS_TRIES) {
 					logger.error(e.getMessage());
 					logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-					throw new SedmapException(OGCExceptionCode.NoApplicableCode, e);
+					throw new SedmapException("Too many errors trying to fetch NWIS WEB data", e);
 				}
 			}
 			nwisTriesCount++;
@@ -496,7 +495,7 @@ public abstract class Fetcher {
 							sites.clear(); // do not retain the discrete sites for NWIS daily data
 						}
 
-						if (sites.size() == 0) { // this is a short circuit to prevent an unneccessary loop
+						if (sites.size() == 0) { // this is a short circuit to prevent an unnecessary loop
 							sites = descriptorSites;
 						} else {
 							// TODO refactor to use sorted set
@@ -513,12 +512,12 @@ public abstract class Fetcher {
 						handler.writeFile(formatter.getContentType(), filename, fileData);
 					}
 				} catch (Exception e) {
-					if(e instanceof SedmapException) {
+					if (e instanceof SedmapException) {
 						throw e;
 					} else {
 						logger.error("Failed to fetch from the Database.  Exception is:" +  e.getMessage());
 						logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-						throw new SedmapException(OGCExceptionCode.NoApplicableCode, e);
+						throw new SedmapException("Error while transfering data", e);
 					}
 				} finally {
 					IoUtils.quiteClose(fileData);

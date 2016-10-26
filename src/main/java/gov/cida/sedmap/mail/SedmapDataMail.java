@@ -1,12 +1,12 @@
 package gov.cida.sedmap.mail;
 
-import gov.cida.sedmap.io.util.SessionUtil;
-import gov.cida.sedmap.io.util.exceptions.SedmapException;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.apache.log4j.Logger;
+
+import gov.cida.sedmap.io.util.SessionUtil;
+import gov.cida.sedmap.io.util.exceptions.SedmapException;
 
 public class SedmapDataMail {
 	private static final Logger logger = Logger.getLogger(SedmapDataMail.class);

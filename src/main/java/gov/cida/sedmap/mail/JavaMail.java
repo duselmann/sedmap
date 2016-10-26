@@ -1,8 +1,6 @@
 package gov.cida.sedmap.mail;
 
 
-import gov.cida.sedmap.io.util.SessionUtil;
-
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -10,7 +8,10 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
 import org.apache.log4j.Logger;
+
+import gov.cida.sedmap.io.util.SessionUtil;
 
 public class JavaMail {
 

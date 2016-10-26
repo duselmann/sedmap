@@ -1,8 +1,5 @@
 package gov.cida.sedmap.data;
 
-import gov.cida.sedmap.io.IoUtils;
-import gov.cida.sedmap.io.util.SessionUtil;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -24,6 +21,9 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.JDBCJNDIDataStoreFactory;
+
+import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.util.SessionUtil;
 
 public class FetcherConfig {
 	private static final Logger logger = Logger.getLogger(FetcherConfig.class);

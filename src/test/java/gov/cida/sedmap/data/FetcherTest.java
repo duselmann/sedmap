@@ -1,13 +1,7 @@
 package gov.cida.sedmap.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import gov.cida.sedmap.mock.MockContext;
-import gov.cida.sedmap.mock.MockDataSource;
-import gov.cida.sedmap.mock.MockRequest;
-import gov.cida.sedmap.mock.MockResultSet;
-import gov.cida.sedmap.mock.MockRowMetaData;
+import static org.junit.Assert.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +11,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import gov.cida.sedmap.mock.MockContext;
+import gov.cida.sedmap.mock.MockDataSource;
+import gov.cida.sedmap.mock.MockRequest;
+import gov.cida.sedmap.mock.MockResultSet;
+import gov.cida.sedmap.mock.MockRowMetaData;
 
 public class FetcherTest {
 

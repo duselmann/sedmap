@@ -1,11 +1,11 @@
 package gov.cida.sedmap.data;
 
-import gov.cida.sedmap.io.IoUtils;
-
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+
+import gov.cida.sedmap.io.IoUtils;
 
 public class CharSepFormatter implements Formatter {
 

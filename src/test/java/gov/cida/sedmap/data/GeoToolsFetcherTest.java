@@ -1,25 +1,6 @@
 package gov.cida.sedmap.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import gov.cida.sedmap.io.FileDownloadHandler;
-import gov.cida.sedmap.io.InputStreamWithFile;
-import gov.cida.sedmap.io.IoUtils;
-import gov.cida.sedmap.io.MultiPartHandler;
-import gov.cida.sedmap.io.util.StrUtils;
-import gov.cida.sedmap.mock.MockContext;
-import gov.cida.sedmap.mock.MockDataSource;
-import gov.cida.sedmap.mock.MockDbMetaData;
-import gov.cida.sedmap.mock.MockRequest;
-import gov.cida.sedmap.mock.MockResponse;
-import gov.cida.sedmap.mock.MockResultSet;
-import gov.cida.sedmap.mock.MockRowMetaData;
-import gov.cida.sedmap.ogc.FilterWithViewParams;
-import gov.cida.sedmap.ogc.MockDS;
-import gov.cida.sedmap.ogc.MockDbMeta;
-import gov.cida.sedmap.ogc.OgcUtils;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -43,6 +24,23 @@ import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.factory.GeoTools;
 import org.junit.Before;
 import org.junit.Test;
+
+import gov.cida.sedmap.io.FileDownloadHandler;
+import gov.cida.sedmap.io.InputStreamWithFile;
+import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.MultiPartHandler;
+import gov.cida.sedmap.io.util.StrUtils;
+import gov.cida.sedmap.mock.MockContext;
+import gov.cida.sedmap.mock.MockDataSource;
+import gov.cida.sedmap.mock.MockDbMetaData;
+import gov.cida.sedmap.mock.MockRequest;
+import gov.cida.sedmap.mock.MockResponse;
+import gov.cida.sedmap.mock.MockResultSet;
+import gov.cida.sedmap.mock.MockRowMetaData;
+import gov.cida.sedmap.ogc.FilterWithViewParams;
+import gov.cida.sedmap.ogc.MockDS;
+import gov.cida.sedmap.ogc.MockDbMeta;
+import gov.cida.sedmap.ogc.OgcUtils;
 
 public class GeoToolsFetcherTest {
 
@@ -272,7 +270,7 @@ public class GeoToolsFetcherTest {
 		ByteArrayOutputStream   out = new ByteArrayOutputStream();
 		HttpServletResponse     res = new MockResponse(out);
 
-		FileDownloadHandler handler = new MultiPartHandler(res, out);
+		FileDownloadHandler handler = new MultiPartHandler(res, out, "Test2NoNWIS");
 
 		fetcher.doFetch(req, handler);
 		IoUtils.quiteClose(out);
@@ -306,7 +304,7 @@ public class GeoToolsFetcherTest {
 		ByteArrayOutputStream   out = new ByteArrayOutputStream();
 		HttpServletResponse     res = new MockResponse(out);
 
-		FileDownloadHandler handler = new MultiPartHandler(res, out);
+		FileDownloadHandler handler = new MultiPartHandler(res, out, "Test2NWIS");
 
 		fetcher.doFetch(req, handler);
 		IoUtils.quiteClose(out);
