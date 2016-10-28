@@ -25,7 +25,7 @@ public class SedmapDataMail {
 
 	protected static final String LINK_ENV_KEY        = "sedmap/email/link";
 	protected static final String LINK_DEFAULT        = "http://localhost:8080/sediment/download?file=";
-	public static final String LINK_STUB;
+	protected static final String LINK_STUB;
 
 	protected static final String SENDER_ADDR_ENV_KEY = "sedmap/email/address";
 	protected static final String SENDER_ADDR_DEFAULT = "SedimentPortal_HELP@usgs.gov";
