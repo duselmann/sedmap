@@ -1,7 +1,6 @@
 package gov.cida.sedmap.io;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -28,9 +27,8 @@ public class TimeOutHandler extends EmailLinkHandler {
 	private volatile boolean sendEmail = false;
 	private volatile boolean pastEmailLogic = false;
 
-	public TimeOutHandler(HttpServletResponse res, File file, String email)
-			throws FileNotFoundException {
-		super(res, file, email);
+	public TimeOutHandler(HttpServletResponse res, String email) throws IOException {
+		super(res, email);
 	}
 	
 	@Override

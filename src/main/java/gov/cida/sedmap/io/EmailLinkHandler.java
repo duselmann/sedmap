@@ -1,9 +1,6 @@
 package gov.cida.sedmap.io;
 
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -20,14 +17,14 @@ public class EmailLinkHandler extends ZipHandler {
 
 	protected String contentType = "text/plain";
 	protected String emailAddr;
-	protected final File file;
+	
+	// TODO these need refactor
 	protected String errorId;
 	protected Exception exceptionThrown;
 
 
-	public EmailLinkHandler(HttpServletResponse res, File file, String email) throws FileNotFoundException {
-		super(res, new FileOutputStream(file), email);
-		this.file = file;
+	public EmailLinkHandler(HttpServletResponse res, String email) throws IOException {
+		super(res);
 		emailAddr = email;
 	}
 
@@ -68,10 +65,6 @@ public class EmailLinkHandler extends ZipHandler {
 		return this; //chain
 	}
 
-	protected String getFileName() {
-
-		return file.getName();
-	}
 
 	public String getErrorId() {
 		return errorId;
