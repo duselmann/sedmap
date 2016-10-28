@@ -36,9 +36,9 @@ public class GeoserverProxy extends ProxyServlet {
 
 	public GeoserverProxy() {
 		try {
-			NHD_SERVER = SessionUtil.lookup("java:comp/env/"+NHD_ENV_SERVER, NHD_SERVER);
-			NHD_PATH   = SessionUtil.lookup("java:comp/env/"+NHD_ENV_PATH,   NHD_PATH);
-			SED_SERVER = SessionUtil.lookup("java:comp/env/"+SED_ENV_SERVER, SED_SERVER);
+			NHD_SERVER = SessionUtil.lookup(NHD_ENV_SERVER, NHD_SERVER);
+			NHD_PATH   = SessionUtil.lookup(NHD_ENV_PATH,   NHD_PATH);
+			SED_SERVER = SessionUtil.lookup(SED_ENV_SERVER, SED_SERVER);
 		} catch (Exception e) {
 			logger.warn("Falling back to default geoservers. NHD:" + NHD_SERVER+NHD_PATH
 					+" and sedmap: " + SED_SERVER, e);
