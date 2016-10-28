@@ -9,10 +9,6 @@ import gov.cida.sedmap.io.util.exceptions.SedmapException;
 
 public class MultiPartHandler extends BaseHandler {
 
-	public static final String BOUNDARY_TAG = "--AMZ90RFX875LKMFasdf09DDFF3";
-	public static final String MULTI_PART_CONTENT_TYPE = "multipart/x-mixed-replace;boundary="
-			+ BOUNDARY_TAG.substring(2);
-
 	public MultiPartHandler(HttpServletResponse res, OutputStream stream, String filename) {
 		super(res, stream, MULTI_PART_CONTENT_TYPE, filename);
 	}
