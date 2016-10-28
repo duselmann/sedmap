@@ -1,7 +1,5 @@
 package gov.cida.sedmap.data;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,7 +21,6 @@ import gov.cida.sedmap.io.InputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.WriterWithFile;
 import gov.cida.sedmap.io.util.SessionUtil;
-import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.io.util.exceptions.SedmapException;
 import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
 import gov.cida.sedmap.ogc.FilterLiteralIterator;
@@ -194,7 +191,6 @@ public class JdbcFetcher extends Fetcher {
 			throws IOException, SQLException, NamingException, Exception {
 
 		InputStreamWithFile fileData = null;
-		FileWriter tmpw = null;
 		Results      rs = new Results();
 
 		try {
@@ -203,34 +199,32 @@ public class JdbcFetcher extends Fetcher {
 				columnNames = Arrays.asList(DAILY_SITE_COLUMN_NAMES_FOR_SPREADSHEET);
 			} else if (descriptor.contains("discrete")) {
 				columnNames = Arrays.asList(DISCRETE_SITE_COLUMN_NAMES_FOR_SPREADSHEET);
-			}
-			else{
+			} else {
 				throw new SedmapException(OGCExceptionCode.OperationNotSupported, new UnsupportedOperationException("Unknown descriptor: " + descriptor));
 			}
-			String        header = formatter.fileHeader(columnNames.iterator(), HeaderType.SITE);
-			String           sql = buildQuery(descriptor, filter);
+			String header = formatter.fileHeader(columnNames.iterator(), HeaderType.SITE);
+			String    sql = buildQuery(descriptor, filter);
 			logger.debug(sql);
 			rs = initData(sql);
 			getData(rs, filter, true);
 
-			File tmp = File.createTempFile(descriptor +'_'+  StrUtils.uniqueName(12), formatter.getFileType());
-			tmpw     = new FileWriter(tmp);
-			logger.debug( tmp.getAbsolutePath() );
-
-			//logger.debug(header);
-			tmpw.write(header);
-			while ( rs.rs.next() ) {
-				String row = formatter.fileRow(new ResultSetColumnIterator(rs.rs));
-				//logger.debug(row);
-				tmpw.write(row);
+			//asdf
+			try ( WriterWithFile tmp = IoUtils.createTmpZipWriter(descriptor, formatter.getFileType()) ) {
+				//logger.debug(header);
+				tmp.write(header);
+				while ( rs.rs.next() ) {
+					String row = formatter.fileRow(new ResultSetColumnIterator(rs.rs));
+					//logger.debug(row);
+					tmp.write(row);
+				}
+				fileData = new InputStreamWithFile(tmp.getFile());
 			}
 
-			fileData = new InputStreamWithFile(tmp);
 
 		} catch (FilterToSQLException e) {
 			throw new SedmapException(OGCExceptionCode.InvalidParameterValue, new SQLException("Failed to convert filter to sql where clause.",e));
 		} finally {
-			IoUtils.quiteClose(tmpw, rs.rs, rs.ps, rs.cn, fileData);
+			IoUtils.quiteClose(rs.rs, rs.ps, rs.cn);
 		}
 
 		return fileData;
@@ -252,10 +246,6 @@ public class JdbcFetcher extends Fetcher {
 			String tableName = Fetcher.conf.DATA_TABLES.get(descriptor);
 			String[] columnNames = Column.getColumnNames(getTableMetadata(tableName).iterator());
 			String        header = formatter.fileHeader(Arrays.asList(columnNames).iterator(), HeaderType.DISCRETE);
-			// TODO use IoUtils tmp file creator
-			//			File   tmpFile = File.createTempFile(descriptor + StrUtils.uniqueName(12), formatter.getFileType());
-			//			logger.debug(tmpFile.getAbsolutePath());
-			//			tmp = new FileWriter(tmpFile);
 			tmp = IoUtils.createTmpZipWriter(descriptor, formatter.getFileType());
 
 			// open temp file
