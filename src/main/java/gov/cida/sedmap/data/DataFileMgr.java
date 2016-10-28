@@ -36,20 +36,25 @@ public class DataFileMgr {
 		if ( file.exists() ) {
 			return file;
 		}
+		logger.info("file was not found " + file.getAbsolutePath());
 		return null;
 	}
 
 
 
 	public int deleteOldFiles() {
-		File[] tempFiles = fetchTempFiles();
-
 		int count=0;
-		for (File tempFile : tempFiles) {
-			count+=deleteIfOld(tempFile);
-		}
-		if (count != 0) {
-			logger.info("deleted " +count+ " old files");
+		try {
+			File[] tempFiles = fetchTempFiles();
+	
+			for (File tempFile : tempFiles) {
+				count+=deleteIfOld(tempFile);
+			}
+			if (count != 0) {
+				logger.info("deleted " +count+ " old files");
+			}
+		} catch	(Exception e) {
+			logger.error("There was an issue deleting old data files",e);
 		}
 		return count;
 	}
