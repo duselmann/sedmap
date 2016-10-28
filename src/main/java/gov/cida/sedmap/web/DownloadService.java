@@ -51,10 +51,13 @@ public class DownloadService extends HttpServlet {
 		try {
 			String fileId = req.getParameter("file");
 			File file = new DataFileMgr().getDataFile(fileId);
+			logger.info("User requesting file ID " + fileId);
 
 			if (file==null) {
+				logger.info("User requested file ID missing " + file);
 				handler = new MissingFileHandler(res, res.getOutputStream(), fileId);
 			} else {
+				logger.info("Sending User requested file " + file.getAbsolutePath());
 				handler = new RawHandler(res, res.getOutputStream(), file);
 			}
 			handler.beginWritingFiles();
