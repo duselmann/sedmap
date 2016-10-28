@@ -543,14 +543,11 @@ public abstract class Fetcher {
 		if (file==null) {
 			return StringValueIterator.EMPTY;
 		}
-		InputStream       fin = null;// IoUtils.createTmpZipStream(file) );
-		InputStreamReader rin = null;
-		BufferedReader reader = null;
 
-		try {
-			fin    = new FileInputStream(file);
-			rin    = new InputStreamReader(fin);
-			reader = new BufferedReader(rin);
+		try ( InputStream       fin = IoUtils.createTmpZipStream(file);
+			  InputStreamReader rin = new InputStreamReader(fin);
+			  BufferedReader reader = new BufferedReader(rin);
+			) {
 
 			String line;
 			while ( (line=reader.readLine()) != null ) {
@@ -562,8 +559,6 @@ public abstract class Fetcher {
 					sites.add(site);
 				}
 			}
-		} finally {
-			IoUtils.quiteClose(reader, rin, fin);
 		}
 
 		return sites;

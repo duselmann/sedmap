@@ -1,5 +1,6 @@
 package gov.cida.sedmap.data;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -208,7 +209,7 @@ public class JdbcFetcher extends Fetcher {
 			rs = initData(sql);
 			getData(rs, filter, true);
 
-			//asdf
+			File tmpFile = null;
 			try ( WriterWithFile tmp = IoUtils.createTmpZipWriter(descriptor, formatter.getFileType()) ) {
 				//logger.debug(header);
 				tmp.write(header);
@@ -217,8 +218,10 @@ public class JdbcFetcher extends Fetcher {
 					//logger.debug(row);
 					tmp.write(row);
 				}
-				fileData = new InputStreamWithFile(tmp.getFile());
+				// preserve the file for once out of the block where java7 closes it
+				tmpFile = tmp.getFile();
 			}
+			fileData = new InputStreamWithFile(tmpFile);
 
 
 		} catch (FilterToSQLException e) {
