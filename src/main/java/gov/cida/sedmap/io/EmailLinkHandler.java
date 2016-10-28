@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,17 +33,15 @@ public class EmailLinkHandler extends ZipHandler {
 
 	@Override
 	public FileDownloadHandler beginWritingFiles() throws SedmapException {
+		resp.setContentType( getContentType() );
 		/**
 		 * We close the clients response connection here to simulate spawning
 		 * another process.  In actuality, the browser gets a "close" after
 		 * "acquisition commenced" is written and continues on its merry way
 		 * while THIS thread (whoever called this method) continues execution.
 		 */
-		try {
-			resp.setContentType( getContentType() );
-			resp.getOutputStream().write("acquisition commenced".getBytes());
-			resp.getOutputStream().flush();
-			resp.getOutputStream().close();
+		try (OutputStream outs = resp.getOutputStream()) {
+			outs.write("acquisition commenced".getBytes());
 		} catch (IOException e) {
 			String msg = "Error writing response to user that the data acquisition commenced";
 			logger.error(msg,e);
@@ -58,6 +57,7 @@ public class EmailLinkHandler extends ZipHandler {
 		SedmapDataMail mailer = new SedmapDataMail();
 		// TODO handle false on send message
 		if ( StrUtils.isEmpty(getErrorId()) ) {
+			// this to prevent exposing how files are stored
 			String fileId = getFileName();
 			fileId = fileId.substring(5,fileId.length()-4);
 
@@ -87,10 +87,5 @@ public class EmailLinkHandler extends ZipHandler {
 
 	public void setExceptionThrown(Exception exceptionThrown) {
 		this.exceptionThrown = exceptionThrown;
-	}
-
-	@Override
-	public boolean isAlive() {
-		return true;
 	}
 }

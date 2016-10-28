@@ -28,8 +28,8 @@ public class BaseHandler implements FileDownloadHandler {
 
 
 	public BaseHandler(HttpServletResponse res, OutputStream stream, String contentType, String name) {
-		resp = res;
-		out  = stream;
+		this.resp = res;
+		this.out  = stream;
 		this.contentType = contentType;
 		this.name = name;
 	}

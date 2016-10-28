@@ -21,24 +21,24 @@ import gov.cida.sedmap.ogc.FilterWithViewParams;
 public class TimeOutFetcher extends Fetcher {
 	private static final Logger logger = Logger.getLogger(TimeOutFetcher.class);
 	
-	public static final String TIME_EXCEEDED_RESPONSE = "time_exceeded";
+	public static final String TIME_EXCEEDED_RESPONSE   = "time_exceeded";
 	
-	protected static final String TIMEOUT_ENV_KEY     = "sedmap/timoutfetcher/timeout";
-	protected static final long TIMEOUT_DEFAULT     = 1000 * 60 * 1;	// 1 minute
-	protected static final long TIMEOUT;
+	protected static final String TIMEOUT_ENV_KEY       = "sedmap/timoutfetcher/timeout";
+	protected static final int TIMEOUT_DEFAULT          = 1000 * 60 * 1;	// 1 minute
+	protected static final int TIMEOUT;
 	
-	protected static final String TIMEOUT_SLEEP_ENV_KEY     = "sedmap/timoutfetcher/sleep";
-	protected static final long TIMEOUT_SLEEP_DEFAULT     = 100;	// 100ms
-	protected static final long TIMEOUT_SLEEP;
+	protected static final String TIMEOUT_SLEEP_ENV_KEY = "sedmap/timoutfetcher/sleep";
+	protected static final int TIMEOUT_SLEEP_DEFAULT    = 100;	// 100ms
+	protected static final int TIMEOUT_SLEEP;
 	
-	protected static final String KILL_THREAD_ENV_KEY = "sedmap/timoutfetcher/killthread";
-	protected static final long KILL_THREAD_DEFAULT = 1000 * 60 * 60 * 3; // 3 hour
-	protected static final long KILL_THREAD;
+	protected static final String KILL_THREAD_ENV_KEY   = "sedmap/timoutfetcher/killthread";
+	protected static final int KILL_THREAD_DEFAULT      = 1000 * 60 * 60 * 3; // 3 hour
+	protected static final int KILL_THREAD;
 		
 	static {
-		TIMEOUT = SessionUtil.lookup(TIMEOUT_ENV_KEY, (int)TIMEOUT_DEFAULT);
-		TIMEOUT_SLEEP = SessionUtil.lookup(TIMEOUT_SLEEP_ENV_KEY, (int)TIMEOUT_SLEEP_DEFAULT);
-		KILL_THREAD  = SessionUtil.lookup(KILL_THREAD_ENV_KEY, (int)KILL_THREAD_DEFAULT);
+		TIMEOUT       = SessionUtil.lookup(TIMEOUT_ENV_KEY, TIMEOUT_DEFAULT);
+		TIMEOUT_SLEEP = SessionUtil.lookup(TIMEOUT_SLEEP_ENV_KEY, TIMEOUT_SLEEP_DEFAULT);
+		KILL_THREAD   = SessionUtil.lookup(KILL_THREAD_ENV_KEY, KILL_THREAD_DEFAULT);
 	}
 	
 	private JdbcFetcher jdbcFetcher;	
@@ -55,12 +55,12 @@ public class TimeOutFetcher extends Fetcher {
 	}
 
 	@Override
-	public void doFetch(HttpServletRequest req, FileDownloadHandler handler)
-			throws Exception {
+	public void doFetch(HttpServletRequest req, FileDownloadHandler handler) throws Exception {
 		/**
 		 * Check to see if the handler is what we are expecting.
 		 */
 		TimeOutHandler timeoutHandler = null;
+		// TODO again here is more foolishness with instanceof
 		if (handler instanceof TimeOutHandler) {
 			timeoutHandler = (TimeOutHandler)handler;
 		} else {

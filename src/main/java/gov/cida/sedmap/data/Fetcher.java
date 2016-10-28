@@ -81,7 +81,7 @@ public abstract class Fetcher {
 		int nwisBatchSize = SessionUtil.lookup(NWIS_BATCH_SIZE_PARAM, NWIS_BATCH_SIZE);
 		int nwisRetryMax  = SessionUtil.lookup(NWIS_RETRY_SIZE_PARAM, NUM_NWIS_TRIES);
 		
-		if ( !sites.hasNext() ) {
+		if ( ! sites.hasNext() ) {
 			// return nothing if there are no sites
 			return null;
 		}
@@ -113,19 +113,20 @@ public abstract class Fetcher {
 			fullTmp = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());
 			fullTmp.write(formatter.fileHeader(HeaderType.DAILY));
 			while ( sites.hasNext() ) {
-				if (! handler.isAlive()) {
+				if ( ! handler.isAlive()) {
 					break;
 				}
+				
+				// site list should be in batches of manageable site IDs
 				int batch = 0;
-
 				String sep = "";
 				StringBuilder siteList = new StringBuilder();
-				// site list should be in batches of manageable site IDs
 				while (++batch<nwisBatchSize && sites.hasNext()) {
 					siteList.append(sep).append(sites.next());
 					sep=",";
 				}
 				sitesUrl = url.replace("_sites_",   siteList);
+				
 				logger.debug("NWIS site list: " + siteList);
 
 				WriterWithFile batchTmp = null;
@@ -190,7 +191,7 @@ public abstract class Fetcher {
 							String column = columnItr.next();
 							columnHeader.append(column);
 							
-							if(columnItr.hasNext()) {
+							if (columnItr.hasNext()) {
 								columnHeader.append(formatter.getSeparator());
 							}
 							
@@ -336,8 +337,11 @@ public abstract class Fetcher {
 					} finally {
 						IoUtils.quiteClose(nwis, batchTmp);
 					}
-					IoUtils.copy(batchTmp.getFile(), fullTmp);
-					batchTmp.deleteFile();
+					try {
+						IoUtils.copy(batchTmp.getFile(), fullTmp);
+					} finally {
+						batchTmp.deleteFile();
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -385,7 +389,13 @@ public abstract class Fetcher {
 		return line;
 	}
 
-
+	// TODO I do not think this structure accomplishes its secondary intent.
+	// the primary intent is to open a connection to the NWIS web for data.
+	// the secondary intent is try a few times if the first connection fails.
+	// the problem is that there is nothing happening so it will act once and
+	// it will never cause any fetch. When I wrote this is was in a different place.
+	// I bet the massive refactor here moved this and accidentally made it useless.
+	// I am not changing it for now because I do not want it introduce a bug while fixing another.
 	protected BufferedReader fetchNwisData(String urlStr) throws Exception {
 		logger.debug("fetching NWIS data");
 		URL url = new URL(urlStr);
@@ -412,8 +422,7 @@ public abstract class Fetcher {
 	}
 
 
-	public void doFetch(HttpServletRequest req, FileDownloadHandler handler)
-			throws Exception {
+	public void doFetch(HttpServletRequest req, FileDownloadHandler handler) throws Exception {
 		logger.debug("doFetch");
 
 		String    dataTypes = getDataTypes(req);			// Search Filter(s)
@@ -470,11 +479,14 @@ public abstract class Fetcher {
 					// TODO this was originally going to be a single call but reality got in the way - could use a refactor
 					if ( "daily_data".equals(descriptor) ) {
 						fileData = handleNwisData(sites.iterator(), filter, formatter, handler);
+						
 					} else if ( "discrete_data".equals(descriptor) ) {
 						fileData = handleDiscreteData(sites.iterator(), filter, formatter);
+						
 					} else if (descriptor.contains("sites") ) {
 						fileData = handleSiteData(descriptor, filter, formatter);
-						List<String> descriptorSites = makeSiteIterator(fileData, formatter);
+						
+						List<String> descriptorSites = makeSiteIterator(fileData.getFile(), formatter);
 
 						if ( ! alsoFlow) { // if the user does not want discrete flow data
 							sites.clear(); // do not retain the discrete sites for NWIS daily data
@@ -520,39 +532,38 @@ public abstract class Fetcher {
 	}
 
 
-	// TODO this needs a bit of finessing because we want to be able to read the site data twice.
+	// TODO this needs a bit of fine tuning because we want to be able to read the site data twice.
 	// once for the use return download and again for the NWIS site list.
 	// right now, it assumes that the data comes from a cached file.
 	// it uses the formatter that created the file to know how to split the file
-	protected List<String> makeSiteIterator(InputStream fileData, Formatter formatter) throws IOException {
+	protected List<String> makeSiteIterator(File file, Formatter formatter) throws IOException {
 
 		LinkedList<String> sites = new LinkedList<String>();
 
-		if (fileData instanceof InputStreamWithFile) {
-			File file = ((InputStreamWithFile) fileData).getFile(); // TODO change to zip for temp files
-			if (file==null) return StringValueIterator.EMPTY;
-			InputStream       fin = null;// IoUtils.createTmpZipStream(file) );
-			InputStreamReader rin = null;
-			BufferedReader reader = null;
+		if (file==null) {
+			return StringValueIterator.EMPTY;
+		}
+		InputStream       fin = null;// IoUtils.createTmpZipStream(file) );
+		InputStreamReader rin = null;
+		BufferedReader reader = null;
 
-			try {
-				fin    = new FileInputStream(file);
-				rin    = new InputStreamReader(fin);
-				reader = new BufferedReader(rin);
+		try {
+			fin    = new FileInputStream(file);
+			rin    = new InputStreamReader(fin);
+			reader = new BufferedReader(rin);
 
-				String line;
-				while ( (line=reader.readLine()) != null ) {
-					int pos = line.indexOf( formatter.getSeparator() );
-					if (pos == -1) continue; // trap empty lines
-					String site = line.substring(0, pos );
-					// only preserve site numbers and not comments or header info
-					if (site.matches("^\\d+$")) {
-						sites.add(site);
-					}
+			String line;
+			while ( (line=reader.readLine()) != null ) {
+				int pos = line.indexOf( formatter.getSeparator() );
+				if (pos == -1) continue; // trap empty lines
+				String site = line.substring(0, pos );
+				// only preserve site numbers and not comments or header info
+				if (site.matches("^\\d+$")) {
+					sites.add(site);
 				}
-			} finally {
-				IoUtils.quiteClose(reader, rin, fin);
 			}
+		} finally {
+			IoUtils.quiteClose(reader, rin, fin);
 		}
 
 		return sites;
