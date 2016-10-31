@@ -1,5 +1,7 @@
 package gov.cida.sedmap.data;
 
+import static gov.cida.sedmap.data.DataFileMgr.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
@@ -242,7 +244,7 @@ public class JdbcFetcher extends Fetcher {
 
 		Results         rs = new Results();
 		WriterWithFile tmp = null;
-		String  descriptor = "discrete_data";
+		String  descriptor = DISCRETE_FILENAME;
 
 		try {
 
@@ -281,7 +283,6 @@ public class JdbcFetcher extends Fetcher {
 				}
 			}
 		} finally {
-//			tmp.deleteFile(); // TODO not for delayed download
 			IoUtils.quiteClose(tmp);
 		}
 

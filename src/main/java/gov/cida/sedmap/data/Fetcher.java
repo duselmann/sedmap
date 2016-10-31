@@ -1,8 +1,9 @@
 package gov.cida.sedmap.data;
 
+import static gov.cida.sedmap.data.DataFileMgr.*;
+
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -110,7 +111,7 @@ public abstract class Fetcher {
 		WriterWithFile fullTmp = null;
 		
 		try {
-			fullTmp = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());
+			fullTmp = IoUtils.createTmpZipWriter(DAILY_FILENAME, formatter.getFileType());
 			fullTmp.write(formatter.fileHeader(HeaderType.DAILY));
 			while ( sites.hasNext() ) {
 				if ( ! handler.isAlive()) {
@@ -362,7 +363,7 @@ public abstract class Fetcher {
 				// second, delete the data file that has an error
 				fullTmp.deleteFile();
 				// then, create a new file for with an error message
-				try (final WriterWithFile msgFile = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());) {
+				try (final WriterWithFile msgFile = IoUtils.createTmpZipWriter(DAILY_FILENAME, formatter.getFileType());) {
 					// now, write the message in the new data file
 					msgFile.write( errMsgBuilder.toString() );
 				}
@@ -477,10 +478,10 @@ public abstract class Fetcher {
 								
 				try {
 					// TODO this was originally going to be a single call but reality got in the way - could use a refactor
-					if ( "daily_data".equals(descriptor) ) {
+					if ( DAILY_FILENAME.equals(descriptor) ) {
 						fileData = handleNwisData(sites.iterator(), filter, formatter, handler);
 						
-					} else if ( "discrete_data".equals(descriptor) ) {
+					} else if ( DISCRETE_FILENAME.equals(descriptor) ) {
 						fileData = handleDiscreteData(sites.iterator(), filter, formatter);
 						
 					} else if (descriptor.contains("sites") ) {

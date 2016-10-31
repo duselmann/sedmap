@@ -50,7 +50,7 @@ public class DownloadService extends HttpServlet {
 		FileDownloadHandler handler = null;
 		try {
 			String fileId = req.getParameter("file");
-			File file = new DataFileMgr().getDataFile(fileId);
+			File file = new DataFileMgr().fetchDataFile(fileId);
 			logger.info("User requesting file ID " + fileId);
 
 			if (file==null) {

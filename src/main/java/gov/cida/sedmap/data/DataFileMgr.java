@@ -11,8 +11,8 @@ import gov.cida.sedmap.io.util.SessionUtil;
 public class DataFileMgr {
 	private static final Logger logger = Logger.getLogger(DataFileMgr.class);
 
-	protected static final String PATH_ENV_KEY = "sedmap/data/path";
-	protected static final String PATH_DEFAULT = "/tmp";
+	protected static final String PATH_ENV_KEY   = "sedmap/data/path";
+	protected static final String PATH_DEFAULT   = "/tmp";
 	protected static final String DATA_PATH;
 
 	protected static final String RETAIN_ENV_KEY = "sedmap/data/retain";
@@ -20,6 +20,11 @@ public class DataFileMgr {
 	protected static final int    RETAIN_TIME;
 	public    static final int    RETAIN_DAYS;
 
+	
+	public static final String DAILY_FILENAME    = "daily_data";
+	public static final String BATCH_FILENAME    = "daily_batch";
+	public static final String DISCRETE_FILENAME = "discrete_data";
+	public static final String DATA_FILENAME     = "data";
 
 
 	static {
@@ -31,8 +36,8 @@ public class DataFileMgr {
 
 
 
-	public File getDataFile(String fileId) { // TODO fetch not get
-		File file = new File(DATA_PATH +"/data_"+ fileId +".zip");
+	public File fetchDataFile(String fileId) {
+		File file = new File(DATA_PATH +"/"+ DATA_FILENAME +"_"+ fileId +".zip");
 		if ( file.exists() ) {
 			return file;
 		}
@@ -69,9 +74,10 @@ public class DataFileMgr {
 			@Override
 			public boolean accept(File dir, String name) {
 				name = name.toLowerCase();
-				boolean accept = name.startsWith("daily_")
-						|| name.startsWith("discrete_")
-						|| name.startsWith("data_");
+				boolean accept = name.startsWith(DAILY_FILENAME)
+						|| name.startsWith(DISCRETE_FILENAME)
+						|| name.startsWith(DATA_FILENAME)
+						|| name.startsWith(BATCH_FILENAME);
 				return accept;
 			}
 		});
