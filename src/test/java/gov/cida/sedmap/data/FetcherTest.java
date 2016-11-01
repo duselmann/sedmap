@@ -1,22 +1,20 @@
 package gov.cida.sedmap.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import gov.cida.sedmap.mock.MockContext;
 import gov.cida.sedmap.mock.MockDataSource;
 import gov.cida.sedmap.mock.MockRequest;
 import gov.cida.sedmap.mock.MockResultSet;
 import gov.cida.sedmap.mock.MockRowMetaData;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.naming.Context;
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-
-import org.junit.Before;
-import org.junit.Test;
 
 public class FetcherTest {
 
@@ -71,12 +69,7 @@ public class FetcherTest {
 		// link ctx to data service for testing
 		dss = new JdbcFetcher();
 
-		Fetcher.conf = new FetcherConfig() {
-			@Override
-			protected Context getContext() throws NamingException {
-				return ctx;
-			}
-		}.init();
+		Fetcher.conf = new FetcherConfig().init();
 	}
 
 	@Test

@@ -4,8 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.Writer;
 
-public class WriterWithFile extends BufferedWriter {
 
+public class WriterWithFile extends BufferedWriter {
 	protected File file;
 
 	public WriterWithFile(Writer out, File file) {
@@ -19,11 +19,6 @@ public class WriterWithFile extends BufferedWriter {
 
 	public void deleteFile() {
 		IoUtils.quiteClose(this);
-
-		if (file == null) return;
-
-		if ( ! file.delete() ) {
-			file.deleteOnExit();
-		}
+		IoUtils.deleteFile(file);
 	}
 }

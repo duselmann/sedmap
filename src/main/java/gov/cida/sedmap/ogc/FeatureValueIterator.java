@@ -1,8 +1,8 @@
 package gov.cida.sedmap.ogc;
 
-import gov.cida.sedmap.io.util.StringValueIterator;
-
 import org.opengis.feature.simple.SimpleFeature;
+
+import gov.cida.sedmap.io.util.StringValueIterator;
 
 public class FeatureValueIterator extends StringValueIterator {
 

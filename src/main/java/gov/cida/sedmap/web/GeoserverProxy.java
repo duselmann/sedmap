@@ -8,14 +8,15 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.naming.InitialContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.util.ErrUtils;
+import gov.cida.sedmap.io.util.SessionUtil;
 import gov.usgs.cida.proxy.ProxyServlet;
 
 
@@ -36,15 +37,9 @@ public class GeoserverProxy extends ProxyServlet {
 
 	public GeoserverProxy() {
 		try {
-			InitialContext ctx = new InitialContext();
-			String nhdS = (String) ctx.lookup("java:comp/env/"+NHD_ENV_SERVER);
-			String nhdP = (String) ctx.lookup("java:comp/env/"+NHD_ENV_PATH);
-			String sedS = (String) ctx.lookup("java:comp/env/"+SED_ENV_SERVER);
-
-			// now set the vars so if there is a problem all defaults are used
-			NHD_SERVER  = nhdS;
-			NHD_PATH    = nhdP;
-			SED_SERVER  = sedS;
+			NHD_SERVER = SessionUtil.lookup(NHD_ENV_SERVER, NHD_SERVER);
+			NHD_PATH   = SessionUtil.lookup(NHD_ENV_PATH,   NHD_PATH);
+			SED_SERVER = SessionUtil.lookup(SED_ENV_SERVER, SED_SERVER);
 		} catch (Exception e) {
 			logger.warn("Falling back to default geoservers. NHD:" + NHD_SERVER+NHD_PATH
 					+" and sedmap: " + SED_SERVER, e);
@@ -149,15 +144,7 @@ public class GeoserverProxy extends ProxyServlet {
 				handleErrorStream(targetConn, responseOutputStream);
 			}
 		} finally {
-			if (targetConnWriter != null) {
-				//This is likely not an err at all - could already be closed.
-				try { targetConnWriter.close(); } catch (Exception e) {}
-			}
-
-			if (targetIs != null) {
-				//This is likely not an err at all - could already be closed.
-				try { targetIs.close(); } catch (Exception e) {}
-			}
+			IoUtils.quiteClose(targetConnWriter, targetIs);
 		}
 	}
 

@@ -1,25 +1,14 @@
 package gov.cida.sedmap.data;
 
-import gov.cida.sedmap.io.FileDownloadHandler;
-import gov.cida.sedmap.io.InputStreamWithFile;
-import gov.cida.sedmap.io.IoUtils;
-import gov.cida.sedmap.io.WriterWithFile;
-import gov.cida.sedmap.io.util.StrUtils;
-import gov.cida.sedmap.io.util.StringValueIterator;
-import gov.cida.sedmap.io.util.exceptions.SedmapException;
-import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
-import gov.cida.sedmap.ogc.FilterWithViewParams;
-import gov.cida.sedmap.ogc.OgcUtils;
+import static gov.cida.sedmap.data.DataFileMgr.*;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,8 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.Context;
-import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -38,6 +25,17 @@ import org.opengis.filter.PropertyIsGreaterThan;
 import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLessThanOrEqualTo;
+
+import gov.cida.sedmap.io.FileDownloadHandler;
+import gov.cida.sedmap.io.InputStreamWithFile;
+import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.WriterWithFile;
+import gov.cida.sedmap.io.util.SessionUtil;
+import gov.cida.sedmap.io.util.StrUtils;
+import gov.cida.sedmap.io.util.StringValueIterator;
+import gov.cida.sedmap.io.util.exceptions.SedmapException;
+import gov.cida.sedmap.ogc.FilterWithViewParams;
+import gov.cida.sedmap.ogc.OgcUtils;
 
 public abstract class Fetcher {
 
@@ -68,36 +66,21 @@ public abstract class Fetcher {
 	protected List<Column> getTableMetadata(String tableName) {
 		return conf.getTableMetadata(tableName);
 	}
-	protected Context getContext() throws NamingException {
-		return conf.getContext();
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> T jndiLookup(String name, T defaultValue) {
-		try {
-			Context ctx = getContext();
-			// if this lookup or cast fails then return given default
-			return (T) ctx.lookup(name);
-		} catch (Exception e) {
-			return defaultValue;
-		}
-	}
-	
 
 	public abstract Fetcher initJndiJdbcStore(String jndiJdbc) throws IOException, Exception;
 
-	protected abstract InputStreamWithFile handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
-			throws IOException, SQLException, NamingException, Exception;
-	protected abstract InputStreamWithFile handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
-			throws IOException, SQLException, NamingException, Exception;
+	protected abstract File handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
+			throws Exception;
+	protected abstract File handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
+			throws Exception;
 
-	protected InputStreamWithFile handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter, FileDownloadHandler handler)
-			throws IOException, SQLException, NamingException {
+	protected File handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter, FileDownloadHandler handler)
+			throws Exception {
 		
-		int nwisBatchSize = jndiLookup(NWIS_BATCH_SIZE_PARAM, NWIS_BATCH_SIZE);
-		int nwisRetryMax  = jndiLookup(NWIS_RETRY_SIZE_PARAM, NUM_NWIS_TRIES);
+		int nwisBatchSize = SessionUtil.lookup(NWIS_BATCH_SIZE_PARAM, NWIS_BATCH_SIZE);
+		int nwisRetryMax  = SessionUtil.lookup(NWIS_RETRY_SIZE_PARAM, NUM_NWIS_TRIES);
 		
-		if ( !sites.hasNext() ) {
+		if ( ! sites.hasNext() ) {
 			// return nothing if there are no sites
 			return null;
 		}
@@ -126,22 +109,23 @@ public abstract class Fetcher {
 		WriterWithFile fullTmp = null;
 		
 		try {
-			fullTmp = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());
+			fullTmp = IoUtils.createTmpZipWriter(DAILY_FILENAME, formatter.getFileType());
 			fullTmp.write(formatter.fileHeader(HeaderType.DAILY));
 			while ( sites.hasNext() ) {
-				if (! handler.isAlive()) {
+				if ( ! handler.isAlive()) {
 					break;
 				}
+				
+				// site list should be in batches of manageable site IDs
 				int batch = 0;
-
 				String sep = "";
 				StringBuilder siteList = new StringBuilder();
-				// site list should be in batches of manageable site IDs
 				while (++batch<nwisBatchSize && sites.hasNext()) {
 					siteList.append(sep).append(sites.next());
 					sep=",";
 				}
 				sitesUrl = url.replace("_sites_",   siteList);
+				
 				logger.debug("NWIS site list: " + siteList);
 
 				WriterWithFile batchTmp = null;
@@ -206,7 +190,7 @@ public abstract class Fetcher {
 							String column = columnItr.next();
 							columnHeader.append(column);
 							
-							if(columnItr.hasNext()) {
+							if (columnItr.hasNext()) {
 								columnHeader.append(formatter.getSeparator());
 							}
 							
@@ -352,8 +336,11 @@ public abstract class Fetcher {
 					} finally {
 						IoUtils.quiteClose(nwis, batchTmp);
 					}
-					IoUtils.copy(batchTmp.getFile(), fullTmp);
-					batchTmp.deleteFile();
+					try {
+						IoUtils.copy(batchTmp.getFile(), fullTmp);
+					} finally {
+						batchTmp.deleteFile();
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -374,7 +361,7 @@ public abstract class Fetcher {
 				// second, delete the data file that has an error
 				fullTmp.deleteFile();
 				// then, create a new file for with an error message
-				try(final WriterWithFile msgFile = IoUtils.createTmpZipWriter("daily_data", formatter.getFileType());) {
+				try ( WriterWithFile msgFile = IoUtils.createTmpZipWriter(DAILY_FILENAME, formatter.getFileType()) ) {
 					// now, write the message in the new data file
 					msgFile.write( errMsgBuilder.toString() );
 				}
@@ -386,7 +373,7 @@ public abstract class Fetcher {
 			IoUtils.quiteClose(fullTmp);
 		}
 
-		return new InputStreamWithFile( IoUtils.createTmpZipStream( fullTmp.getFile() ), fullTmp.getFile());
+		return fullTmp.getFile();
 	}
 
 
@@ -401,7 +388,6 @@ public abstract class Fetcher {
 		return line;
 	}
 
-
 	protected BufferedReader fetchNwisData(String urlStr) throws Exception {
 		logger.debug("fetching NWIS data");
 		URL url = new URL(urlStr);
@@ -410,26 +396,12 @@ public abstract class Fetcher {
 		//		cn.setConnectTimeout(timeout);
 		//		cn.setReadTimeout(timeout);
 
-		BufferedReader reader = null;
-		int nwisTriesCount = 0;
-		while (null == reader && nwisTriesCount < NUM_NWIS_TRIES){
-			try {
-				reader = new BufferedReader(new InputStreamReader(cn.getInputStream()));
-			} catch (IOException e) {
-				if (nwisTriesCount == NUM_NWIS_TRIES -1) {
-					logger.error(e.getMessage());
-					logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-					throw new SedmapException(OGCExceptionCode.NoApplicableCode, e);
-				}
-			}
-			nwisTriesCount++;
-		}
+		BufferedReader reader = new BufferedReader(new InputStreamReader(cn.getInputStream()));
 		return reader;
 	}
 
 
-	public void doFetch(HttpServletRequest req, FileDownloadHandler handler)
-			throws Exception {
+	public void doFetch(HttpServletRequest req, FileDownloadHandler handler) throws Exception {
 		logger.debug("doFetch");
 
 		String    dataTypes = getDataTypes(req);			// Search Filter(s)
@@ -480,23 +452,26 @@ public abstract class Fetcher {
 				String    descriptor = name.append(site).append('_').append(value).toString();
 				String      filename = descriptor + formatter.getFileType();
 
-				InputStreamWithFile fileData = null;
+				File fileData = null;
 								
 				try {
 					// TODO this was originally going to be a single call but reality got in the way - could use a refactor
-					if ( "daily_data".equals(descriptor) ) {
+					if ( DAILY_FILENAME.equals(descriptor) ) {
 						fileData = handleNwisData(sites.iterator(), filter, formatter, handler);
-					} else if ( "discrete_data".equals(descriptor) ) {
+						
+					} else if ( DISCRETE_FILENAME.equals(descriptor) ) {
 						fileData = handleDiscreteData(sites.iterator(), filter, formatter);
+						
 					} else if (descriptor.contains("sites") ) {
 						fileData = handleSiteData(descriptor, filter, formatter);
+						
 						List<String> descriptorSites = makeSiteIterator(fileData, formatter);
 
 						if ( ! alsoFlow) { // if the user does not want discrete flow data
 							sites.clear(); // do not retain the discrete sites for NWIS daily data
 						}
 
-						if (sites.size() == 0) { // this is a short circuit to prevent an unneccessary loop
+						if (sites.size() == 0) { // this is a short circuit to prevent an unnecessary loop
 							sites = descriptorSites;
 						} else {
 							// TODO refactor to use sorted set
@@ -510,21 +485,19 @@ public abstract class Fetcher {
 					
 					// if we found some sites or data then append it to the collection
 					if ( fileData != null && !sites.isEmpty() ) {
-						handler.writeFile(formatter.getContentType(), filename, fileData);
+						InputStreamWithFile stream = IoUtils.createTmpZipStream(fileData);
+						handler.writeFile(formatter.getContentType(), filename, stream);
 					}
 				} catch (Exception e) {
-					if(e instanceof SedmapException) {
+					if (e instanceof SedmapException) {
 						throw e;
 					} else {
 						logger.error("Failed to fetch from the Database.  Exception is:" +  e.getMessage());
 						logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-						throw new SedmapException(OGCExceptionCode.NoApplicableCode, e);
+						throw new SedmapException("Error while transfering data", e);
 					}
 				} finally {
-					IoUtils.quiteClose(fileData);
-					if (fileData != null) {
-						fileData.deleteFile(); // TODO these files are not deleting. it must still be open?
-					}
+					IoUtils.deleteFile(fileData);
 				}
 
 				long totalTime = System.currentTimeMillis() - startTime;
@@ -536,38 +509,32 @@ public abstract class Fetcher {
 	}
 
 
-	// TODO this needs a bit of finessing because we want to be able to read the site data twice.
+	// TODO this needs a bit of fine tuning because we want to be able to read the site data twice.
 	// once for the use return download and again for the NWIS site list.
 	// right now, it assumes that the data comes from a cached file.
 	// it uses the formatter that created the file to know how to split the file
-	protected List<String> makeSiteIterator(InputStream fileData, Formatter formatter) throws IOException {
+	protected List<String> makeSiteIterator(File file, Formatter formatter) throws IOException {
 
 		LinkedList<String> sites = new LinkedList<String>();
 
-		if (fileData instanceof InputStreamWithFile) {
-			File file = ((InputStreamWithFile) fileData).getFile(); // TODO change to zip for temp files
-			if (file==null) return StringValueIterator.EMPTY;
-			InputStream       fin = null;// IoUtils.createTmpZipStream(file) );
-			InputStreamReader rin = null;
-			BufferedReader reader = null;
+		if (file==null) {
+			return StringValueIterator.EMPTY;
+		}
 
-			try {
-				fin    = new FileInputStream(file);
-				rin    = new InputStreamReader(fin);
-				reader = new BufferedReader(rin);
+		try ( InputStream       fin = IoUtils.createTmpZipStream(file);
+			  InputStreamReader rin = new InputStreamReader(fin);
+			  BufferedReader reader = new BufferedReader(rin);
+			) {
 
-				String line;
-				while ( (line=reader.readLine()) != null ) {
-					int pos = line.indexOf( formatter.getSeparator() );
-					if (pos == -1) continue; // trap empty lines
-					String site = line.substring(0, pos );
-					// only preserve site numbers and not comments or header info
-					if (site.matches("^\\d+$")) {
-						sites.add(site);
-					}
+			String line;
+			while ( (line=reader.readLine()) != null ) {
+				int pos = line.indexOf( formatter.getSeparator() );
+				if (pos == -1) continue; // trap empty lines
+				String site = line.substring(0, pos );
+				// only preserve site numbers and not comments or header info
+				if (site.matches("^\\d+$")) {
+					sites.add(site);
 				}
-			} finally {
-				IoUtils.quiteClose(reader, rin, fin);
 			}
 		}
 

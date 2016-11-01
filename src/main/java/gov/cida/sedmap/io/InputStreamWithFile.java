@@ -13,7 +13,15 @@ public class InputStreamWithFile extends InputStream {
 
 
 	public InputStreamWithFile(File file) throws FileNotFoundException {
-		in   = new FileInputStream(file);
+		if (file.getAbsolutePath().endsWith("zip")) {
+			try {
+				in = IoUtils.createTmpZipStream(file);
+			} catch (IOException e) {
+				throw new FileNotFoundException("Could not open " + file.getAbsolutePath());
+			}
+		} else {
+			in   = new FileInputStream(file);
+		}
 		this.file = file;
 	}
 	public InputStreamWithFile(InputStream in, File file) throws FileNotFoundException {
@@ -27,12 +35,7 @@ public class InputStreamWithFile extends InputStream {
 
 	public void deleteFile() {
 		IoUtils.quiteClose(this);
-
-		if (file == null) return;
-
-		if ( ! file.delete() ) {
-			file.deleteOnExit();
-		}
+		IoUtils.deleteFile(file);
 	}
 
 	@Override

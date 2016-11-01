@@ -1,15 +1,16 @@
 package gov.cida.sedmap.ogc;
 
-import gov.cida.sedmap.io.util.StrUtils;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.AbstractFilter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterVisitor;
+
+import gov.cida.sedmap.io.util.StrUtils;
 
 public class FilterWithViewParams  extends AbstractFilter implements Iterable<String> {
 

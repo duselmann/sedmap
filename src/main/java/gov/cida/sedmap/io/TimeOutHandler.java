@@ -1,18 +1,15 @@
 package gov.cida.sedmap.io;
 
-import gov.cida.sedmap.io.util.SessionUtil;
-import gov.cida.sedmap.io.util.StrUtils;
-import gov.cida.sedmap.io.util.exceptions.SedmapException;
-import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
-import gov.cida.sedmap.mail.SedmapDataMail;
-
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+
+import gov.cida.sedmap.io.util.SessionUtil;
+import gov.cida.sedmap.io.util.StrUtils;
+import gov.cida.sedmap.io.util.exceptions.SedmapException;
+import gov.cida.sedmap.mail.SedmapDataMail;
 
 
 public class TimeOutHandler extends EmailLinkHandler {
@@ -30,13 +27,12 @@ public class TimeOutHandler extends EmailLinkHandler {
 	private volatile boolean sendEmail = false;
 	private volatile boolean pastEmailLogic = false;
 
-	public TimeOutHandler(HttpServletResponse res, File file, String email)
-			throws FileNotFoundException {
-		super(res, file, email);
+	public TimeOutHandler(HttpServletResponse res, String email) throws IOException {
+		super(res, email);
 	}
 	
 	@Override
-	public FileDownloadHandler beginWritingFiles() throws Exception {
+	public FileDownloadHandler beginWritingFiles() throws SedmapException {
 		/**
 		 * Since the fetcher is dealing w/ response to the client based on a
 		 * timeout value, we dont do anything here.
@@ -46,7 +42,7 @@ public class TimeOutHandler extends EmailLinkHandler {
 	}
 	
 	@Override
-	public FileDownloadHandler finishWritingFiles() throws Exception {
+	public FileDownloadHandler finishWritingFiles() throws SedmapException {
 		/**
 		 * This is a relatively fast method but its speed has implications such
 		 * that if we actually have started this method but the main thread's
@@ -58,25 +54,13 @@ public class TimeOutHandler extends EmailLinkHandler {
 		synchronized (finishedWriting) {
 			finishedWriting = true;
 			
-			try {
-				/**
-				 * We cannot do super.finishWritingFiles() as this parent is 
-				 * EmailLinkHandler and that method actually does the emailing.  We
-				 * need to clean ourself up instead.
-				 */
-				out.flush();
-				out.close();
-			} catch (IOException e) {
-				logger.error(e.getMessage());
-				logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-				throw new SedmapException(OGCExceptionCode.NoApplicableCode, e);
-			}
-	
+			super.finishWritingFiles();
+			
 			/**
 			 * Lets see if this job timeout out at all.  If it did then we need to
 			 * send an email.  If not, we just exit out.
 			 */
-			if(this.sendEmail) {			
+			if (sendEmail) {			
 				sendEmail();				
 				pastEmailLogic = true;
 			}
@@ -127,6 +111,7 @@ public class TimeOutHandler extends EmailLinkHandler {
 	}
 	
 	public void sendEmail() {
+		logger.info("Sending email to " + emailAddr);
 		SedmapDataMail mailer = new SedmapDataMail();
 		// TODO handle false on send message
 		if ( StrUtils.isEmpty(getErrorId()) ) {

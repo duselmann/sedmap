@@ -1,9 +1,10 @@
 package gov.cida.sedmap.util;
 
 import static org.junit.Assert.*;
-import gov.cida.sedmap.io.util.StrUtils;
 
 import org.junit.Test;
+
+import gov.cida.sedmap.io.util.StrUtils;
 
 public class StrUtilsTest {
 

@@ -1,21 +1,9 @@
 package gov.cida.sedmap.data;
 
-import gov.cida.sedmap.io.InputStreamWithFile;
-import gov.cida.sedmap.io.IoUtils;
-import gov.cida.sedmap.io.WriterWithFile;
-import gov.cida.sedmap.io.util.StrUtils;
-import gov.cida.sedmap.io.util.exceptions.SedmapException;
-import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
-import gov.cida.sedmap.ogc.FilterLiteralIterator;
-import gov.cida.sedmap.ogc.FilterWithViewParams;
-import gov.cida.sedmap.ogc.OgcUtils;
+import static gov.cida.sedmap.data.DataFileMgr.*;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,16 +11,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.Context;
 import javax.naming.NamingException;
-import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.jdbc.FilterToSQLException;
+
+import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.WriterWithFile;
+import gov.cida.sedmap.io.util.exceptions.SedmapException;
+import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
+import gov.cida.sedmap.ogc.FilterLiteralIterator;
+import gov.cida.sedmap.ogc.FilterWithViewParams;
+import gov.cida.sedmap.ogc.OgcUtils;
 
 public class JdbcFetcher extends Fetcher {
-
-
 	private static final Logger logger = Logger.getLogger(JdbcFetcher.class);
 
 	private static final Map<String,String> dataQueries  = new HashMap<String, String>();
@@ -166,15 +157,6 @@ public class JdbcFetcher extends Fetcher {
 	}
 
 
-	// nice little bundle for the JDBC results set needs
-	protected static class Results {
-		Connection cn;
-		PreparedStatement ps;
-		ResultSet  rs;
-	}
-
-
-
 	public JdbcFetcher() {
 	}
 	public JdbcFetcher(String jndiJdbc) {
@@ -190,78 +172,55 @@ public class JdbcFetcher extends Fetcher {
 
 
 	@Override
-	protected InputStreamWithFile handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
-			throws IOException, SQLException, NamingException, Exception {
+	protected File handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
+			throws Exception {
 
-		InputStreamWithFile fileData = null;
-		FileWriter tmpw = null;
-		Results      rs = new Results();
-
-		try {
+		try (Results rs = new Results()) {
 			List<String> columnNames;
 			if (descriptor.contains("daily")) {
 				columnNames = Arrays.asList(DAILY_SITE_COLUMN_NAMES_FOR_SPREADSHEET);
 			} else if (descriptor.contains("discrete")) {
 				columnNames = Arrays.asList(DISCRETE_SITE_COLUMN_NAMES_FOR_SPREADSHEET);
-			}
-			else{
+			} else {
 				throw new SedmapException(OGCExceptionCode.OperationNotSupported, new UnsupportedOperationException("Unknown descriptor: " + descriptor));
 			}
-			String        header = formatter.fileHeader(columnNames.iterator(), HeaderType.SITE);
-			String           sql = buildQuery(descriptor, filter);
+			String header = formatter.fileHeader(columnNames.iterator(), HeaderType.SITE);
+			String    sql = buildQuery(descriptor, filter);
 			logger.debug(sql);
-			rs = initData(sql);
-			getData(rs, filter, true);
+			rs.openQuery(jndiDS, sql);
+			fetchData(rs, filter, true);
 
-			File tmp = File.createTempFile(descriptor +'_'+  StrUtils.uniqueName(12), formatter.getFileType());
-			tmpw     = new FileWriter(tmp);
-			logger.debug( tmp.getAbsolutePath() );
-
-			//logger.debug(header);
-			tmpw.write(header);
-			while ( rs.rs.next() ) {
-				String row = formatter.fileRow(new ResultSetColumnIterator(rs.rs));
-				//logger.debug(row);
-				tmpw.write(row);
+			try ( WriterWithFile tmp = IoUtils.createTmpZipWriter(descriptor, formatter.getFileType()) ) {
+				//logger.debug(header);
+				tmp.write(header);
+				while ( rs.rs.next() ) {
+					String row = formatter.fileRow(new ResultSetColumnIterator(rs.rs));
+					//logger.debug(row);
+					tmp.write(row);
+				}
+				// preserve the file for once out of the block where java7 closes it
+				return tmp.getFile();
 			}
-
-			fileData = new InputStreamWithFile(tmp);
-
-		} catch (FilterToSQLException e) {
-			throw new SedmapException(OGCExceptionCode.InvalidParameterValue, new SQLException("Failed to convert filter to sql where clause.",e));
-		} finally {
-			IoUtils.quiteClose(tmpw, rs.rs, rs.ps, rs.cn);
-			// TODO maybe close fileData?
 		}
-
-		return fileData;
 	}
 	@Override
-	protected InputStreamWithFile handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
+	protected File handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
 			throws Exception {
 		if ( !sites.hasNext() ) {
 			// return nothing if there are no sites
 			return null;
 		}
 
-		Results         rs = new Results();
-		WriterWithFile tmp = null;
-		String  descriptor = "discrete_data";
-
-		try {
-
-			String tableName = Fetcher.conf.DATA_TABLES.get(descriptor);
-			String[] columnNames = Column.getColumnNames(getTableMetadata(tableName).iterator());
-			String        header = formatter.fileHeader(Arrays.asList(columnNames).iterator(), HeaderType.DISCRETE);
-			// TODO use IoUtils tmp file creator
-			//			File   tmpFile = File.createTempFile(descriptor + StrUtils.uniqueName(12), formatter.getFileType());
-			//			logger.debug(tmpFile.getAbsolutePath());
-			//			tmp = new FileWriter(tmpFile);
-			tmp = IoUtils.createTmpZipWriter(descriptor, formatter.getFileType());
+		String descriptor    = DISCRETE_FILENAME;
+		String tableName     = Fetcher.conf.DATA_TABLES.get(descriptor);
+		String[] columnNames = Column.getColumnNames(getTableMetadata(tableName).iterator());
+		String header        = formatter.fileHeader(Arrays.asList(columnNames).iterator(), HeaderType.DISCRETE);
+		
+		try (WriterWithFile tmp = IoUtils.createTmpZipWriter(descriptor, formatter.getFileType()) ) {
 
 			// open temp file
-			while (sites.hasNext()) {
-				try {
+			while ( sites.hasNext() ) {
+				try (Results rs = new Results()) {
 					int batch = 0;
 					StringBuilder sitesClause = new StringBuilder();
 					String join="";
@@ -272,8 +231,8 @@ public class JdbcFetcher extends Fetcher {
 					String sql = getQuery(descriptor);
 					sql=sql.replace("_siteList_", sitesClause.toString() );
 					logger.debug(sql);
-					rs = initData(sql);
-					getData(rs, filter, false);
+					rs.openQuery(jndiDS,sql);
+					fetchData(rs, filter, false);
 
 
 					//logger.debug(header);
@@ -283,21 +242,14 @@ public class JdbcFetcher extends Fetcher {
 						//logger.debug(row);
 						tmp.write(row);
 					}
-
-				} finally {
-					IoUtils.quiteClose(rs.rs, rs.ps, rs.cn);
 				}
 			}
-		} finally {
-			//tmp.delete(); // TODO not for delayed download
-			IoUtils.quiteClose(tmp);
+			return tmp.getFile();
 		}
-
-		return IoUtils.createTmpZipStream( tmp.getFile() );
 	}
 
 
-	protected String buildQuery(String descriptor, FilterWithViewParams filter) throws Exception {
+	protected String buildQuery(String descriptor, FilterWithViewParams filter) throws SedmapException {
 		//		FilterToSQL trans = new FilterToSQL();
 		//		trans.setInline(true);
 
@@ -333,30 +285,7 @@ public class JdbcFetcher extends Fetcher {
 
 
 
-	protected Results initData(String sql) throws NamingException, SQLException, Exception {
-		Results r = new Results();
-
-		try {
-			Context ctx = getContext();
-			DataSource ds = (DataSource) ctx.lookup(jndiDS);
-			r.cn = ds.getConnection();
-		} catch (SQLException e) {
-			throw new SedmapException(OGCExceptionCode.ResourceNotFound, e);
-		}
-		
-		try {
-			r.ps = r.cn.prepareStatement(sql);
-		} catch (SQLException e) {
-			logger.error(e);
-			throw e;
-		} catch (Exception e) {
-			logger.error(e);
-			e.printStackTrace();
-		}
-
-		return r;
-	}
-	protected Results getData(Results r, FilterWithViewParams filter, boolean doFilterValues) throws NamingException, SQLException, Exception {
+	protected Results fetchData(Results r, FilterWithViewParams filter, boolean doFilterValues) throws NamingException, SQLException, Exception {
 		try {
 			int index = 1;
 			for (String value : filter) {
@@ -381,10 +310,11 @@ public class JdbcFetcher extends Fetcher {
 			logger.info("executeQuery: finish");
 		} catch (SQLException e) {
 			logger.error("executeQuery: error", e);
-			throw new SedmapException(OGCExceptionCode.InvalidParameterValue, e);
+			throw new SedmapException("Error while querying discrete sites", e);
 		} catch (Exception e) {
-			logger.error(e);
-			e.printStackTrace();
+			String msg = "Non-SQL error when querying or discrete sites.";
+			logger.error(msg, e);
+			throw new SedmapException(msg, e);
 		}
 
 		return r;

@@ -1,45 +1,42 @@
 package gov.cida.sedmap.data;
 
-import gov.cida.sedmap.data.agent.TimeOutAgent;
-import gov.cida.sedmap.io.FileDownloadHandler;
-import gov.cida.sedmap.io.InputStreamWithFile;
-import gov.cida.sedmap.io.TimeOutHandler;
-import gov.cida.sedmap.io.util.SessionUtil;
-import gov.cida.sedmap.io.util.exceptions.SedmapException;
-import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
-import gov.cida.sedmap.ogc.FilterWithViewParams;
-
+import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Iterator;
 
-import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import gov.cida.sedmap.data.agent.TimeOutAgent;
+import gov.cida.sedmap.io.FileDownloadHandler;
+import gov.cida.sedmap.io.TimeOutHandler;
+import gov.cida.sedmap.io.util.SessionUtil;
+import gov.cida.sedmap.io.util.exceptions.SedmapException;
+import gov.cida.sedmap.ogc.FilterWithViewParams;
+
 public class TimeOutFetcher extends Fetcher {
 	private static final Logger logger = Logger.getLogger(TimeOutFetcher.class);
 	
-	public static final String TIME_EXCEEDED_RESPONSE = "time_exceeded";
+	public static final String TIME_EXCEEDED_RESPONSE   = "time_exceeded";
 	
-	protected static final String TIMEOUT_ENV_KEY     = "sedmap/timoutfetcher/timeout";
-	protected static final long TIMEOUT_DEFAULT     = 1000 * 60 * 1;	// 1 minute
-	protected static final long TIMEOUT;
+	protected static final String TIMEOUT_ENV_KEY       = "sedmap/timoutfetcher/timeout";
+	protected static final int TIMEOUT_DEFAULT          = 1000 * 60 * 1;	// 1 minute
+	protected static final int TIMEOUT;
 	
-	protected static final String TIMEOUT_SLEEP_ENV_KEY     = "sedmap/timoutfetcher/sleep";
-	protected static final long TIMEOUT_SLEEP_DEFAULT     = 100;	// 100ms
-	protected static final long TIMEOUT_SLEEP;
+	protected static final String TIMEOUT_SLEEP_ENV_KEY = "sedmap/timoutfetcher/sleep";
+	protected static final int TIMEOUT_SLEEP_DEFAULT    = 100;	// 100ms
+	protected static final int TIMEOUT_SLEEP;
 	
-	protected static final String KILL_THREAD_ENV_KEY = "sedmap/timoutfetcher/killthread";
-	protected static final long KILL_THREAD_DEFAULT = 1000 * 60 * 60 * 3; // 3 hour
-	protected static final long KILL_THREAD;
+	protected static final String KILL_THREAD_ENV_KEY   = "sedmap/timoutfetcher/killthread";
+	protected static final int KILL_THREAD_DEFAULT      = 1000 * 60 * 60 * 3; // 3 hour
+	protected static final int KILL_THREAD;
 		
 	static {
-		TIMEOUT = SessionUtil.lookup(TIMEOUT_ENV_KEY, (int)TIMEOUT_DEFAULT);
-		TIMEOUT_SLEEP = SessionUtil.lookup(TIMEOUT_SLEEP_ENV_KEY, (int)TIMEOUT_SLEEP_DEFAULT);
-		KILL_THREAD  = SessionUtil.lookup(KILL_THREAD_ENV_KEY, (int)KILL_THREAD_DEFAULT);
+		TIMEOUT       = SessionUtil.lookup(TIMEOUT_ENV_KEY, TIMEOUT_DEFAULT);
+		TIMEOUT_SLEEP = SessionUtil.lookup(TIMEOUT_SLEEP_ENV_KEY, TIMEOUT_SLEEP_DEFAULT);
+		KILL_THREAD   = SessionUtil.lookup(KILL_THREAD_ENV_KEY, KILL_THREAD_DEFAULT);
 	}
 	
 	private JdbcFetcher jdbcFetcher;	
@@ -56,17 +53,17 @@ public class TimeOutFetcher extends Fetcher {
 	}
 
 	@Override
-	public void doFetch(HttpServletRequest req, FileDownloadHandler handler)
-			throws Exception {
+	public void doFetch(HttpServletRequest req, FileDownloadHandler handler) throws Exception {
 		/**
 		 * Check to see if the handler is what we are expecting.
 		 */
 		TimeOutHandler timeoutHandler = null;
-		if(handler instanceof TimeOutHandler) {
+		// TODO again here is more foolishness with instanceof
+		if (handler instanceof TimeOutHandler) {
 			timeoutHandler = (TimeOutHandler)handler;
 		} else {
 			logger.error("Client Handler used in TimeOut logic is not a TimeOutHandler.  Cannot proceed with data fetch.");
-			throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(SedmapException.GENERIC_ERROR));
+			throw new SedmapException("Application error - expecting instance of TimeOutHandler - must fix");
 		}
 		
 		/**
@@ -139,21 +136,21 @@ public class TimeOutFetcher extends Fetcher {
 		/**
 		 * Handler is finished, lets see if it really finished
 		 */
-		if(timeoutAgent.isRunning()) {
+		if (timeoutAgent.isRunning()) {
 			/**
 			 * Darn thing is still running.  We need to kill it
 			 */
 			timeoutAgent.interrupt();
 			String msg = "Data collection time limit exceeded.  Canceling job and exiting...";
-			logger.error("TimeOutAgent time limit exceeded.  Interrupting thread and exiting.");
-			throw new SedmapException(OGCExceptionCode.NoApplicableCode, new Exception(msg));
+			logger.debug(msg);
+			throw new SedmapException(msg);
 		}
 		
 		/**
 		 * Data fetch is finally completed.  Lets exit out as long as we dont have
 		 * to manually send an email (runtime condition above)
 		 */
-		if(mustSendEmailManually) {
+		if (mustSendEmailManually) {
 			timeoutHandler.sendEmail();
 		}
 		return;		
@@ -166,17 +163,15 @@ public class TimeOutFetcher extends Fetcher {
 	}
 
 	@Override
-	protected InputStreamWithFile handleSiteData(String descriptor,
-			FilterWithViewParams filter, Formatter formatter)
-			throws IOException, SQLException, NamingException, Exception {
-		return this.jdbcFetcher.handleSiteData(descriptor, filter, formatter);
+	protected File handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
+			throws Exception {
+		return jdbcFetcher.handleSiteData(descriptor, filter, formatter);
 	}
 
 	@Override
-	protected InputStreamWithFile handleDiscreteData(Iterator<String> sites,
-			FilterWithViewParams filter, Formatter formatter)
-			throws IOException, SQLException, NamingException, Exception {
-		return this.jdbcFetcher.handleDiscreteData(sites, filter, formatter);
+	protected File handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
+			throws Exception {
+		return jdbcFetcher.handleDiscreteData(sites, filter, formatter);
 	}
 	
 	private void waitForThreadToFinish(TimeOutAgent timeoutAgent, long startTime, long currentTime, long waitTime) throws Exception {
@@ -205,7 +200,7 @@ public class TimeOutFetcher extends Fetcher {
 		/**
 		 * We're out of the loop, lets see if there was an exception in the thread
 		 */
-		if(timeoutAgent.exceptionThrown()) {
+		if(timeoutAgent.isError()) {
 			/**
 			 * Something went wrong in the fetcher.  Lets throw the exception
 			 * caught and let the data service handle it.

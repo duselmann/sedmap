@@ -1,24 +1,10 @@
 package gov.cida.sedmap.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import gov.cida.sedmap.io.FileDownloadHandler;
-import gov.cida.sedmap.io.InputStreamWithFile;
-import gov.cida.sedmap.io.IoUtils;
-import gov.cida.sedmap.io.MultiPartHandler;
-import gov.cida.sedmap.io.util.StrUtils;
-import gov.cida.sedmap.mock.MockContext;
-import gov.cida.sedmap.mock.MockDataSource;
-import gov.cida.sedmap.mock.MockRequest;
-import gov.cida.sedmap.mock.MockResponse;
-import gov.cida.sedmap.mock.MockResultSet;
-import gov.cida.sedmap.mock.MockRowMetaData;
-import gov.cida.sedmap.ogc.FilterWithViewParams;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -31,7 +17,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
-import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,6 +26,19 @@ import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.factory.GeoTools;
 import org.junit.Before;
 import org.junit.Test;
+
+import gov.cida.sedmap.io.FileDownloadHandler;
+import gov.cida.sedmap.io.InputStreamWithFile;
+import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.MultiPartHandler;
+import gov.cida.sedmap.io.util.StrUtils;
+import gov.cida.sedmap.mock.MockContext;
+import gov.cida.sedmap.mock.MockDataSource;
+import gov.cida.sedmap.mock.MockRequest;
+import gov.cida.sedmap.mock.MockResponse;
+import gov.cida.sedmap.mock.MockResultSet;
+import gov.cida.sedmap.mock.MockRowMetaData;
+import gov.cida.sedmap.ogc.FilterWithViewParams;
 
 public class JdbcFetcherTest {
 
@@ -65,6 +63,9 @@ public class JdbcFetcherTest {
 	boolean nwisHandlerCalled;
 	boolean localHandlerCalled;
 	int     handleCount;
+	
+	
+	HashMap<File, InputStream> fileStreams; // mock saving files
 
 
 	@Before
@@ -74,7 +75,8 @@ public class JdbcFetcherTest {
 		nwisHandlerCalled  = false;
 		localHandlerCalled = false;
 		handleCount        = 0;
-		params = new HashMap<String, String>();
+		fileStreams        = new HashMap<>();
+		params             = new HashMap<String, String>();
 
 		rs  = new MockResultSet();
 		rs.addMockRow("1234567891",40.1,-90.1,new Date(01,1-1,1));
@@ -106,12 +108,7 @@ public class JdbcFetcherTest {
 		ds.put("select * from sedmap.DISCRETE_SAMPLE_FACT", new MockResultSet());
 		ds.put("select * from sedmap.DISCRETE_SAMPLE_FACT", new MockRowMetaData());
 
-		Fetcher.conf = new FetcherConfig() {
-			@Override
-			protected Context getContext() throws NamingException {
-				return ctx;
-			}
-		}.init();
+		Fetcher.conf = new FetcherConfig().init();
 		// link ctx to data service for testing
 		fetcher = new JdbcFetcher(Fetcher.SEDMAP_DS);
 
@@ -122,19 +119,19 @@ public class JdbcFetcherTest {
 	protected void initJdbcFetcherForDoFetchTesting() {
 		fetcher = new JdbcFetcher(Fetcher.SEDMAP_DS) {
 			@Override
-			protected InputStreamWithFile handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter, FileDownloadHandler handler)
-					throws IOException, SQLException, NamingException {
+			protected File handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter, FileDownloadHandler handler)
+					throws Exception {
 				nwisHandlerCalled = true;
 				return handleData("NWIS", filter, formatter);
 			}
 			@Override
-			protected InputStreamWithFile handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
-					throws IOException, SQLException, NamingException {
+			protected File handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
+					throws Exception {
 				localHandlerCalled = true;
 				return handleData(descriptor, filter, formatter);
 			}
 
-			protected InputStreamWithFile handleData(String descriptor, FilterWithViewParams filter, Formatter formatter)
+			protected File handleData(String descriptor, FilterWithViewParams filter, Formatter formatter)
 					throws IOException, SQLException, NamingException {
 				handleCount++;
 
@@ -147,10 +144,13 @@ public class JdbcFetcherTest {
 						throw new SQLException("Failed to convert filter to sql where clause.",e);
 					}
 				}
-				return new InputStreamWithFile(
+				File file = new File("MockFile");
+				InputStream stream = new InputStreamWithFile(
 						new ByteArrayInputStream(("Test data for descriptor:'" +descriptor
 								+"' and where clause:'" +where +"' file format:'" +formatter.getContentType() +"'").getBytes()),
 								null);
+				fileStreams.put(file, stream);
+				return file;
 			}
 		};
 	}
@@ -160,8 +160,7 @@ public class JdbcFetcherTest {
 	public void handleLocalData_csv() throws Exception {
 		fetcher = new JdbcFetcher(Fetcher.SEDMAP_DS) {
 			@Override
-			protected String buildQuery(String descriptor, FilterWithViewParams filter)
-					throws FilterToSQLException {
+			protected String buildQuery(String descriptor, FilterWithViewParams filter) {
 				return "select * from sedmap.DISCRETE_STATIONS";
 			}
 		};
@@ -172,8 +171,14 @@ public class JdbcFetcherTest {
 			}
 		};
 		CsvFormatter csvFormatter = new CsvFormatter();
-		InputStream in = fetcher.handleSiteData("discrete_sites", filter, csvFormatter);
-		String actual  = IoUtils.readStream(in);
+		File file = fetcher.handleSiteData("discrete_sites", filter, csvFormatter);
+		String actual;
+		if ( fileStreams.get(file) == null ) {
+			actual  = IoUtils.readZip(file);
+			IoUtils.deleteFile(file);
+		} else {
+			actual  = IoUtils.readStream( fileStreams.get(file) );
+		}
 		//		assertTrue("", new File("discrete_sites.csv"));
 		//		System.out.println(actual);
 
@@ -198,8 +203,7 @@ public class JdbcFetcherTest {
 	public void handleLocalData_rdb() throws Exception {
 		fetcher = new JdbcFetcher(Fetcher.SEDMAP_DS) {
 			@Override
-			protected String buildQuery(String descriptor, FilterWithViewParams filter)
-					throws FilterToSQLException {
+			protected String buildQuery(String descriptor, FilterWithViewParams filter) {
 				return "select * from sedmap.DISCRETE_STATIONS";
 			}
 		};
@@ -210,8 +214,14 @@ public class JdbcFetcherTest {
 			}
 		};
 		RdbFormatter rdbFormatter = new RdbFormatter();
-		InputStream in = fetcher.handleSiteData("discrete_sites", filter, new RdbFormatter());
-		String actual  = IoUtils.readStream(in);
+		File file = fetcher.handleSiteData("discrete_sites", filter, new RdbFormatter());
+		String actual;
+		if ( fileStreams.get(file) == null ) {
+			actual  = IoUtils.readZip(file);
+			IoUtils.deleteFile(file);
+		} else {
+			actual  = IoUtils.readStream( fileStreams.get(file) );
+		}
 		System.out.println();
 		System.out.println(actual);
 		//		assertTrue("", new File("discrete_sites.csv"));
@@ -242,7 +252,7 @@ public class JdbcFetcherTest {
 		ByteArrayOutputStream   out = new ByteArrayOutputStream();
 		HttpServletResponse     res = new MockResponse(out);
 
-		FileDownloadHandler handler = new MultiPartHandler(res, out);
+		FileDownloadHandler handler = new MultiPartHandler(res, out, "Test2NoNwisJDBC");
 
 		fetcher.doFetch(req, handler);
 		IoUtils.quiteClose(out);
@@ -276,7 +286,7 @@ public class JdbcFetcherTest {
 		ByteArrayOutputStream   out = new ByteArrayOutputStream();
 		HttpServletResponse     res = new MockResponse(out);
 
-		FileDownloadHandler handler = new MultiPartHandler(res, out);
+		FileDownloadHandler handler = new MultiPartHandler(res, out, "Test2NwisJDBC");
 
 		fetcher.doFetch(req, handler);
 		IoUtils.quiteClose(out);

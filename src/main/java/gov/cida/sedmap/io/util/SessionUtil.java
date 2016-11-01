@@ -1,6 +1,9 @@
 package gov.cida.sedmap.io.util;
 
+import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 
@@ -8,11 +11,26 @@ public class SessionUtil {
 
 	private static final Logger logger = Logger.getLogger(SessionUtil.class);
 
+	protected static Context ctx;
+	
+	public static void setContext(Context context) {
+		ctx = context;
+	}
+	
+	public static Context getContext() throws NamingException {
+		if (ctx == null) {
+			ctx = new InitialContext();
+		}
+		return ctx;
+	}
 
+	public static DataSource lookupDataSource(String jndiDS) throws NamingException {
+		return (DataSource) getContext().lookup(jndiDS);
+	}
+	
 	public static String lookup(String property, String defaultValue) {
 		try {
-			InitialContext ctx = new InitialContext();
-			String value = (String) ctx.lookup("java:comp/env/"+property);
+			String value = (String) getContext().lookup("java:comp/env/"+property);
 			return value;
 		} catch (Exception e) {
 			logger.warn(e.getMessage());
@@ -28,9 +46,6 @@ public class SessionUtil {
 
 		String dummy = ""+defaultValue;
 		String propertyValue = lookup(property, dummy);
-
-		// pointer compare is fine
-		if (propertyValue == dummy) return defaultValue;
 
 		try {
 			value = Integer.parseInt(propertyValue);

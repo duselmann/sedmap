@@ -1,8 +1,5 @@
 package gov.cida.sedmap.data;
 
-import gov.cida.sedmap.io.IoUtils;
-import gov.cida.sedmap.io.util.SessionUtil;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -16,14 +13,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.JDBCJNDIDataStoreFactory;
+
+import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.util.SessionUtil;
 
 public class FetcherConfig {
 	private static final Logger logger = Logger.getLogger(FetcherConfig.class);
@@ -142,39 +139,26 @@ public class FetcherConfig {
 		return Collections.unmodifiableMap(env);
 	}
 
-
-
-	// over-ride-able for testing
-	protected Context getContext() throws NamingException {
-		InitialContext ctx = new InitialContext();
-		return ctx;
-	}
-
-
-
+	
+	@SuppressWarnings("resource") // we are closing resources - java just cannot "see" quiteClose
 	protected Map<String, List<Column>> loadTableMetadata() {
 		logger.info("Static Fetcher loadTableMetadata.");
 		Connection cn = null;
 		Statement  st = null;
 		try {
-			Context ctx = getContext();
-			DataSource ds = (DataSource) ctx.lookup(jndiDS);
+			DataSource ds = SessionUtil.lookupDataSource(jndiDS);
 			cn = ds.getConnection();
 			st = cn.createStatement();
 
 			Map<String, List<Column>> tableData = new HashMap<String, List<Column>>();
 
-			ResultSet rs = null;
 			for (String tableName : DATA_TABLES.values()) {
-				try {
-					rs = st.executeQuery("select * from sedmap." +tableName+ " where 0=1");
+				try ( ResultSet rs = st.executeQuery("select * from sedmap." +tableName+ " where 0=1") ) {
 					List<Column> columnData = getTableColumns(rs);
 					tableData.put(tableName, columnData);
 					logger.info("Collected " +columnData.size()+ " columns metadata for table " +tableName);
 				} catch (Exception e) {
 					throw new RuntimeException("Did not find metadata for table "+tableName, e);
-				} finally {
-					IoUtils.quiteClose(rs);
 				}
 			}
 			return tableData;
@@ -194,23 +178,14 @@ public class FetcherConfig {
 	// TODO this one connects once per table metadata and the other connects to retrieve all tables metadata
 	protected List<Column> loadTableMetadata(String tableName) {
 		logger.info("Static Fetcher loadTableMetadata.");
-		Connection cn = null;
-		Statement  st = null;
-		ResultSet rs = null;
-		try {
-			Context ctx = getContext();
-			DataSource ds = (DataSource) ctx.lookup(jndiDS);
-			cn = ds.getConnection();
-			st = cn.createStatement();
-			rs = st.executeQuery("select * from sedmap." +tableName+ " where 0=1");
-			List<Column> columnData = getTableColumns(rs);
+		try (Results rs = new Results()) {
+			rs.openQuery(jndiDS, "select * from sedmap." +tableName+ " where 0=1");
+			List<Column> columnData = getTableColumns(rs.rs);
 			logger.info("Collected " +columnData.size()+ " columns metadata for table " +tableName);
 			return columnData;
 		} catch (Exception e) {
 			logger.error("failed to load table metadata " + tableName);
 			handleMetadataException(e);
-		} finally {
-			IoUtils.quiteClose(rs,st,cn);
 		}
 		return null;
 	}

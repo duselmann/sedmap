@@ -1,5 +1,20 @@
 package gov.cida.sedmap.web;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+
 import gov.cida.sedmap.data.DataFileMgr;
 import gov.cida.sedmap.data.Fetcher;
 import gov.cida.sedmap.data.FetcherConfig;
@@ -11,22 +26,7 @@ import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.TimeOutHandler;
 import gov.cida.sedmap.io.ZipHandler;
 import gov.cida.sedmap.io.util.ErrUtils;
-import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.io.util.exceptions.SedmapException;
-import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
 
 
 
@@ -77,30 +77,18 @@ public class DataService extends HttpServlet {
 	 * generic error. 
 	 * 
 	 */
-	protected void doPost(HttpServletRequest req, HttpServletResponse res)
-			throws ServletException, IOException {
+	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 		logger.debug("doPost");
+		long startTime = System.currentTimeMillis();
 
-		try {
-			int count = new DataFileMgr().deleteOldFiles();
-			if (count>0) {
-				logger.error("Deleting old data files: " + count);
-			}
-		} catch (Exception e) {
-			logger.error("Error deleting old data files", e);
-		}
+		new DataFileMgr().deleteOldFiles();
 
 		FileDownloadHandler handler = null;
 		try {			
 			String email = req.getParameter("email");
-			
-			boolean doDownload = false;
 			String directDownload = req.getParameter("directDownload");
-			if((directDownload != null) && (directDownload.equals("true"))) {
-				doDownload = true;
-			}
 			
-			if ( doDownload ) {
+			if ( "true".equalsIgnoreCase(directDownload) ) {
 				/**
 				 * JIRA NSM-82 and NSM-251
 				 * To use direct download ability with error handling, we cannot
@@ -125,29 +113,24 @@ public class DataService extends HttpServlet {
 				 *  we have exceeded our processing time and an email will be sent w/ the
 				 *  file link.
 				 */
-				if((email == null) || (email.equals(""))) {
+				if (StringUtils.isBlank(email)) {
 					/**
 					 * We do not have an email so we will attempt to process the request
 					 * and stream back the file to the client response.
 					 */
-					File   tmp = null;
-					tmp = File.createTempFile("data_" + StrUtils.uniqueName(12), ".zip");
-					handler = new ZipHandler(res, new FileOutputStream(tmp));
-					
+					handler = new ZipHandler(res);
 					Fetcher fetcher = new JdbcFetcher(jndiDS);
-						
-					long startTime = System.currentTimeMillis();
 					fetcher.doFetch(req, handler);
-					long totalTime = System.currentTimeMillis() - startTime;
-					logger.info(fetcher.toString() + ": Total request time (ms) " + totalTime);
 						
 					/**
 					 * The fetch was successful we now stream the file to the response
 					 */
-					res.setContentType( handler.getContentType() );
-					res.getOutputStream().write(Files.readAllBytes(tmp.toPath()));
-					res.getOutputStream().flush();
-					res.getOutputStream().close();					
+					try (InputStream in = new FileInputStream(((ZipHandler)handler).getFileName());
+						 OutputStream out = res.getOutputStream()) {; 
+						
+						res.setContentType( handler.getContentType() );
+						IOUtils.copy( in,out);
+					}
 				} else {
 					/**
 					 * This is a UI direct download request.  In order to make it
@@ -162,75 +145,57 @@ public class DataService extends HttpServlet {
 					 * If we exceed our timeout limit while processing, we will reply
 					 * to the stream with a string of TimeOutFetcher.TIME_EXCEEDED_RESPONSE
 					 */
-					File   tmp = null;
-					tmp = File.createTempFile("data_" + StrUtils.uniqueName(12), ".zip");
-					handler = new TimeOutHandler(res, tmp, email);
-						
+					handler = new TimeOutHandler(res, email);
 					Fetcher fetcher = new TimeOutFetcher(jndiDS);
-						
-					long startTime = System.currentTimeMillis();
 					fetcher.doFetch(req, handler);
-					long totalTime = System.currentTimeMillis() - startTime;
-					logger.info(fetcher.toString() + ": Total request time (ms) " + totalTime);
 				}
 			} else {
 				/**
 				 * This is an email download request.
 				 */
-				File   tmp = File.createTempFile("data_" + StrUtils.uniqueName(12), ".zip");
-				
-				logger.debug(tmp.getAbsolutePath());
-				handler = new EmailLinkHandler(res, tmp, email);
-				
+				handler = new EmailLinkHandler(res, email);
 				Fetcher fetcher = new JdbcFetcher(jndiDS);
-				
-				long startTime = System.currentTimeMillis();
-				fetcher.doFetch(req, handler);					// This is an "email" handler then
-																// the internal workings CLOSE the client
-																// response connection and releases the
-																// browser but continues execution.
-																// This is important as it looks like
-																// this is threaded from a client POV but
-																// in reality all we did was close the
-																// client stream.
-				long totalTime = System.currentTimeMillis() - startTime;
-				logger.info(fetcher.toString() + ": Total request time (ms) " + totalTime);
+				fetcher.doFetch(req, handler);					
+				// This is an "email" handler then the internal workings CLOSE the client
+				// response connection and releases the browser but continues execution.
+				// This is important as it looks like this is threaded from a client POV but
+				// in reality all we did was close the client stream.
 			}
 		} catch (Exception e) {
-			String errorid = null;
 			try {
+				// TODO this is polymorphism done wrong -- I wrote all these handlers to prevent this
+				// I cleaned this up a bit but it really should not be necessary to check instances
 				if (handler instanceof EmailLinkHandler) {
-					errorid = ErrUtils.handleExceptionResponse(req,res,e);
+					String errorid = ErrUtils.handleExceptionResponse(req,res,e);
 					((EmailLinkHandler)handler).setErrorId(errorid);
 					((EmailLinkHandler)handler).setExceptionThrown(e);
 					handler.finishWritingFiles();
 				} else {
-					if(e instanceof SedmapException) {
-						ErrUtils.handleExceptionResponseServices(res, (SedmapException)e);
-					} else {
+					
+					if ( !(e instanceof SedmapException) ) {
 						/**
-						 * This is not a sedmap exception.  We must
-						 * create a SedmapException to respond with a legitimate
-						 * xml response.
+						 * This is not a sedmap exception.  We must create a SedmapException 
+						 * to respond with a legitimate xml response.
 						 * 
-						 * Since there really is no way to accurately determine
-						 * what a value is, we'll just set it to NoApplicableCode,
-						 * set the message to a Generic one and then let the
-						 * ErrUtils deal with it.
+						 * Since there really is no way to accurately determine what a value is,
+						 * we'll just set it to NoApplicableCode, set the message to a Generic one 
+						 * and then let the ErrUtils deal with it.
 						 */
-						logger.error("Exception in DataService:" +  e.getMessage());
-						logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-						SedmapException exception = new SedmapException(OGCExceptionCode.NoApplicableCode, e);
-						exception.setExceptionMessage(SedmapException.GENERIC_ERROR);
-						ErrUtils.handleExceptionResponseServices(res, exception);
+						logger.error("Exception in DataService:",  e);
+						e = new SedmapException("Data Service Error", e);
 					}
+					
+					ErrUtils.handleExceptionResponseServices(res, (SedmapException)e);
 				}
 			} catch (Exception t) {
 				logger.error(t);
 			}
 		} finally {
 			IoUtils.quiteClose(handler);
+			long totalTime = System.currentTimeMillis() - startTime;
+			logger.info("Processing time (ms) " + totalTime );
 		}
+		
 	}
 
 }

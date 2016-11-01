@@ -1,22 +1,18 @@
 package gov.cida.sedmap.data;
 
-import gov.cida.sedmap.io.InputStreamWithFile;
+import java.io.File;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
+import org.geotools.data.DataStore;
+import org.geotools.jdbc.JDBCFeatureReader;
+
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.WriterWithFile;
 import gov.cida.sedmap.ogc.FeatureValueIterator;
 import gov.cida.sedmap.ogc.FilterWithViewParams;
 import gov.cida.sedmap.ogc.OgcUtils;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.naming.NamingException;
-
-import org.geotools.data.DataStore;
-import org.geotools.jdbc.JDBCFeatureReader;
 
 // TODO this was left in an unfinished state once it was determined that GeoTools was insufficient
 public class GeoToolsFetcher extends Fetcher {
@@ -47,47 +43,35 @@ public class GeoToolsFetcher extends Fetcher {
 	// this will work if the query is against a table or layer feature but not a join query
 
 	@Override
-	protected InputStreamWithFile handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
-			throws IOException, SQLException, NamingException, Exception {
-		InputStreamWithFile fileData = null;
+	protected File handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
+			throws Exception {
 
-		JDBCFeatureReader reader = null;
-		try {
-			String tableName = getDataTable(descriptor);
-			reader = OgcUtils.executeQuery(store, tableName, filter.getFilter());
+		String tableName = getDataTable(descriptor);
 
-			WriterWithFile tmp = IoUtils.createTmpZipWriter(descriptor, formatter.getFileType());
+		try (JDBCFeatureReader reader = OgcUtils.executeQuery(store, tableName, filter.getFilter());
+			 WriterWithFile tmp = IoUtils.createTmpZipWriter(descriptor, formatter.getFileType()) ) {
+			
+			List<Column> columns = getTableMetadata(tableName);
+                            String[] columnNames = Column.getColumnNames(columns.iterator());
+                            Iterator<String> columnNamesIter = Arrays.asList(columnNames).iterator();
+			String header = formatter.fileHeader(columnNamesIter, HeaderType.SITE);
+                            tmp.write(header);
 
-			try {
-				List<Column> columns = getTableMetadata(tableName);
-                                String[] columnNames = Column.getColumnNames(columns.iterator());
-                                Iterator<String> columnNamesIter = Arrays.asList(columnNames).iterator();
-				String header = formatter.fileHeader(columnNamesIter, HeaderType.SITE);
-                                tmp.write(header);
-
-
-				while (reader.hasNext()) {
-					FeatureValueIterator values = new FeatureValueIterator(reader.next());
-					String line = formatter.fileRow(values);
-					tmp.write(line);
-				}
-			} finally {
-				IoUtils.quiteClose(tmp);
+			while (reader.hasNext()) {
+				FeatureValueIterator values = new FeatureValueIterator(reader.next());
+				String line = formatter.fileRow(values);
+				tmp.write(line);
 			}
-
-			fileData = IoUtils.createTmpZipStream( tmp.getFile() );
-		} finally {
-			IoUtils.quiteClose(reader);
+			
+			return tmp.getFile();
 		}
 
-		return fileData;
 	}
 
 
 	@Override
-	protected InputStreamWithFile handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
-			throws IOException, SQLException, NamingException {
-		// TODO IMPL
-		throw new RuntimeException("Not yet impl");
+	protected File handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
+			throws Exception {
+		throw new UnsupportedOperationException("Not yet impl");
 	}
 }

@@ -1,12 +1,5 @@
 package gov.cida.sedmap.web;
 
-import gov.cida.sedmap.data.DataFileMgr;
-import gov.cida.sedmap.io.FileDownloadHandler;
-import gov.cida.sedmap.io.IoUtils;
-import gov.cida.sedmap.io.MissingFileHandler;
-import gov.cida.sedmap.io.RawHandler;
-import gov.cida.sedmap.io.util.ErrUtils;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -16,6 +9,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+
+import gov.cida.sedmap.data.DataFileMgr;
+import gov.cida.sedmap.io.FileDownloadHandler;
+import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.MissingFileHandler;
+import gov.cida.sedmap.io.RawHandler;
+import gov.cida.sedmap.io.util.ErrUtils;
 
 
 
@@ -50,11 +50,14 @@ public class DownloadService extends HttpServlet {
 		FileDownloadHandler handler = null;
 		try {
 			String fileId = req.getParameter("file");
-			File file = new DataFileMgr().getDataFile(fileId);
+			File file = new DataFileMgr().fetchDataFile(fileId);
+			logger.info("User requesting file ID " + fileId);
 
 			if (file==null) {
-				handler = new MissingFileHandler(res, res.getOutputStream());
+				logger.info("User requested file ID missing " + file);
+				handler = new MissingFileHandler(res, res.getOutputStream(), fileId);
 			} else {
+				logger.info("Sending User requested file " + file.getAbsolutePath());
 				handler = new RawHandler(res, res.getOutputStream(), file);
 			}
 			handler.beginWritingFiles();

@@ -1,70 +1,60 @@
 package gov.cida.sedmap.io;
 
 
-import gov.cida.sedmap.io.util.StrUtils;
-import gov.cida.sedmap.io.util.exceptions.SedmapException;
-import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
-import gov.cida.sedmap.mail.SedmapDataMail;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+
+import gov.cida.sedmap.io.util.StrUtils;
+import gov.cida.sedmap.io.util.exceptions.SedmapException;
+import gov.cida.sedmap.mail.SedmapDataMail;
 
 public class EmailLinkHandler extends ZipHandler {
 	private static final Logger logger = Logger.getLogger(EmailLinkHandler.class);
 
 	protected String contentType = "text/plain";
 	protected String emailAddr;
-	protected final File file;
+	
+	// TODO these need refactor
 	protected String errorId;
 	protected Exception exceptionThrown;
 
 
-	public EmailLinkHandler(HttpServletResponse res, File file, String email) throws FileNotFoundException {
-		super(res, new FileOutputStream(file));
-		this.file = file;
+	public EmailLinkHandler(HttpServletResponse res, String email) throws IOException {
+		super(res);
 		emailAddr = email;
 	}
 
 	@Override
-	public FileDownloadHandler beginWritingFiles() throws Exception {
+	public FileDownloadHandler beginWritingFiles() throws SedmapException {
+		resp.setContentType( getContentType() );
 		/**
 		 * We close the clients response connection here to simulate spawning
 		 * another process.  In actuality, the browser gets a "close" after
 		 * "acquisition commenced" is written and continues on its merry way
 		 * while THIS thread (whoever called this method) continues execution.
 		 */
-		try {
-		resp.setContentType( getContentType() );
-		resp.getOutputStream().write("acquisition commenced".getBytes());
-		resp.getOutputStream().flush();
-		resp.getOutputStream().close();
+		try (OutputStream outs = resp.getOutputStream()) {
+			outs.write("acquisition commenced".getBytes());
 		} catch (IOException e) {
-			logger.error(e.getMessage());
-			logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-			throw new SedmapException(OGCExceptionCode.NoApplicableCode, e);
+			String msg = "Error writing response to user that the data acquisition commenced";
+			logger.error(msg,e);
+			throw new SedmapException(msg, e);
 		}
 		
 		return this; //chain
 	}
 	@Override
-	public FileDownloadHandler finishWritingFiles() throws Exception {
-		try {
-			super.finishWritingFiles();
-		} catch (IOException e) {
-			logger.error(e.getMessage());
-			logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-			throw new SedmapException(OGCExceptionCode.NoApplicableCode, e);
-		}
+	public FileDownloadHandler finishWritingFiles() throws SedmapException {
+		super.finishWritingFiles();
 
 		SedmapDataMail mailer = new SedmapDataMail();
 		// TODO handle false on send message
 		if ( StrUtils.isEmpty(getErrorId()) ) {
+			// this to prevent exposing how files are stored
 			String fileId = getFileName();
 			fileId = fileId.substring(5,fileId.length()-4);
 
@@ -75,10 +65,6 @@ public class EmailLinkHandler extends ZipHandler {
 		return this; //chain
 	}
 
-	protected String getFileName() {
-
-		return file.getName();
-	}
 
 	public String getErrorId() {
 		return errorId;
@@ -94,10 +80,5 @@ public class EmailLinkHandler extends ZipHandler {
 
 	public void setExceptionThrown(Exception exceptionThrown) {
 		this.exceptionThrown = exceptionThrown;
-	}
-
-	@Override
-	public boolean isAlive() {
-		return true;
 	}
 }

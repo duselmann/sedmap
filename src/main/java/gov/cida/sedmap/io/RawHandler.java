@@ -7,7 +7,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.io.IOUtils;
+
+import gov.cida.sedmap.io.util.exceptions.SedmapException;
 
 public class RawHandler extends BaseHandler {
 
@@ -17,7 +22,7 @@ public class RawHandler extends BaseHandler {
 	protected final File file;
 
 	public RawHandler(HttpServletResponse res, OutputStream stream, File file) {
-		super(res, stream, CONTENT_TYPE);
+		super(res, stream, CONTENT_TYPE, file.getName());
 		try {
 			this.file = file;
 			source = new FileInputStream(file);
@@ -27,16 +32,15 @@ public class RawHandler extends BaseHandler {
 	}
 
 	@Override
-	public FileDownloadHandler beginWritingFiles() throws Exception {
+	public FileDownloadHandler beginWritingFiles() throws SedmapException {
 		super.beginWritingFiles();
 		resp.addHeader("Content-Disposition", "attachment; filename=data.zip");
 		resp.addHeader("Content-Length", ""+file.length());
 
-		int count=0;
-		byte[] data=new byte[1024<<3]; // 8k buffer
-
-		while ( (count=source.read(data)) >0 ) {
-			write(data, count);
+		try {
+			IOUtils.copy(source, this.out);
+		} catch (IOException e) {
+			throw new SedmapException("Failed to copy date to target: " + name , e);
 		}
 
 		return this; //chain

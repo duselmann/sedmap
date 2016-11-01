@@ -69,8 +69,7 @@ public class IoUtils {
 	public static String readTextResource(String resource) {
 		String contents = "";
 
-		try {
-			InputStream in = IoUtils.class.getResourceAsStream(resource); //, "UTF-8");
+		try (InputStream in = IoUtils.class.getResourceAsStream(resource)) {
 			contents = readStream(in);
 		} catch (IOException ex) {
 			ex.printStackTrace();
@@ -79,8 +78,9 @@ public class IoUtils {
 		return contents;
 	}
 
-
-
+	// This should not be used for large data files because it does not stream
+	// It is currently used for small header files and test data assertions
+	// see the streamed copy method below
 	public static String readStream(InputStream in) throws IOException {
 		StringBuilder buf = new StringBuilder();
 
@@ -95,17 +95,36 @@ public class IoUtils {
 
 		return buf.toString();
 	}
+	// also for testing
+	public static String readZip(File file) throws IOException {
+		String read = readStream( createTmpZipStream(file) );
+		deleteFile(file);
+		return read;
+	}
 
 
-	public static WriterWithFile createTmpZipWriter(String fileName, String extention) throws IOException {
-		
-		File   file = File.createTempFile(fileName +'_'+ StrUtils.uniqueName(12), ".zip");
-
+	public static String createTmpFileName(String name) {
+		return name +'_'+ StrUtils.uniqueName(12);
+	}
+	
+	public static File createTmpZipFile(String filename) throws IOException {
+		File file = File.createTempFile(createTmpFileName(filename), ".zip");
 		logger.debug(file.getAbsolutePath());
-
+		return file;
+	}
+	
+	public static ZipOutputStream createTmpZipOutStream(File file) throws IOException {
 		FileOutputStream out   = new FileOutputStream(file);
 		ZipOutputStream zip    = new ZipOutputStream(out);
-		ZipEntry entry         = new ZipEntry(fileName + extention);
+
+		return zip;
+	}
+
+	public static WriterWithFile createTmpZipWriter(String filename, String extention) throws IOException {
+		File file              = createTmpZipFile(filename);
+		ZipOutputStream zip    = createTmpZipOutStream(file);
+		
+		ZipEntry entry         = new ZipEntry(filename + extention);
 		OutputStreamWriter osw = new OutputStreamWriter(zip);
 		WriterWithFile tmp     = new WriterWithFile(osw, file);
 
@@ -117,13 +136,26 @@ public class IoUtils {
 
 
 	public static InputStreamWithFile createTmpZipStream(File file) throws IOException {
-		FileInputStream fis = new FileInputStream(file);
-		ZipInputStream  zip = new ZipInputStream(fis);
-		InputStreamWithFile fisf = new InputStreamWithFile(zip, file);
-
-		zip.getNextEntry();
-
-		return fisf;
+		try {
+			FileInputStream fis = new FileInputStream(file);
+			ZipInputStream  zip = new ZipInputStream(fis);
+			InputStreamWithFile fisf = new InputStreamWithFile(zip, file);
+	
+			zip.getNextEntry(); // open the first entry
+			// strictly speaking, there could be many entries; however, this is to be used for single entry
+			// zip files. While the final output file will contain many entries, portions are downloaded
+			// into individual single entry zip files and then merged into the one for the user.
+			// The ZipHandler processes the only multiple entry zip file.
+			
+			return fisf;
+		} catch (IOException e) {
+			String filename = "";
+			if (file != null) {
+				filename = file.getAbsolutePath();
+			}
+			logger.error("Failed to open zip file " + filename, e);
+			throw e;
+		}
 	}
 
     public static String readTextResource() {
@@ -136,6 +168,21 @@ public class IoUtils {
 		try (InputStreamWithFile source = createTmpZipStream(sourceFile)) {
 			Reader reader = new InputStreamReader(source);
 			IOUtils.copy(reader, writer);
+		}
+	}
+	
+	public static void deleteFile(File file) {
+		if (file == null) {
+			return;
+		}
+
+		if (logger.isDebugEnabled()) {
+			String existence = ( ! file.exists() ) ?"(not found) " :"";
+			logger.debug("deleting file "+ existence + file.getAbsolutePath());
+		}
+		
+		if ( ! file.delete() ) {
+			file.deleteOnExit();
 		}
 	}
 

@@ -1,10 +1,6 @@
 package gov.cida.sedmap.ogc;
 
 
-import gov.cida.sedmap.io.util.StrUtils;
-import gov.cida.sedmap.io.util.exceptions.SedmapException;
-import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -19,7 +15,6 @@ import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.data.oracle.OracleDialect;
 import org.geotools.data.oracle.OracleFilterToSQL;
 import org.geotools.filter.AbstractFilter;
@@ -34,6 +29,10 @@ import org.geotools.xml.Parser;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.PropertyName;
+
+import gov.cida.sedmap.io.util.StrUtils;
+import gov.cida.sedmap.io.util.exceptions.SedmapException;
+import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
 
 public class OgcUtils {
 
@@ -80,8 +79,8 @@ public class OgcUtils {
 			// parse the OGC filter
 			ByteArrayInputStream ogcStream = new ByteArrayInputStream( ogcXml.getBytes() );
 			Parser parser = new Parser( new org.geotools.filter.v1_1.OGCConfiguration() );
-			Filter filter = (Filter) parser.parse( ogcStream );
-			return (AbstractFilter)filter;
+			AbstractFilter filter = (AbstractFilter) parser.parse( ogcStream );
+			return filter;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			logger.error("Due to internal exception caught, throwing InvalidParameterValue OGC error for error handling on the client side.");
@@ -95,11 +94,11 @@ public class OgcUtils {
 		Filter filter = ogcXmlToFilter(ogcXml);
 		return ogcXmlToParameterQueryWhereClause(filter);
 	}
-	public static String ogcXmlToParameterQueryWhereClause(Filter filter) throws Exception {
+	public static String ogcXmlToParameterQueryWhereClause(Filter filter) throws SedmapException {
 		// convert to SQL
-		String sql="";
+		String sql=" 1=1 ";
 		if (isAllFilter(filter)) {
-			return " 1=1 ";
+			return sql;
 		}
 
 		try {
@@ -116,7 +115,7 @@ public class OgcUtils {
 			osql.encode(filter);
 
 			sql = buf.getBuffer().toString();
-		} catch (FilterToSQLException e) {
+		} catch (Exception e) {
 			logger.error("Failed to convert to SQL.  Exception is: " + e.getMessage());
 			logger.error("Due to internal exception caught, throwing OperationNotSupported OGC error for error handling on the client side.");
 			throw new SedmapException(OGCExceptionCode.OperationNotSupported, new Exception("Failed to parse OGC.",e));
@@ -175,9 +174,9 @@ public class OgcUtils {
 		try {
 			store =  DataStoreFinder.getDataStore(dataStoreEnv);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
-			logger.error("Due to internal exception caught, throwing ResourceNotFound OGC error for error handling on the client side.");
-			throw new SedmapException(OGCExceptionCode.ResourceNotFound, e);
+			String msg = "Error fetching oracle JDBC data source";
+			logger.error(msg,e);
+			throw new SedmapException(msg, e);
 		}
 
 		return store;
@@ -190,8 +189,9 @@ public class OgcUtils {
 		Transaction trans = new DefaultTransaction("read-only");
 		return executeQuery(trans, store, tableName, filter, properties);
 	}
+	
 	public static JDBCFeatureReader executeQuery(Transaction trans, DataStore store, String tableName, Filter filter, String ... properties)
-			throws Exception {
+			throws SedmapException {
 		Query query;
 		if (properties.length==0) {
 			query = new Query(tableName, filter);
@@ -203,10 +203,10 @@ public class OgcUtils {
 		
 		try {
 			reader = (JDBCFeatureReader) store.getFeatureReader(query, trans);
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-			throw new SedmapException(OGCExceptionCode.NoApplicableCode, e);
+		} catch (IOException e) {
+			String msg = "Error getting feature reader";
+			logger.error(msg,e);
+			throw new SedmapException(msg, e);
 		}
 		
 		return reader;

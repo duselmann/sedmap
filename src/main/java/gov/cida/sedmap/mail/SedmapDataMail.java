@@ -1,12 +1,13 @@
 package gov.cida.sedmap.mail;
 
-import gov.cida.sedmap.io.util.SessionUtil;
-import gov.cida.sedmap.io.util.exceptions.SedmapException;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.apache.log4j.Logger;
+
+import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.util.SessionUtil;
+import gov.cida.sedmap.io.util.exceptions.SedmapException;
 
 public class SedmapDataMail {
 	private static final Logger logger = Logger.getLogger(SedmapDataMail.class);
@@ -25,7 +26,7 @@ public class SedmapDataMail {
 
 	protected static final String LINK_ENV_KEY        = "sedmap/email/link";
 	protected static final String LINK_DEFAULT        = "http://localhost:8080/sediment/download?file=";
-	public static final String LINK_STUB;
+	protected static final String LINK_STUB;
 
 	protected static final String SENDER_ADDR_ENV_KEY = "sedmap/email/address";
 	protected static final String SENDER_ADDR_DEFAULT = "SedimentPortal_HELP@usgs.gov";
@@ -69,25 +70,20 @@ public class SedmapDataMail {
 		String msgText = ERR_BODY+errorId+"\n";
 		String adminText = "Sediment Data Portal Error to user [" + emailAddr + "].\n\nError text sent to user: \n\n********************" + msgText + "\n********************\n\nFull Stack Trace:\n\n";
 		
-		if(e == null) {
+		if (e == null) {
 			adminText += "-- No stack trace available --";
 		} else {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
 			
-			if(e instanceof SedmapException) {
+			if (e instanceof SedmapException) {
 				((SedmapException) e).getOriginalException().printStackTrace(pw);
 			}
 			
 			adminText += sw.toString();
 			
-			try {
-				sw.close();
-				pw.close();
-			} catch (Exception e1) {
-				logger.error(e1.getMessage());
-			}
+			IoUtils.quiteClose(pw, sw);
 		}
 
 		notifyAdminOfError("Sediment Portal Error - [" + SUBJECT + "]", adminText);

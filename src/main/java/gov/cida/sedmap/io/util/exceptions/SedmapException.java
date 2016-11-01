@@ -65,11 +65,22 @@ public class SedmapException extends Exception {
 		}
 	}
 	
-	public SedmapException(OGCExceptionCode code, Exception e) {
-		super();
+	public SedmapException(String message) {
+		this(message, new Exception(SedmapException.GENERIC_ERROR));
+	}
+	public SedmapException(String message,Exception cause) {
+		super(message, cause);
+		setLocalState(OGCExceptionCode.NoApplicableCode, cause);
+	}
+	
+	public SedmapException(OGCExceptionCode code, Exception cause) {
+		super(cause); // need to keep the causal chain in the exception tree
+		setLocalState(code, cause);
+	}
+	private void setLocalState(OGCExceptionCode code, Exception cause) {
 		this.exceptionCode = code;
-		this.originalException = e;
-		this.exceptionMessage = e.getLocalizedMessage();
+		this.originalException = cause; // this local instance is not in the exception tree
+		this.exceptionMessage = cause.getLocalizedMessage();
 	}
 
 	public OGCExceptionCode getExceptionCode() {

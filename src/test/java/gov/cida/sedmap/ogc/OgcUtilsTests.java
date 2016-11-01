@@ -1,20 +1,7 @@
 package gov.cida.sedmap.ogc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import gov.cida.sedmap.data.Fetcher;
-import gov.cida.sedmap.io.IoUtils;
-import gov.cida.sedmap.io.util.StrUtils;
-import gov.cida.sedmap.mock.MockContext;
-import gov.cida.sedmap.mock.MockDataSource;
-import gov.cida.sedmap.mock.MockDbMetaData;
-import gov.cida.sedmap.mock.MockResultSet;
-import gov.cida.sedmap.mock.MockRowMetaData;
+import static org.junit.Assert.*;
 
-import java.lang.reflect.Field;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -28,7 +15,6 @@ import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.factory.GeoTools;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.JDBCFeatureReader;
 import org.geotools.jdbc.JDBCJNDIDataStoreFactory;
@@ -41,6 +27,15 @@ import org.opengis.filter.PropertyIsGreaterThan;
 import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLessThanOrEqualTo;
+
+import gov.cida.sedmap.data.Fetcher;
+import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.util.StrUtils;
+import gov.cida.sedmap.mock.MockContext;
+import gov.cida.sedmap.mock.MockDataSource;
+import gov.cida.sedmap.mock.MockDbMetaData;
+import gov.cida.sedmap.mock.MockResultSet;
+import gov.cida.sedmap.mock.MockRowMetaData;
 
 public class OgcUtilsTests {
 
@@ -118,11 +113,6 @@ public class OgcUtilsTests {
 		ctxenv = new HashMap<String, Object>();
 		ctxenv.put(Fetcher.SEDMAP_DS, ds);
 		ctx    = new MockContext(ctxenv);
-
-		Field geoToolsCtx = GeoTools.class.getDeclaredField("context");
-		geoToolsCtx.setAccessible(true);
-		geoToolsCtx.set(null, ctx);
-
 	}
 
 
@@ -132,7 +122,6 @@ public class OgcUtilsTests {
 		String sql0   = OgcUtils.ogcXmlToParameterQueryWhereClause(filter);
 		assertTrue("original filter should contain the yr1 param", sql0.contains("yr1"));
 
-		@SuppressWarnings("unchecked") // suppress warning that is bug in java
 		String value  = OgcUtils.removeFilter(filter, "yr1");
 		assertEquals("1900",value);
 
@@ -147,11 +136,9 @@ public class OgcUtilsTests {
 		assertTrue("original filter should contain the yr1 param", sql0.contains("yr1"));
 		assertTrue("original filter should contain the yr1 param", sql0.contains("yr2"));
 
-		@SuppressWarnings("unchecked") // suppress warning that is bug in java
 		String value1 = OgcUtils.removeFilter(filter, "yr1");
 		assertEquals("1900",value1);
 
-		@SuppressWarnings("unchecked") // suppress warning that is bug in java
 		String value2 = OgcUtils.removeFilter(filter, "yr2");
 		assertEquals("1950",value2);
 
@@ -177,12 +164,10 @@ public class OgcUtilsTests {
 	public void test_findFilter() throws Exception {
 		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
 
-		@SuppressWarnings("unchecked") // suppress warning that is bug in java
 		Filter year1 = OgcUtils.findFilter(filter, "yr1");
 		assertNotNull(year1);
 		assertTrue(year1.toString().contains("yr1"));
 
-		@SuppressWarnings("unchecked") // suppress warning that is bug in java
 		Filter year2 = OgcUtils.findFilter(filter, "yr2");
 		assertNotNull(year1);
 		assertTrue(year2.toString().contains("yr2"));
@@ -191,12 +176,10 @@ public class OgcUtilsTests {
 	public void test_findFilter_notRemoved() throws Exception {
 		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
 
-		@SuppressWarnings("unchecked") // suppress warning that is bug in java
 		Filter year1 = OgcUtils.findFilter(filter, "yr1");
 		assertNotNull(year1);
 		assertTrue(year1.toString().contains("yr1"));
 
-		@SuppressWarnings("unchecked") // suppress warning that is bug in java
 		Filter year2 = OgcUtils.findFilter(filter, "yr1");
 		assertNotNull("should find the year a second time if not removed", year1);
 		assertTrue(year2.toString().contains("yr1"));
@@ -206,11 +189,9 @@ public class OgcUtilsTests {
 
 		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
 
-		@SuppressWarnings("unchecked") // suppress warning that is bug in java
 		String yr1_actual = OgcUtils.findFilterValue(filter, "yr1");
 		assertEquals("1900", yr1_actual);
 
-		@SuppressWarnings("unchecked") // suppress warning that is bug in java
 		String yr2_actual = OgcUtils.findFilterValue(filter, "yr2");
 		assertEquals("1950", yr2_actual);
 	}
@@ -218,13 +199,11 @@ public class OgcUtilsTests {
 	public void test_findFilter_opcodeStyle() throws Exception {
 		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
 
-		@SuppressWarnings("unchecked") // suppress warning that is bug in java
 		Filter year1 = OgcUtils.findFilter(filter, "year", PropertyIsGreaterThanOrEqualTo.class);
 		assertNotNull(year1);
 		assertTrue("year/YEAR should be found case insensitive", year1.toString().contains("YEAR"));
 		assertTrue( year1 instanceof PropertyIsGreaterThanOrEqualTo );
 
-		@SuppressWarnings("unchecked") // suppress warning that is bug in java
 		Filter year2 = OgcUtils.findFilter(filter, "year", PropertyIsLessThanOrEqualTo.class);
 		assertNotNull(year1);
 		assertTrue("year/YEAR should be found case insensitive", year1.toString().contains("YEAR"));
@@ -234,13 +213,11 @@ public class OgcUtilsTests {
 	public void test_findFilter_opcodeStyle_mutliple() throws Exception {
 		Filter filter = OgcUtils.ogcXmlToFilter(ogc_v1_1);
 
-		@SuppressWarnings("unchecked") // suppress warning that is bug in java
 		Filter year1 = OgcUtils.findFilter(filter, "year", PropertyIsGreaterThan.class, PropertyIsGreaterThanOrEqualTo.class);
 		assertNotNull(year1);
 		assertTrue("year/YEAR should be found case insensitive", year1.toString().contains("YEAR"));
 		assertTrue( year1 instanceof PropertyIsGreaterThanOrEqualTo );
 
-		@SuppressWarnings("unchecked") // suppress warning that is bug in java
 		Filter year2 = OgcUtils.findFilter(filter, "year", PropertyIsLessThan.class, PropertyIsLessThanOrEqualTo.class);
 		assertNotNull(year1);
 		assertTrue("year/YEAR should be found case insensitive", year1.toString().contains("YEAR"));
