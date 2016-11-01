@@ -73,20 +73,4 @@ public class ZipHandler extends BaseHandler {
 		
 		return this; //chain
 	}
-	
-	@Override
-	public FileDownloadHandler finishWritingFiles() throws SedmapException {
-		// if the container handles this then it does not have to be in a finally block
-		
-		try {
-			out.finish();
-			super.finishWritingFiles();
-		}  catch (IOException e) {
-			String msg = "Error finishing zip file " + name; 
-			logger.error(msg,e);
-			throw new SedmapException(msg, e);
-		}
-		
-		return this; //chain
-	}
 }
