@@ -79,8 +79,8 @@ public class OgcUtils {
 			// parse the OGC filter
 			ByteArrayInputStream ogcStream = new ByteArrayInputStream( ogcXml.getBytes() );
 			Parser parser = new Parser( new org.geotools.filter.v1_1.OGCConfiguration() );
-			Filter filter = (Filter) parser.parse( ogcStream );
-			return (AbstractFilter)filter;
+			AbstractFilter filter = (AbstractFilter) parser.parse( ogcStream );
+			return filter;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			logger.error("Due to internal exception caught, throwing InvalidParameterValue OGC error for error handling on the client side.");

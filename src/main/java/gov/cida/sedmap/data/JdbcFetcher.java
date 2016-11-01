@@ -12,13 +12,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.naming.NamingException;
-import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.WriterWithFile;
-import gov.cida.sedmap.io.util.SessionUtil;
 import gov.cida.sedmap.io.util.exceptions.SedmapException;
 import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
 import gov.cida.sedmap.ogc.FilterLiteralIterator;
@@ -26,8 +24,6 @@ import gov.cida.sedmap.ogc.FilterWithViewParams;
 import gov.cida.sedmap.ogc.OgcUtils;
 
 public class JdbcFetcher extends Fetcher {
-
-
 	private static final Logger logger = Logger.getLogger(JdbcFetcher.class);
 
 	private static final Map<String,String> dataQueries  = new HashMap<String, String>();
@@ -191,7 +187,7 @@ public class JdbcFetcher extends Fetcher {
 			String header = formatter.fileHeader(columnNames.iterator(), HeaderType.SITE);
 			String    sql = buildQuery(descriptor, filter);
 			logger.debug(sql);
-			openQuery(rs, sql);
+			rs.openQuery(jndiDS, sql);
 			fetchData(rs, filter, true);
 
 			try ( WriterWithFile tmp = IoUtils.createTmpZipWriter(descriptor, formatter.getFileType()) ) {
@@ -235,7 +231,7 @@ public class JdbcFetcher extends Fetcher {
 					String sql = getQuery(descriptor);
 					sql=sql.replace("_siteList_", sitesClause.toString() );
 					logger.debug(sql);
-					openQuery(rs,sql);
+					rs.openQuery(jndiDS,sql);
 					fetchData(rs, filter, false);
 
 
@@ -289,30 +285,6 @@ public class JdbcFetcher extends Fetcher {
 
 
 
-	protected Results openQuery(Results results, String sql) throws SedmapException {
-		try {
-			DataSource ds = SessionUtil.lookupDataSource(jndiDS);
-			results.cn = ds.getConnection();			
-		} catch (NamingException e) {
-			String msg = "Error fetching JDBC data source";
-			logger.error(msg,e);
-			throw new SedmapException(msg, e);
-		} catch (SQLException e) {
-			String msg = "Error fetching JDBC connection";
-			logger.error(msg,e);
-			throw new SedmapException(msg, e);
-		}
-		
-		try {
-			results.ps = results.cn.prepareStatement(sql);
-		} catch (SQLException e) {
-			String msg = "Error creating SQL statement on JDBC connection";
-			logger.error(msg,e);
-			throw new SedmapException(msg, e);
-		}
-
-		return results;
-	}
 	protected Results fetchData(Results r, FilterWithViewParams filter, boolean doFilterValues) throws NamingException, SQLException, Exception {
 		try {
 			int index = 1;

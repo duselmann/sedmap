@@ -69,8 +69,7 @@ public class IoUtils {
 	public static String readTextResource(String resource) {
 		String contents = "";
 
-		try {
-			InputStream in = IoUtils.class.getResourceAsStream(resource); //, "UTF-8");
+		try (InputStream in = IoUtils.class.getResourceAsStream(resource)) {
 			contents = readStream(in);
 		} catch (IOException ex) {
 			ex.printStackTrace();

@@ -178,22 +178,14 @@ public class FetcherConfig {
 	// TODO this one connects once per table metadata and the other connects to retrieve all tables metadata
 	protected List<Column> loadTableMetadata(String tableName) {
 		logger.info("Static Fetcher loadTableMetadata.");
-		Connection cn = null;
-		Statement  st = null;
-		ResultSet rs = null;
-		try {
-			DataSource ds = SessionUtil.lookupDataSource(jndiDS);
-			cn = ds.getConnection();
-			st = cn.createStatement();
-			rs = st.executeQuery("select * from sedmap." +tableName+ " where 0=1");
-			List<Column> columnData = getTableColumns(rs);
+		try (Results rs = new Results()) {
+			rs.openQuery(jndiDS, "select * from sedmap." +tableName+ " where 0=1");
+			List<Column> columnData = getTableColumns(rs.rs);
 			logger.info("Collected " +columnData.size()+ " columns metadata for table " +tableName);
 			return columnData;
 		} catch (Exception e) {
 			logger.error("failed to load table metadata " + tableName);
 			handleMetadataException(e);
-		} finally {
-			IoUtils.quiteClose(rs,st,cn);
 		}
 		return null;
 	}

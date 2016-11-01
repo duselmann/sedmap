@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.util.ErrUtils;
 import gov.cida.sedmap.io.util.SessionUtil;
 import gov.usgs.cida.proxy.ProxyServlet;
@@ -143,15 +144,7 @@ public class GeoserverProxy extends ProxyServlet {
 				handleErrorStream(targetConn, responseOutputStream);
 			}
 		} finally {
-			if (targetConnWriter != null) {
-				//This is likely not an err at all - could already be closed.
-				try { targetConnWriter.close(); } catch (Exception e) {}
-			}
-
-			if (targetIs != null) {
-				//This is likely not an err at all - could already be closed.
-				try { targetIs.close(); } catch (Exception e) {}
-			}
+			IoUtils.quiteClose(targetConnWriter, targetIs);
 		}
 	}
 

@@ -41,8 +41,9 @@ public class TimeOutAgent extends Thread {
 		} catch (Exception e) {
 			logger.info("TimeOutAgent has received an exception.  [" + e.getMessage() + "]");
 			exception = e;
+		} finally {
+			isRunning = false; // this used to be set in all blocks above
 		}
-		isRunning = false; // this used to be set in all blocks above
 	}
 
 	public boolean isRunning() {
