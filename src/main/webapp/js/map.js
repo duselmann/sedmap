@@ -433,8 +433,9 @@ var addFlowLinesLayer = function(map) {
             return 0;
         }
     });
+
     
-    var flowlineLayer = "NHDPlusFlowlines:PlusFlowlineVAA_NHDPlus-StreamOrder";
+    var flowlineLayer = "nhdplus:nhdflowline_network";
     var options = { opacity: 0, displayInLayerSwitcher: false, tileOptions: { crossOriginKeyword: 'anonymous' } }
     var flowlinesWMSData = _addLayer(map, "Flowline WMS (Data)", flowlineLayer, "wms",
             flowUrl + "wms", options, {styles: "FlowlineStreamOrder"})
