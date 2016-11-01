@@ -24,7 +24,7 @@ public class ErrUtils {
 
 	public static String handleExceptionResponse(HttpServletRequest req, HttpServletResponse res, Throwable e) {
 		String errorid = StrUtils.uniqueName(9);
-		logger.error( errorid ); // log it right away in case something else goes wrong
+		logger.error( errorid, e ); // log it right away in case something else goes wrong
 
 		try {
 			HttpSession s = req.getSession();
