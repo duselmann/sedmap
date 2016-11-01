@@ -497,7 +497,6 @@ public abstract class Fetcher {
 						throw new SedmapException("Error while transfering data", e);
 					}
 				} finally {
-					IoUtils.quiteClose(fileData);
 					IoUtils.deleteFile(fileData);
 				}
 
