@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,7 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -71,13 +69,13 @@ public abstract class Fetcher {
 
 	public abstract Fetcher initJndiJdbcStore(String jndiJdbc) throws IOException, Exception;
 
-	protected abstract InputStreamWithFile handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
-			throws IOException, SQLException, NamingException, Exception;
-	protected abstract InputStreamWithFile handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
-			throws IOException, SQLException, NamingException, Exception;
+	protected abstract File handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
+			throws Exception;
+	protected abstract File handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
+			throws Exception;
 
-	protected InputStreamWithFile handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter, FileDownloadHandler handler)
-			throws IOException, SQLException, NamingException {
+	protected File handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter, FileDownloadHandler handler)
+			throws Exception {
 		
 		int nwisBatchSize = SessionUtil.lookup(NWIS_BATCH_SIZE_PARAM, NWIS_BATCH_SIZE);
 		int nwisRetryMax  = SessionUtil.lookup(NWIS_RETRY_SIZE_PARAM, NUM_NWIS_TRIES);
@@ -363,7 +361,7 @@ public abstract class Fetcher {
 				// second, delete the data file that has an error
 				fullTmp.deleteFile();
 				// then, create a new file for with an error message
-				try (final WriterWithFile msgFile = IoUtils.createTmpZipWriter(DAILY_FILENAME, formatter.getFileType());) {
+				try ( WriterWithFile msgFile = IoUtils.createTmpZipWriter(DAILY_FILENAME, formatter.getFileType()) ) {
 					// now, write the message in the new data file
 					msgFile.write( errMsgBuilder.toString() );
 				}
@@ -375,7 +373,7 @@ public abstract class Fetcher {
 			IoUtils.quiteClose(fullTmp);
 		}
 
-		return new InputStreamWithFile( IoUtils.createTmpZipStream( fullTmp.getFile() ), fullTmp.getFile());
+		return fullTmp.getFile();
 	}
 
 
@@ -390,13 +388,6 @@ public abstract class Fetcher {
 		return line;
 	}
 
-	// TODO I do not think this structure accomplishes its secondary intent.
-	// the primary intent is to open a connection to the NWIS web for data.
-	// the secondary intent is try a few times if the first connection fails.
-	// the problem is that there is nothing happening so it will act once and
-	// it will never cause any fetch. When I wrote this is was in a different place.
-	// I bet the massive refactor here moved this and accidentally made it useless.
-	// I am not changing it for now because I do not want it introduce a bug while fixing another.
 	protected BufferedReader fetchNwisData(String urlStr) throws Exception {
 		logger.debug("fetching NWIS data");
 		URL url = new URL(urlStr);
@@ -405,20 +396,7 @@ public abstract class Fetcher {
 		//		cn.setConnectTimeout(timeout);
 		//		cn.setReadTimeout(timeout);
 
-		BufferedReader reader = null;
-		int nwisTriesCount = 0;
-		while (null == reader && nwisTriesCount < NUM_NWIS_TRIES){
-			try {
-				reader = new BufferedReader(new InputStreamReader(cn.getInputStream()));
-			} catch (IOException e) {
-				if (nwisTriesCount >= NUM_NWIS_TRIES) {
-					logger.error(e.getMessage());
-					logger.error("Due to internal exception caught, throwing generic OGC error for error handling on the client side.");
-					throw new SedmapException("Too many errors trying to fetch NWIS WEB data", e);
-				}
-			}
-			nwisTriesCount++;
-		}
+		BufferedReader reader = new BufferedReader(new InputStreamReader(cn.getInputStream()));
 		return reader;
 	}
 
@@ -474,7 +452,7 @@ public abstract class Fetcher {
 				String    descriptor = name.append(site).append('_').append(value).toString();
 				String      filename = descriptor + formatter.getFileType();
 
-				InputStreamWithFile fileData = null;
+				File fileData = null;
 								
 				try {
 					// TODO this was originally going to be a single call but reality got in the way - could use a refactor
@@ -487,7 +465,7 @@ public abstract class Fetcher {
 					} else if (descriptor.contains("sites") ) {
 						fileData = handleSiteData(descriptor, filter, formatter);
 						
-						List<String> descriptorSites = makeSiteIterator(fileData.getFile(), formatter);
+						List<String> descriptorSites = makeSiteIterator(fileData, formatter);
 
 						if ( ! alsoFlow) { // if the user does not want discrete flow data
 							sites.clear(); // do not retain the discrete sites for NWIS daily data
@@ -507,7 +485,8 @@ public abstract class Fetcher {
 					
 					// if we found some sites or data then append it to the collection
 					if ( fileData != null && !sites.isEmpty() ) {
-						handler.writeFile(formatter.getContentType(), filename, fileData);
+						InputStreamWithFile stream = IoUtils.createTmpZipStream(fileData);
+						handler.writeFile(formatter.getContentType(), filename, stream);
 					}
 				} catch (Exception e) {
 					if (e instanceof SedmapException) {
@@ -519,9 +498,7 @@ public abstract class Fetcher {
 					}
 				} finally {
 					IoUtils.quiteClose(fileData);
-					if (fileData != null) {
-						fileData.deleteFile(); // TODO these files are not deleting. it must still be open?
-					}
+					IoUtils.deleteFile(fileData);
 				}
 
 				long totalTime = System.currentTimeMillis() - startTime;

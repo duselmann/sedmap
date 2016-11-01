@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.sql.Date;
@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -72,6 +71,7 @@ public class GeoToolsFetcherTest {
 	boolean nwisHandlerCalled;
 	boolean localHandlerCalled;
 	int     handleCount;
+	HashMap<File, InputStream> fileStreams; // mock saving files
 
 
 	@Before
@@ -82,7 +82,7 @@ public class GeoToolsFetcherTest {
 		nwisHandlerCalled  = false;
 		localHandlerCalled = false;
 		handleCount        = 0;
-
+		fileStreams        = new HashMap<>();
 
 		rs  = new MockResultSet() {
 			@Override
@@ -169,20 +169,20 @@ public class GeoToolsFetcherTest {
 	protected void initGeoToolsFetcherForDoFetchTesting() {
 		fetcher = new GeoToolsFetcher() {
 			@Override
-			protected InputStreamWithFile handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter, FileDownloadHandler handler)
-					throws IOException, SQLException, NamingException {
+			protected File handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter, FileDownloadHandler handler) 
+					throws Exception {
 				nwisHandlerCalled = true;
 				return handleData("NWIS", filter, formatter);
 			}
 			@Override
-			protected InputStreamWithFile handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
-					throws IOException, SQLException, NamingException {
+			protected File handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
+					throws Exception {
 				localHandlerCalled = true;
 				return handleData(descriptor, filter, formatter);
 			}
 
-			protected InputStreamWithFile handleData(String descriptor, FilterWithViewParams filter, Formatter formatter)
-					throws IOException, SQLException, NamingException {
+			protected File handleData(String descriptor, FilterWithViewParams filter, Formatter formatter)
+					throws Exception {
 				handleCount++;
 
 				String where = "";
@@ -194,10 +194,14 @@ public class GeoToolsFetcherTest {
 						throw new SQLException("Failed to convert filter to sql where clause.",e);
 					}
 				}
-				return new InputStreamWithFile(
+				File file = new File("MockFile");
+				InputStream stream = new InputStreamWithFile(
 						new ByteArrayInputStream(("Test data for descriptor:'" +descriptor
 								+"' and where clause:'" +where +"' file format:'" +formatter.getContentType() +"'").getBytes()),
 								null);
+				fileStreams.put(file, stream);
+				return file;
+				
 			}
 		};
 	}
@@ -208,11 +212,15 @@ public class GeoToolsFetcherTest {
 		fetcher.initJndiJdbcStore(Fetcher.SEDMAP_DS);
 
 		FilterWithViewParams filter = new FilterWithViewParams( OgcUtils.ogcXmlToFilter(ogc_v1_0));
-		InputStream in = fetcher.handleSiteData("discrete_sites", filter, new CsvFormatter());
-		String actual  = IoUtils.readStream(in);
-		//		assertTrue("", new File("discrete_sites.csv"));
-		//		System.out.println(actual);
-
+		File file = fetcher.handleSiteData("discrete_sites", filter, new CsvFormatter());
+		String actual;
+		if ( fileStreams.get(file) == null ) {
+			actual  = IoUtils.readZip(file);
+			IoUtils.deleteFile(file);
+		} else {
+			actual  = IoUtils.readStream( fileStreams.get(file) );
+		}
+		
 		assertNotNull("data should not be null", actual);
 		assertTrue("data should not be empty", actual.trim().length()>0);
 
@@ -234,11 +242,15 @@ public class GeoToolsFetcherTest {
 	public void handleLocalData_rdb() throws Exception {
 		fetcher.initJndiJdbcStore(Fetcher.SEDMAP_DS);
 		FilterWithViewParams filter = new FilterWithViewParams( OgcUtils.ogcXmlToFilter(ogc_v1_0));
-		InputStream in = fetcher.handleSiteData("discrete_sites", filter, new RdbFormatter());
-		String actual  = IoUtils.readStream(in);
-		//		assertTrue("", new File("discrete_sites.csv"));
-		//		System.out.println(actual);
-
+		File file = fetcher.handleSiteData("discrete_sites", filter, new RdbFormatter());
+		String actual;
+		if ( fileStreams.get(file) == null ) {
+			actual  = IoUtils.readZip(file);
+			IoUtils.deleteFile(file);
+		} else {
+			actual  = IoUtils.readStream( fileStreams.get(file) );
+		}
+		
 		assertNotNull("data should not be null", actual);
 		assertTrue("data should not be empty", actual.trim().length()>0);
 

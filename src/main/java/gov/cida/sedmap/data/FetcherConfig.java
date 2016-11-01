@@ -139,7 +139,8 @@ public class FetcherConfig {
 		return Collections.unmodifiableMap(env);
 	}
 
-
+	
+	@SuppressWarnings("resource") // we are closing resources - java just cannot "see" quiteClose
 	protected Map<String, List<Column>> loadTableMetadata() {
 		logger.info("Static Fetcher loadTableMetadata.");
 		Connection cn = null;
@@ -151,17 +152,13 @@ public class FetcherConfig {
 
 			Map<String, List<Column>> tableData = new HashMap<String, List<Column>>();
 
-			ResultSet rs = null;
 			for (String tableName : DATA_TABLES.values()) {
-				try {
-					rs = st.executeQuery("select * from sedmap." +tableName+ " where 0=1");
+				try ( ResultSet rs = st.executeQuery("select * from sedmap." +tableName+ " where 0=1") ) {
 					List<Column> columnData = getTableColumns(rs);
 					tableData.put(tableName, columnData);
 					logger.info("Collected " +columnData.size()+ " columns metadata for table " +tableName);
 				} catch (Exception e) {
 					throw new RuntimeException("Did not find metadata for table "+tableName, e);
-				} finally {
-					IoUtils.quiteClose(rs);
 				}
 			}
 			return tableData;

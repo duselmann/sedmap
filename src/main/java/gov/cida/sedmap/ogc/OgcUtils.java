@@ -15,7 +15,6 @@ import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.data.oracle.OracleDialect;
 import org.geotools.data.oracle.OracleFilterToSQL;
 import org.geotools.filter.AbstractFilter;
@@ -95,11 +94,11 @@ public class OgcUtils {
 		Filter filter = ogcXmlToFilter(ogcXml);
 		return ogcXmlToParameterQueryWhereClause(filter);
 	}
-	public static String ogcXmlToParameterQueryWhereClause(Filter filter) throws Exception {
+	public static String ogcXmlToParameterQueryWhereClause(Filter filter) throws SedmapException {
 		// convert to SQL
-		String sql="";
+		String sql=" 1=1 ";
 		if (isAllFilter(filter)) {
-			return " 1=1 ";
+			return sql;
 		}
 
 		try {
@@ -116,7 +115,7 @@ public class OgcUtils {
 			osql.encode(filter);
 
 			sql = buf.getBuffer().toString();
-		} catch (FilterToSQLException e) {
+		} catch (Exception e) {
 			logger.error("Failed to convert to SQL.  Exception is: " + e.getMessage());
 			logger.error("Due to internal exception caught, throwing OperationNotSupported OGC error for error handling on the client side.");
 			throw new SedmapException(OGCExceptionCode.OperationNotSupported, new Exception("Failed to parse OGC.",e));

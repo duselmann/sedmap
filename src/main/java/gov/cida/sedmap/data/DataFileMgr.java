@@ -86,7 +86,7 @@ public class DataFileMgr {
 
 
 	public int deleteIfOld(File file) {
-		if (file.lastModified()+RETAIN_TIME <  System.currentTimeMillis()) {
+		if ( file.lastModified()+RETAIN_TIME <  System.currentTimeMillis() ) {
 			IoUtils.deleteFile(file);
 			return 1;
 		}

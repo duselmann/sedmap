@@ -4,9 +4,6 @@ import static gov.cida.sedmap.data.DataFileMgr.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,9 +15,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.jdbc.FilterToSQLException;
 
-import gov.cida.sedmap.io.InputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.WriterWithFile;
 import gov.cida.sedmap.io.util.SessionUtil;
@@ -166,15 +161,6 @@ public class JdbcFetcher extends Fetcher {
 	}
 
 
-	// nice little bundle for the JDBC results set needs
-	protected static class Results {
-		Connection cn;
-		PreparedStatement ps;
-		ResultSet  rs;
-	}
-
-
-
 	public JdbcFetcher() {
 	}
 	public JdbcFetcher(String jndiJdbc) {
@@ -190,13 +176,10 @@ public class JdbcFetcher extends Fetcher {
 
 
 	@Override
-	protected InputStreamWithFile handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
-			throws IOException, SQLException, NamingException, Exception {
+	protected File handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
+			throws Exception {
 
-		InputStreamWithFile fileData = null;
-		Results      rs = new Results();
-
-		try {
+		try (Results rs = new Results()) {
 			List<String> columnNames;
 			if (descriptor.contains("daily")) {
 				columnNames = Arrays.asList(DAILY_SITE_COLUMN_NAMES_FOR_SPREADSHEET);
@@ -208,10 +191,9 @@ public class JdbcFetcher extends Fetcher {
 			String header = formatter.fileHeader(columnNames.iterator(), HeaderType.SITE);
 			String    sql = buildQuery(descriptor, filter);
 			logger.debug(sql);
-			rs = initData(sql);
-			getData(rs, filter, true);
+			openQuery(rs, sql);
+			fetchData(rs, filter, true);
 
-			File tmpFile = null;
 			try ( WriterWithFile tmp = IoUtils.createTmpZipWriter(descriptor, formatter.getFileType()) ) {
 				//logger.debug(header);
 				tmp.write(header);
@@ -221,41 +203,28 @@ public class JdbcFetcher extends Fetcher {
 					tmp.write(row);
 				}
 				// preserve the file for once out of the block where java7 closes it
-				tmpFile = tmp.getFile();
+				return tmp.getFile();
 			}
-			fileData = new InputStreamWithFile(tmpFile);
-
-
-		} catch (FilterToSQLException e) {
-			throw new SedmapException(OGCExceptionCode.InvalidParameterValue, new SQLException("Failed to convert filter to sql where clause.",e));
-		} finally {
-			IoUtils.quiteClose(rs.rs, rs.ps, rs.cn);
 		}
-
-		return fileData;
 	}
 	@Override
-	protected InputStreamWithFile handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
+	protected File handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
 			throws Exception {
 		if ( !sites.hasNext() ) {
 			// return nothing if there are no sites
 			return null;
 		}
 
-		Results         rs = new Results();
-		WriterWithFile tmp = null;
-		String  descriptor = DISCRETE_FILENAME;
-
-		try {
-
-			String tableName = Fetcher.conf.DATA_TABLES.get(descriptor);
-			String[] columnNames = Column.getColumnNames(getTableMetadata(tableName).iterator());
-			String        header = formatter.fileHeader(Arrays.asList(columnNames).iterator(), HeaderType.DISCRETE);
-			tmp = IoUtils.createTmpZipWriter(descriptor, formatter.getFileType());
+		String descriptor    = DISCRETE_FILENAME;
+		String tableName     = Fetcher.conf.DATA_TABLES.get(descriptor);
+		String[] columnNames = Column.getColumnNames(getTableMetadata(tableName).iterator());
+		String header        = formatter.fileHeader(Arrays.asList(columnNames).iterator(), HeaderType.DISCRETE);
+		
+		try (WriterWithFile tmp = IoUtils.createTmpZipWriter(descriptor, formatter.getFileType()) ) {
 
 			// open temp file
-			while (sites.hasNext()) {
-				try {
+			while ( sites.hasNext() ) {
+				try (Results rs = new Results()) {
 					int batch = 0;
 					StringBuilder sitesClause = new StringBuilder();
 					String join="";
@@ -266,8 +235,8 @@ public class JdbcFetcher extends Fetcher {
 					String sql = getQuery(descriptor);
 					sql=sql.replace("_siteList_", sitesClause.toString() );
 					logger.debug(sql);
-					rs = initData(sql);
-					getData(rs, filter, false);
+					openQuery(rs,sql);
+					fetchData(rs, filter, false);
 
 
 					//logger.debug(header);
@@ -277,20 +246,14 @@ public class JdbcFetcher extends Fetcher {
 						//logger.debug(row);
 						tmp.write(row);
 					}
-
-				} finally {
-					IoUtils.quiteClose(rs.rs, rs.ps, rs.cn);
 				}
 			}
-		} finally {
-			IoUtils.quiteClose(tmp);
+			return tmp.getFile();
 		}
-
-		return IoUtils.createTmpZipStream( tmp.getFile() );
 	}
 
 
-	protected String buildQuery(String descriptor, FilterWithViewParams filter) throws Exception {
+	protected String buildQuery(String descriptor, FilterWithViewParams filter) throws SedmapException {
 		//		FilterToSQL trans = new FilterToSQL();
 		//		trans.setInline(true);
 
@@ -326,12 +289,10 @@ public class JdbcFetcher extends Fetcher {
 
 
 
-	protected Results initData(String sql) throws SedmapException {
-		Results r = new Results();
-
+	protected Results openQuery(Results results, String sql) throws SedmapException {
 		try {
 			DataSource ds = SessionUtil.lookupDataSource(jndiDS);
-			r.cn = ds.getConnection();			
+			results.cn = ds.getConnection();			
 		} catch (NamingException e) {
 			String msg = "Error fetching JDBC data source";
 			logger.error(msg,e);
@@ -343,16 +304,16 @@ public class JdbcFetcher extends Fetcher {
 		}
 		
 		try {
-			r.ps = r.cn.prepareStatement(sql);
+			results.ps = results.cn.prepareStatement(sql);
 		} catch (SQLException e) {
 			String msg = "Error creating SQL statement on JDBC connection";
 			logger.error(msg,e);
 			throw new SedmapException(msg, e);
 		}
 
-		return r;
+		return results;
 	}
-	protected Results getData(Results r, FilterWithViewParams filter, boolean doFilterValues) throws NamingException, SQLException, Exception {
+	protected Results fetchData(Results r, FilterWithViewParams filter, boolean doFilterValues) throws NamingException, SQLException, Exception {
 		try {
 			int index = 1;
 			for (String value : filter) {

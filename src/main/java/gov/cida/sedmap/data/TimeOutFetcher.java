@@ -1,10 +1,9 @@
 package gov.cida.sedmap.data;
 
+import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Iterator;
 
-import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -12,7 +11,6 @@ import org.apache.log4j.Logger;
 
 import gov.cida.sedmap.data.agent.TimeOutAgent;
 import gov.cida.sedmap.io.FileDownloadHandler;
-import gov.cida.sedmap.io.InputStreamWithFile;
 import gov.cida.sedmap.io.TimeOutHandler;
 import gov.cida.sedmap.io.util.SessionUtil;
 import gov.cida.sedmap.io.util.exceptions.SedmapException;
@@ -165,17 +163,15 @@ public class TimeOutFetcher extends Fetcher {
 	}
 
 	@Override
-	protected InputStreamWithFile handleSiteData(String descriptor,
-			FilterWithViewParams filter, Formatter formatter)
-			throws IOException, SQLException, NamingException, Exception {
-		return this.jdbcFetcher.handleSiteData(descriptor, filter, formatter);
+	protected File handleSiteData(String descriptor, FilterWithViewParams filter, Formatter formatter)
+			throws Exception {
+		return jdbcFetcher.handleSiteData(descriptor, filter, formatter);
 	}
 
 	@Override
-	protected InputStreamWithFile handleDiscreteData(Iterator<String> sites,
-			FilterWithViewParams filter, Formatter formatter)
-			throws IOException, SQLException, NamingException, Exception {
-		return this.jdbcFetcher.handleDiscreteData(sites, filter, formatter);
+	protected File handleDiscreteData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter)
+			throws Exception {
+		return jdbcFetcher.handleDiscreteData(sites, filter, formatter);
 	}
 	
 	private void waitForThreadToFinish(TimeOutAgent timeoutAgent, long startTime, long currentTime, long waitTime) throws Exception {
@@ -204,7 +200,7 @@ public class TimeOutFetcher extends Fetcher {
 		/**
 		 * We're out of the loop, lets see if there was an exception in the thread
 		 */
-		if(timeoutAgent.exceptionThrown()) {
+		if(timeoutAgent.isError()) {
 			/**
 			 * Something went wrong in the fetcher.  Lets throw the exception
 			 * caught and let the data service handle it.

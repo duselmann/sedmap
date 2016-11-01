@@ -96,6 +96,12 @@ public class IoUtils {
 
 		return buf.toString();
 	}
+	// also for testing
+	public static String readZip(File file) throws IOException {
+		String read = readStream( createTmpZipStream(file) );
+		deleteFile(file);
+		return read;
+	}
 
 
 	public static String createTmpFileName(String name) {
@@ -179,6 +185,6 @@ public class IoUtils {
 		if ( ! file.delete() ) {
 			file.deleteOnExit();
 		}
-	}	
+	}
 
 }

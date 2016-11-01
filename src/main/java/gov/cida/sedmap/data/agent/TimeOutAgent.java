@@ -14,11 +14,10 @@ public class TimeOutAgent extends Thread {
 	private TimeOutHandler timeoutHandler;
 	private HttpServletRequest request;
 	
-	private volatile boolean running = false;
+	private volatile boolean isRunning = false;
 	
-	private boolean hasStarted = false;
+	private boolean isStarted = false;
 	
-	private boolean exceptionThrown = false;
 	private Exception exception = null; 
 	
 	public TimeOutAgent(JdbcFetcher jdbcFetcher, TimeOutHandler timeoutHandler, HttpServletRequest request) {
@@ -26,41 +25,32 @@ public class TimeOutAgent extends Thread {
 		this.timeoutHandler = timeoutHandler;
 		this.request = request;
 		
-		this.running = false;
-		hasStarted = false;
-		this.exceptionThrown = false;
+		this.isRunning = false;
+		isStarted = false;
 		this.exception = null;
 	}
 	
 	public void run() {
 		try {
-			hasStarted = true;
-			this.running = true;
-			this.jdbcFetcher.doFetch(this.request, this.timeoutHandler);
-			this.running = false;
+			isStarted = true;
+			isRunning = true;
+			jdbcFetcher.doFetch(this.request, this.timeoutHandler);
 		} catch (InterruptedException e) {
 			logger.info("TimeOutAgent has received a stop interrupt.  Exiting agent...");
-			this.running = false;
-			this.exceptionThrown = true;
-			this.exception = e;
+			exception = e;
 		} catch (Exception e) {
 			logger.info("TimeOutAgent has received an exception.  [" + e.getMessage() + "]");
-			this.running = false;
-			this.exceptionThrown = true;
-			this.exception = e;
+			exception = e;
 		}
+		isRunning = false; // this used to be set in all blocks above
 	}
 
 	public boolean isRunning() {
-		if(!hasStarted) {
-			return true;
-		} else {
-			return running;
-		}
+		return isStarted & isRunning;
 	}
 
-	public boolean exceptionThrown() {
-		return exceptionThrown;
+	public boolean isError() {
+		return exception != null;
 	}
 
 	public Exception getException() {
