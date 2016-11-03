@@ -19,10 +19,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.geotools.filter.AbstractFilter;
-import org.geotools.filter.IsBetweenImpl;
 import org.opengis.filter.PropertyIsGreaterThan;
 import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
 import org.opengis.filter.PropertyIsLessThan;
@@ -171,7 +169,7 @@ public abstract class Fetcher {
 			for (String column : DEFAULT_DAILY_DATA_COLUMN_NAMES) {
 				String value = getValue(column);
 				if (value != null) {
-					join.append(colHeaderSep).append(column);
+					join.append(colHeaderSep).append(value);
 				}
 				colHeaderSep = formatter.getSeparator();
 			}
