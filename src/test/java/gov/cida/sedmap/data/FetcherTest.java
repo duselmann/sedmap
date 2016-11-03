@@ -76,7 +76,7 @@ public class FetcherTest {
 	public void reconditionLine() throws Exception {
 		String line = "agency_cd	site_no	datetime	16_00060_00003	06_00060_00003_cd	02_80154_00003	02_80154_00003_cd	03_80155_00003	03_80155_00003_cd";
 		String expect = "agency_cd	site_no	datetime	DAILY_FLOW	DAILY_FLOW_QUAL	DAILY_SSC	DAILY_SSC_QUAL	DAILY_SSL	DAILY_SSL_QUAL";
-		String actual = dss.reconditionLine(line);
+		String actual = new Fetcher.ColumnManager(new RdbFormatter()).reconditionLine(line);
 		System.out.println(line);
 		System.out.println(actual);
 
@@ -86,7 +86,7 @@ public class FetcherTest {
 	public void reconditionLine_additionalDigits() throws Exception {
 		String line = "agency_cd	site_no	datetime	33316_00060_00003	33306_00060_00003_cd	33302_80154_00003	33302_80154_00003_cd	33303_80155_00003	33303_80155_00003_cd";
 		String expect = "agency_cd	site_no	datetime	DAILY_FLOW	DAILY_FLOW_QUAL	DAILY_SSC	DAILY_SSC_QUAL	DAILY_SSL	DAILY_SSL_QUAL";
-		String actual = dss.reconditionLine(line);
+		String actual = new Fetcher.ColumnManager(new RdbFormatter()).reconditionLine(line);
 		System.out.println(line);
 		System.out.println(actual);
 

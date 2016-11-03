@@ -81,4 +81,11 @@ public class EmailLinkHandler extends ZipHandler {
 	public void setExceptionThrown(Exception exceptionThrown) {
 		this.exceptionThrown = exceptionThrown;
 	}
+	
+	@Override
+	// this returns true because the super class version are managing the stream to the user
+	// this one is writing to a file for email notification later.
+	public boolean isAlive() {
+		return true;
+	}
 }

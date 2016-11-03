@@ -2,6 +2,7 @@ package gov.cida.sedmap.io;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
 import java.io.Writer;
 
 
@@ -15,6 +16,11 @@ public class WriterWithFile extends BufferedWriter {
 
 	public File getFile() {
 		return file;
+	}
+	
+	public void writeLine(String line) throws IOException {
+		write(line);
+		write(IoUtils.LINE_SEPARATOR);
 	}
 
 	public void deleteFile() {
