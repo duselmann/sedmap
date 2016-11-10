@@ -27,25 +27,21 @@ public class GeoserverProxy extends ProxyServlet {
 
 	public static final String NHD_ENV_SERVER = "sedmap/nhdServer";
 	public static final String NHD_ENV_PATH   = "sedmap/nhdPath";
-	public static final String SED_ENV_SERVER = "sedmap/sedServer";	// This is our GeoServer instance
+	public static final String GEO_ENV_SERVER = "sedmap/sedServer";	// This is our GeoServer instance
 
-	private String NHD_SERVER = "http://cida-wiwsc-wsdev.er.usgs.gov:8080";
-	private String NHD_PATH   = "/geoserver/NHDPlusFlowlines/wms";
-	private String SED_SERVER = "http://localhost:8080";
+	private String NHD_SERVER = "http://cidasdpdasnwc.cr.usgs.gov:8082/geoserver/nhdplus/wms";
+	private String GEO_SERVER = "http://localhost:8080";
 
 
 
 	public GeoserverProxy() {
 		try {
 			NHD_SERVER = SessionUtil.lookup(NHD_ENV_SERVER, NHD_SERVER);
-			NHD_PATH   = SessionUtil.lookup(NHD_ENV_PATH,   NHD_PATH);
-			SED_SERVER = SessionUtil.lookup(SED_ENV_SERVER, SED_SERVER);
+			GEO_SERVER = SessionUtil.lookup(GEO_ENV_SERVER, GEO_SERVER);
 		} catch (Exception e) {
-			logger.warn("Falling back to default geoservers. NHD:" + NHD_SERVER+NHD_PATH
-					+" and sedmap: " + SED_SERVER, e);
+			logger.warn("Falling back to default geoservers. NHD:" + NHD_SERVER
+					+" and sedmap: " + GEO_SERVER, e);
 		}
-		// lets concat this once
-		NHD_SERVER  += NHD_PATH;
 	}
 
 
@@ -61,7 +57,7 @@ public class GeoserverProxy extends ProxyServlet {
 			logger.error(uri+"?"+params);
 		} else {
 			uri = uri.replace("sediment/map", "geoserver/sedmap");
-			uri = SED_SERVER + uri; //"http://cida-wiwsc-sedmapdev.er.usgs.gov:8080" + uri;
+			uri = GEO_SERVER + uri; //"http://cida-wiwsc-sedmapdev.er.usgs.gov:8080" + uri;
 		}
 		return new URL(uri +"?" +params);
 	}
