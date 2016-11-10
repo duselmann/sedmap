@@ -30,7 +30,9 @@ import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 
 import gov.cida.sedmap.data.FetcherConfig;
 import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.util.SessionUtil;
 import gov.cida.sedmap.io.util.StrUtils;
+import gov.cida.sedmap.io.util.exceptions.SedmapException;
 import gov.cida.sedmap.mock.MockContext;
 import gov.cida.sedmap.mock.MockDataSource;
 import gov.cida.sedmap.mock.MockDbMetaData;
@@ -266,7 +268,7 @@ public class OgcUtilsTests {
 		// dataStoreEnv.put( JDBCDataStoreFactory.SCHEMA.getName(), "sedmap"); // OPTIONAL
 		dataStoreEnv.put( JDBCDataStoreFactory.DBTYPE.getName(), "oracle");
 		dataStoreEnv.put( JDBCDataStoreFactory.EXPOSE_PK.getName(), true);
-		dataStoreEnv.put( JDBCJNDIDataStoreFactory.JNDI_REFNAME.getName(), FetcherConfig.SEDMAP_DS);
+		dataStoreEnv.put( JDBCJNDIDataStoreFactory.JNDI_REFNAME.getName(), SessionUtil.JNDI_PREFIX+FetcherConfig.SEDMAP_DS);
 		DataStore store =  DataStoreFinder.getDataStore(dataStoreEnv);
 
 		Filter filter     = OgcUtils.ogcXmlToFilter(ogc_v1_0);
@@ -401,38 +403,23 @@ public class OgcUtilsTests {
 	}
 
 
-	@Test(expected=RuntimeException.class)
-	public void test_invalidChars_openParentheses() {
+	@Test(expected=SedmapException.class)
+	public void test_invalidChars_openParentheses() throws Exception {
 		String qry = "[ foo=( ]";
 
-		try {
-			OgcUtils.checkForInvalidChars(qry);
-		} catch (Exception e) {
-			fail(e.getMessage());
-			return;
-		}
+		OgcUtils.checkForInvalidChars(qry);
 	}
-	@Test(expected=RuntimeException.class)
-	public void test_invalidChars_closedParentheses() {
+	@Test(expected=SedmapException.class)
+	public void test_invalidChars_closedParentheses() throws Exception {
 		String qry = "[ foo=) ]";
 
-		try {
-			OgcUtils.checkForInvalidChars(qry);
-		} catch (Exception e) {
-			fail(e.getMessage());
-			return;
-		}
+		OgcUtils.checkForInvalidChars(qry);
 	}
-	@Test(expected=RuntimeException.class)
-	public void test_invalidChars_semicolon() {
+	@Test(expected=SedmapException.class)
+	public void test_invalidChars_semicolon() throws Exception {
 		String qry = "[ foo=dfsdf; ]";
 
-		try {
-			OgcUtils.checkForInvalidChars(qry);
-		} catch (Exception e) {
-			fail(e.getMessage());
-			return;
-		}
+		OgcUtils.checkForInvalidChars(qry);
 	}
 
 

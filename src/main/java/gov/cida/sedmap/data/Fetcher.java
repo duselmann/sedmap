@@ -304,7 +304,7 @@ public abstract class Fetcher {
 
 		// NWIS offers RDB only that is compatible with sedmap needs
 		String format = "rdb";
-		String url = FetcherConfig.nwisUrl.replace("_format_", format); // this is non-destructive
+		String url = conf.getNwisUrl().replace("_format_", format); // this is non-destructive
 
 		// extract expressions from the filter we can handle
 		String yr1 = filter.getViewParam("yr1");

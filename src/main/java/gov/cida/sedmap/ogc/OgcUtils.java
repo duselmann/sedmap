@@ -30,6 +30,7 @@ import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.PropertyName;
 
+import gov.cida.sedmap.io.util.SessionUtil;
 import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.io.util.exceptions.SedmapException;
 import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
@@ -125,7 +126,7 @@ public class OgcUtils {
 	}
 
 
-	protected static void checkForInvalidChars(String sql) throws Exception {
+	protected static void checkForInvalidChars(String sql) throws SedmapException {
 		logger.debug("checkForInvalidChars");
 
 		for (char invalid : INVALID_CHARS) {
@@ -168,7 +169,7 @@ public class OgcUtils {
 		// dataStoreEnv.put( JDBCDataStoreFactory.SCHEMA.getName(), "sedmap"); // OPTIONAL
 		dataStoreEnv.put( JDBCDataStoreFactory.DBTYPE.getName(), "oracle");
 		dataStoreEnv.put( JDBCDataStoreFactory.EXPOSE_PK.getName(), true);
-		dataStoreEnv.put( JDBCJNDIDataStoreFactory.JNDI_REFNAME.getName(), jndiName);
+		dataStoreEnv.put( JDBCJNDIDataStoreFactory.JNDI_REFNAME.getName(), SessionUtil.JNDI_PREFIX+jndiName);
 		
 		DataStore store;
 		try {

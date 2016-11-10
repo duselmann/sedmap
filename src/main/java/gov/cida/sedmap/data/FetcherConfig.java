@@ -48,7 +48,7 @@ public class FetcherConfig {
 	
 	public static final String SEDMAP_DS        = "jdbc/sedmapDS";
 	
-	protected static String nwisUrl;
+	protected String nwisUrl;
 
 	protected String jndiDS = SEDMAP_DS;
 
@@ -72,6 +72,8 @@ public class FetcherConfig {
 	public FetcherConfig init() {
 		logger.info("Static Fetcher initialization.");
 		nwisUrl = SessionUtil.lookup(NWIS_URL_ENV, NWIS_URL_DEFAULT);
+		batchSize = SessionUtil.lookup(NWIS_BATCH_SIZE_PARAM, NWIS_BATCH_SIZE);
+		retries = SessionUtil.lookup(NWIS_RETRY_SIZE_PARAM, NUM_NWIS_TRIES);
 
 		FIELD_TRANSLATIONS = configFieldTranslaions();
 		FILE_FORMATS       = configFormats();
@@ -234,19 +236,16 @@ public class FetcherConfig {
 	}
 
 	public int getBatchSize() {
-		if (this.batchSize==0) {
-			this.batchSize = SessionUtil.lookup(NWIS_BATCH_SIZE_PARAM, NWIS_BATCH_SIZE);
-		}
 		return this.batchSize;
 	}
 
 	public int getRetries() {
-		if (this.retries==0) {
-			this.retries = SessionUtil.lookup(NWIS_RETRY_SIZE_PARAM, NUM_NWIS_TRIES);
-		}
 		return this.retries;
 	}
 	
+	public String getNwisUrl() {
+		return this.nwisUrl;
+	}
 	
 	
 }

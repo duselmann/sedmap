@@ -6,11 +6,14 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
+import org.geotools.jdbc.JDBCJNDIDataStoreFactory;
 
 public class SessionUtil {
 
 	private static final Logger logger = Logger.getLogger(SessionUtil.class);
 
+	public static final String JNDI_PREFIX = JDBCJNDIDataStoreFactory.J2EERootContext;
+	
 	protected static Context ctx;
 	
 	public static void setContext(Context context) {
@@ -30,7 +33,7 @@ public class SessionUtil {
 	
 	public static String lookup(String property, String defaultValue) {
 		try {
-			String value = (String) getContext().lookup("java:comp/env/"+property);
+			String value = (String) getContext().lookup(JNDI_PREFIX+property);
 			return value;
 		} catch (Exception e) {
 			logger.warn(e.getMessage());
