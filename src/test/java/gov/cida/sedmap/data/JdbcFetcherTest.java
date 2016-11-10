@@ -92,7 +92,7 @@ public class JdbcFetcherTest {
 		// populate env and params
 		ds  = new MockDataSource();
 		ctxenv = new HashMap<String, Object>();
-		ctxenv.put(Fetcher.SEDMAP_DS, ds);
+		ctxenv.put(FetcherConfig.SEDMAP_DS, ds);
 		// link ctx to data service for testing
 		ctx = new MockContext(ctxenv);
 		Field geoToolsCtx = GeoTools.class.getDeclaredField("context");
@@ -110,14 +110,14 @@ public class JdbcFetcherTest {
 
 		Fetcher.conf = new FetcherConfig().init();
 		// link ctx to data service for testing
-		fetcher = new JdbcFetcher(Fetcher.SEDMAP_DS);
+		fetcher = new JdbcFetcher(FetcherConfig.SEDMAP_DS);
 
 	}
 
 
 	// override specific behaviors for testing others
 	protected void initJdbcFetcherForDoFetchTesting() {
-		fetcher = new JdbcFetcher(Fetcher.SEDMAP_DS) {
+		fetcher = new JdbcFetcher(FetcherConfig.SEDMAP_DS) {
 			@Override
 			protected File handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter, FileDownloadHandler handler)
 					throws Exception {
@@ -158,7 +158,7 @@ public class JdbcFetcherTest {
 
 	@Test
 	public void handleLocalData_csv() throws Exception {
-		fetcher = new JdbcFetcher(Fetcher.SEDMAP_DS) {
+		fetcher = new JdbcFetcher(FetcherConfig.SEDMAP_DS) {
 			@Override
 			protected String buildQuery(String descriptor, FilterWithViewParams filter) {
 				return "select * from sedmap.DISCRETE_STATIONS";
@@ -201,7 +201,7 @@ public class JdbcFetcherTest {
 
 	@Test
 	public void handleLocalData_rdb() throws Exception {
-		fetcher = new JdbcFetcher(Fetcher.SEDMAP_DS) {
+		fetcher = new JdbcFetcher(FetcherConfig.SEDMAP_DS) {
 			@Override
 			protected String buildQuery(String descriptor, FilterWithViewParams filter) {
 				return "select * from sedmap.DISCRETE_STATIONS";

@@ -30,7 +30,6 @@ import gov.cida.sedmap.io.FileDownloadHandler;
 import gov.cida.sedmap.io.InputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.WriterWithFile;
-import gov.cida.sedmap.io.util.SessionUtil;
 import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.io.util.StringValueIterator;
 import gov.cida.sedmap.io.util.exceptions.SedmapException;
@@ -39,16 +38,12 @@ import gov.cida.sedmap.ogc.OgcUtils;
 
 public abstract class Fetcher {
 
-	public static final String SEDMAP_DS = "jdbc/sedmapDS";
-	public static final String NWIS_BATCH_SIZE_PARAM = "sedmap/nwis.batch.size";
-	public static final String NWIS_RETRY_SIZE_PARAM = "sedmap/nwis.tries.size";
 
 	private static final Logger logger = Logger.getLogger(Fetcher.class);
 
 
 	public static FetcherConfig conf;
-	public static int NUM_NWIS_TRIES  = 3;
-	public static int NWIS_BATCH_SIZE = 25;
+	
 	private static final List<String> DEFAULT_DAILY_DATA_COLUMN_NAMES = new ArrayList<String>(Arrays.asList(
 		"agency_cd",
 		"site_no",
@@ -299,8 +294,8 @@ public abstract class Fetcher {
 	protected File handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter, FileDownloadHandler handler)
 			throws Exception {
 		
-		int nwisBatchSize = SessionUtil.lookup(NWIS_BATCH_SIZE_PARAM, NWIS_BATCH_SIZE);
-		int nwisRetryMax  = SessionUtil.lookup(NWIS_RETRY_SIZE_PARAM, NUM_NWIS_TRIES);
+		int nwisBatchSize = conf.getBatchSize();
+		int nwisRetryMax  = conf.getRetries();
 		
 		if ( ! sites.hasNext() ) {
 			// return nothing if there are no sites
@@ -455,12 +450,12 @@ public abstract class Fetcher {
 		// build a reader waiting for stream ready
 		BufferedReader reader = null;
 		int nwisTriesCount = 0;
-		while (null == reader && nwisTriesCount++ < NUM_NWIS_TRIES) {
+		while (null == reader && nwisTriesCount++ < conf.getRetries() ) {
 			try {
 				reader = new BufferedReader(new InputStreamReader(cn.getInputStream()));
 			} catch (IOException e) {
 				// if we cannot access the stream then wait a second
-				if (nwisTriesCount > NUM_NWIS_TRIES) {
+				if (nwisTriesCount > conf.getRetries() ) {
 					throw e;
 				}
 				Thread.sleep(10000);

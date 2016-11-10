@@ -54,7 +54,7 @@ public class FetcherTest {
 		params = new HashMap<String, String>();
 
 		ctxenv = new HashMap<String, Object>();
-		ctxenv.put(Fetcher.SEDMAP_DS, ds);
+		ctxenv.put(FetcherConfig.SEDMAP_DS, ds);
 		// link ctx to data service for testing
 		ctx = new MockContext(ctxenv);
 
