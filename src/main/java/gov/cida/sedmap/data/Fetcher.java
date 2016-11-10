@@ -39,9 +39,9 @@ import gov.cida.sedmap.ogc.OgcUtils;
 
 public abstract class Fetcher {
 
-	public static final String SEDMAP_DS = "java:comp/env/jdbc/sedmapDS";
-	public static final String NWIS_BATCH_SIZE_PARAM = "java:comp/env/sedmap/nwis.batch.size";
-	public static final String NWIS_RETRY_SIZE_PARAM = "java:comp/env/sedmap/nwis.tries.size";
+	public static final String SEDMAP_DS = "jdbc/sedmapDS";
+	public static final String NWIS_BATCH_SIZE_PARAM = "sedmap/nwis.batch.size";
+	public static final String NWIS_RETRY_SIZE_PARAM = "sedmap/nwis.tries.size";
 
 	private static final Logger logger = Logger.getLogger(Fetcher.class);
 
@@ -308,7 +308,6 @@ public abstract class Fetcher {
 		}
 
 		// NWIS offers RDB only that is compatible with sedmap needs
-		Formatter rdb = new RdbFormatter();
 		String format = "rdb";
 		String url = FetcherConfig.nwisUrl.replace("_format_", format); // this is non-destructive
 
@@ -341,7 +340,7 @@ public abstract class Fetcher {
 				int batchAttempts = 0; // keep track of batch attempts
 				WriterWithFile batchTmp = null;
 				BufferedReader nwis = null;
-				while (batchAttempts++ < nwisRetryMax) { // try again a limited number of times
+				while (batchAttempts++ <= nwisRetryMax) { // try again a limited number of times
 					logger.debug("NWIS WEB attempt starting number " +batchAttempts);
 
 					try {
@@ -393,6 +392,7 @@ public abstract class Fetcher {
 							batchTmp.deleteFile();
 							continue;
 						} else {
+							logger.error("Possible EOF Issue.", ioe);
 							throw ioe; // too many tries
 						}
 					} finally {
@@ -432,6 +432,7 @@ public abstract class Fetcher {
 				// finally, append more for the log
 				logger.error(errMsgBuilder.toString(), e);
 			}
+			throw e;
 		} finally {
 			IoUtils.quiteClose(nwisTmp);
 		}
@@ -445,11 +446,28 @@ public abstract class Fetcher {
 		logger.debug("fetching NWIS data");
 		URL url = new URL(urlStr);
 		URLConnection cn = url.openConnection();
-		//		final int timeout = 60000;//60sec
-		//		cn.setConnectTimeout(timeout);
-		//		cn.setReadTimeout(timeout);
+		
+		// wait for connection and data
+		final int timeout = 60000;// 60sec
+		cn.setConnectTimeout(timeout);
+		cn.setReadTimeout(timeout);
 
-		BufferedReader reader = new BufferedReader(new InputStreamReader(cn.getInputStream()));
+		// build a reader waiting for stream ready
+		BufferedReader reader = null;
+		int nwisTriesCount = 0;
+		while (null == reader && nwisTriesCount++ < NUM_NWIS_TRIES) {
+			try {
+				reader = new BufferedReader(new InputStreamReader(cn.getInputStream()));
+			} catch (IOException e) {
+				// if we cannot access the stream then wait a second
+				if (nwisTriesCount > NUM_NWIS_TRIES) {
+					throw e;
+				}
+				Thread.sleep(10000);
+			}
+			nwisTriesCount++;
+		}
+
 		return reader;
 	}
 
