@@ -15,6 +15,7 @@ import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.factory.GeoTools;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.JDBCFeatureReader;
 import org.geotools.jdbc.JDBCJNDIDataStoreFactory;
@@ -116,6 +117,7 @@ public class OgcUtilsTests {
 		ctxenv = new HashMap<String, Object>();
 		ctxenv.put(Fetcher.SEDMAP_DS, ds);
 		ctx    = new MockContext(ctxenv);
+		GeoTools.init(ctx);
 	}
 
 
@@ -265,11 +267,6 @@ public class OgcUtilsTests {
 
 	@Test
 	public void test_gt_dataStore_raw_access() throws Exception {
-		dataStoreEnv = new HashMap<String, Object>();
-		// dataStoreEnv.put( JDBCDataStoreFactory.SCHEMA.getName(), "sedmap"); // OPTIONAL
-		dataStoreEnv.put( JDBCDataStoreFactory.DBTYPE.getName(), "oracle");
-		dataStoreEnv.put( JDBCDataStoreFactory.EXPOSE_PK.getName(), true);
-		dataStoreEnv.put( JDBCJNDIDataStoreFactory.JNDI_REFNAME.getName(), Fetcher.SEDMAP_DS);
 		DataStore store =  DataStoreFinder.getDataStore(dataStoreEnv);
 
 		Filter filter     = OgcUtils.ogcXmlToFilter(ogc_v1_0);
