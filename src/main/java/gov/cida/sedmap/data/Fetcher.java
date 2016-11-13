@@ -37,11 +37,7 @@ import gov.cida.sedmap.ogc.FilterWithViewParams;
 import gov.cida.sedmap.ogc.OgcUtils;
 
 public abstract class Fetcher {
-
-	public static final String SEDMAP_DS = "java:comp/env/jdbc/sedmapDS";
-
 	private static final Logger logger = Logger.getLogger(Fetcher.class);
-
 
 	public static FetcherConfig conf;
 	

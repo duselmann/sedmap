@@ -114,7 +114,7 @@ public class GeoToolsFetcherTest {
 		ds     = new MockDS();
 		params = new HashMap<String, String>();
 		ctxenv = new HashMap<String, Object>();
-		ctxenv.put(Fetcher.SEDMAP_DS, ds);
+		ctxenv.put(FetcherConfig.SEDMAP_DS, ds);
 		// link ctx to data service for testing
 		ctx = new MockContext(ctxenv);
 		Field geoToolsCtx = GeoTools.class.getDeclaredField("context");
@@ -210,7 +210,7 @@ public class GeoToolsFetcherTest {
 
 	@Test
 	public void handleLocalData_csv() throws Exception {
-		fetcher.initJndiJdbcStore(Fetcher.SEDMAP_DS);
+		fetcher.initJndiJdbcStore(FetcherConfig.SEDMAP_DS);
 
 		FilterWithViewParams filter = new FilterWithViewParams( OgcUtils.ogcXmlToFilter(ogc_v1_0));
 		File file = fetcher.handleSiteData("discrete_sites", filter, new CsvFormatter());
@@ -241,7 +241,7 @@ public class GeoToolsFetcherTest {
 
 	@Test
 	public void handleLocalData_rdb() throws Exception {
-		fetcher.initJndiJdbcStore(Fetcher.SEDMAP_DS);
+		fetcher.initJndiJdbcStore(FetcherConfig.SEDMAP_DS);
 		FilterWithViewParams filter = new FilterWithViewParams( OgcUtils.ogcXmlToFilter(ogc_v1_0));
 		File file = fetcher.handleSiteData("discrete_sites", filter, new RdbFormatter());
 		String actual;
