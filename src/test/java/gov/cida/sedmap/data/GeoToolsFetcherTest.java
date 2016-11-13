@@ -27,6 +27,7 @@ import gov.cida.sedmap.io.FileDownloadHandler;
 import gov.cida.sedmap.io.InputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.MultiPartHandler;
+import gov.cida.sedmap.io.util.SessionUtil;
 import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.mock.MockContext;
 import gov.cida.sedmap.mock.MockDataSource;
@@ -113,7 +114,7 @@ public class GeoToolsFetcherTest {
 		ds     = new MockDS();
 		params = new HashMap<String, String>();
 		ctxenv = new HashMap<String, Object>();
-		ctxenv.put(FetcherConfig.SEDMAP_DS, ds);
+		ctxenv.put(SessionUtil.JNDI_PREFIX+FetcherConfig.SEDMAP_DS, ds);
 		// link ctx to data service for testing
 		ctx = new MockContext(ctxenv);
 		Field geoToolsCtx = GeoTools.class.getDeclaredField("context");
