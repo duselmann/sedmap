@@ -50,7 +50,7 @@ public class FetcherConfig {
 	
 	protected String nwisUrl;
 
-	protected String jndiDS = SEDMAP_DS;
+	protected String jndiDS = Fetcher.SEDMAP_DS;
 
 	private int batchSize;
 

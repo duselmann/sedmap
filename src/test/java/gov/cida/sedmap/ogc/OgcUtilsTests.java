@@ -28,6 +28,7 @@ import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 
+import gov.cida.sedmap.data.Fetcher;
 import gov.cida.sedmap.data.FetcherConfig;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.util.SessionUtil;
@@ -76,7 +77,7 @@ public class OgcUtilsTests {
 		// dataStoreEnv.put( JDBCDataStoreFactory.SCHEMA.getName(), "sedmap"); // OPTIONAL
 		dataStoreEnv.put( JDBCDataStoreFactory.DBTYPE.getName(), "oracle");
 		dataStoreEnv.put( JDBCDataStoreFactory.EXPOSE_PK.getName(), true);
-		dataStoreEnv.put( JDBCJNDIDataStoreFactory.JNDI_REFNAME.getName(), SessionUtil.JNDI_PREFIX+FetcherConfig.SEDMAP_DS);
+		dataStoreEnv.put( JDBCJNDIDataStoreFactory.JNDI_REFNAME.getName(), Fetcher.SEDMAP_DS);
 
 		// init values
 		ds  = new MockDS();
@@ -113,7 +114,7 @@ public class OgcUtilsTests {
 		// populate env and params
 		params = new HashMap<String, String>();
 		ctxenv = new HashMap<String, Object>();
-		ctxenv.put(SessionUtil.JNDI_PREFIX+FetcherConfig.SEDMAP_DS, ds);
+		ctxenv.put(Fetcher.SEDMAP_DS, ds);
 		ctx    = new MockContext(ctxenv);
 	}
 
@@ -231,7 +232,7 @@ public class OgcUtilsTests {
 
 	@Test
 	public void test_gt_dataStore_utils() throws Exception {
-		DataStore store = OgcUtils.jndiOracleDataStore(FetcherConfig.SEDMAP_DS);
+		DataStore store = OgcUtils.jndiOracleDataStore(Fetcher.SEDMAP_DS);
 		Filter filter   = OgcUtils.ogcXmlToFilter(ogc_v1_0);
 		JDBCFeatureReader reader = OgcUtils.executeQuery(store, "TABLENAME", filter);
 
@@ -268,7 +269,7 @@ public class OgcUtilsTests {
 		// dataStoreEnv.put( JDBCDataStoreFactory.SCHEMA.getName(), "sedmap"); // OPTIONAL
 		dataStoreEnv.put( JDBCDataStoreFactory.DBTYPE.getName(), "oracle");
 		dataStoreEnv.put( JDBCDataStoreFactory.EXPOSE_PK.getName(), true);
-		dataStoreEnv.put( JDBCJNDIDataStoreFactory.JNDI_REFNAME.getName(), SessionUtil.JNDI_PREFIX+FetcherConfig.SEDMAP_DS);
+		dataStoreEnv.put( JDBCJNDIDataStoreFactory.JNDI_REFNAME.getName(), Fetcher.SEDMAP_DS);
 		DataStore store =  DataStoreFinder.getDataStore(dataStoreEnv);
 
 		Filter filter     = OgcUtils.ogcXmlToFilter(ogc_v1_0);

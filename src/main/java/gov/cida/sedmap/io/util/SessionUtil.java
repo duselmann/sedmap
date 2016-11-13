@@ -33,7 +33,7 @@ public class SessionUtil {
 	
 	public static String lookup(String property, String defaultValue) {
 		try {
-			String value = (String) getContext().lookup(JNDI_PREFIX+property);
+			String value = (String) getContext().lookup("java:comp/env/"+property);
 			return value;
 		} catch (Exception e) {
 			logger.warn(e.getMessage());

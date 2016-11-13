@@ -169,7 +169,7 @@ public class OgcUtils {
 		// dataStoreEnv.put( JDBCDataStoreFactory.SCHEMA.getName(), "sedmap"); // OPTIONAL
 		dataStoreEnv.put( JDBCDataStoreFactory.DBTYPE.getName(), "oracle");
 		dataStoreEnv.put( JDBCDataStoreFactory.EXPOSE_PK.getName(), true);
-		dataStoreEnv.put( JDBCJNDIDataStoreFactory.JNDI_REFNAME.getName(), SessionUtil.JNDI_PREFIX+jndiName);
+		dataStoreEnv.put( JDBCJNDIDataStoreFactory.JNDI_REFNAME.getName(), jndiName);
 		
 		DataStore store;
 		try {
