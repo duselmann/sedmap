@@ -30,6 +30,7 @@ import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.PropertyName;
 
+import gov.cida.sedmap.io.util.SessionUtil;
 import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.io.util.exceptions.SedmapException;
 import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;
@@ -125,7 +126,7 @@ public class OgcUtils {
 	}
 
 
-	protected static void checkForInvalidChars(String sql) throws Exception {
+	protected static void checkForInvalidChars(String sql) throws SedmapException {
 		logger.debug("checkForInvalidChars");
 
 		for (char invalid : INVALID_CHARS) {

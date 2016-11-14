@@ -63,25 +63,24 @@
         <gt.version>9.4</gt.version>
     </properties>
     
-
-        <scm>
-                <connection>scm:git:https://github.com/USGS-CIDA/sedmap.git</connection>
-                <developerConnection>scm:git:ssh://git@github.com/USGS-CIDA/sedmap.git</developerConnection>
-                <url>https://github.com/USGS-CIDA/sedmap</url>
-        </scm>
+    <scm>
+            <connection>scm:git:https://github.com/USGS-CIDA/sedmap.git</connection>
+            <developerConnection>scm:git:ssh://git@github.com/USGS-CIDA/sedmap.git</developerConnection>
+            <url>https://github.com/USGS-CIDA/sedmap</url>
+    </scm>
         
-        <distributionManagement>
-                <repository>
-                        <id>cida-releases</id>
-                        <name>CIDA Releases</name>
-                        <url>http://internal.cida.usgs.gov/maven/content/repositories/cida-releases/</url>
-                </repository>
-                <snapshotRepository>
-                        <id>cida-snapshots</id>
-                        <name>CIDA Snapshots</name>
-                        <url>http://internal.cida.usgs.gov/maven/content/repositories/cida-snapshots/</url>
-                </snapshotRepository>
-        </distributionManagement>
+    <distributionManagement>
+            <repository>
+                    <id>cida-releases</id>
+                    <name>CIDA Releases</name>
+                    <url>http://internal.cida.usgs.gov/maven/content/repositories/cida-releases/</url>
+            </repository>
+            <snapshotRepository>
+                    <id>cida-snapshots</id>
+                    <name>CIDA Snapshots</name>
+                    <url>http://internal.cida.usgs.gov/maven/content/repositories/cida-snapshots/</url>
+            </snapshotRepository>
+    </distributionManagement>
         
     <repositories>
         <repository>
@@ -431,8 +430,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.0.2</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
@@ -444,7 +443,6 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>

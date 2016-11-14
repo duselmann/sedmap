@@ -30,7 +30,6 @@ import gov.cida.sedmap.io.FileDownloadHandler;
 import gov.cida.sedmap.io.InputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.WriterWithFile;
-import gov.cida.sedmap.io.util.SessionUtil;
 import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.io.util.StringValueIterator;
 import gov.cida.sedmap.io.util.exceptions.SedmapException;
@@ -38,17 +37,10 @@ import gov.cida.sedmap.ogc.FilterWithViewParams;
 import gov.cida.sedmap.ogc.OgcUtils;
 
 public abstract class Fetcher {
-
-	public static final String SEDMAP_DS = "java:comp/env/jdbc/sedmapDS";
-	public static final String NWIS_BATCH_SIZE_PARAM = "java:comp/env/sedmap/nwis.batch.size";
-	public static final String NWIS_RETRY_SIZE_PARAM = "java:comp/env/sedmap/nwis.tries.size";
-
 	private static final Logger logger = Logger.getLogger(Fetcher.class);
 
-
 	public static FetcherConfig conf;
-	public static int NUM_NWIS_TRIES  = 3;
-	public static int NWIS_BATCH_SIZE = 25;
+	
 	private static final List<String> DEFAULT_DAILY_DATA_COLUMN_NAMES = new ArrayList<String>(Arrays.asList(
 		"agency_cd",
 		"site_no",
@@ -299,8 +291,8 @@ public abstract class Fetcher {
 	protected File handleNwisData(Iterator<String> sites, FilterWithViewParams filter, Formatter formatter, FileDownloadHandler handler)
 			throws Exception {
 		
-		int nwisBatchSize = SessionUtil.lookup(NWIS_BATCH_SIZE_PARAM, NWIS_BATCH_SIZE);
-		int nwisRetryMax  = SessionUtil.lookup(NWIS_RETRY_SIZE_PARAM, NUM_NWIS_TRIES);
+		int nwisBatchSize = conf.getBatchSize();
+		int nwisRetryMax  = conf.getRetries();
 		
 		if ( ! sites.hasNext() ) {
 			// return nothing if there are no sites
@@ -308,9 +300,8 @@ public abstract class Fetcher {
 		}
 
 		// NWIS offers RDB only that is compatible with sedmap needs
-		Formatter rdb = new RdbFormatter();
 		String format = "rdb";
-		String url = FetcherConfig.nwisUrl.replace("_format_", format); // this is non-destructive
+		String url = conf.getNwisUrl().replace("_format_", format); // this is non-destructive
 
 		// extract expressions from the filter we can handle
 		String yr1 = filter.getViewParam("yr1");
@@ -341,7 +332,7 @@ public abstract class Fetcher {
 				int batchAttempts = 0; // keep track of batch attempts
 				WriterWithFile batchTmp = null;
 				BufferedReader nwis = null;
-				while (batchAttempts++ < nwisRetryMax) { // try again a limited number of times
+				while (batchAttempts++ <= nwisRetryMax) { // try again a limited number of times
 					logger.debug("NWIS WEB attempt starting number " +batchAttempts);
 
 					try {
@@ -393,6 +384,7 @@ public abstract class Fetcher {
 							batchTmp.deleteFile();
 							continue;
 						} else {
+							logger.error("Possible EOF Issue.", ioe);
 							throw ioe; // too many tries
 						}
 					} finally {
@@ -432,6 +424,7 @@ public abstract class Fetcher {
 				// finally, append more for the log
 				logger.error(errMsgBuilder.toString(), e);
 			}
+			throw e;
 		} finally {
 			IoUtils.quiteClose(nwisTmp);
 		}
@@ -445,11 +438,28 @@ public abstract class Fetcher {
 		logger.debug("fetching NWIS data");
 		URL url = new URL(urlStr);
 		URLConnection cn = url.openConnection();
-		//		final int timeout = 60000;//60sec
-		//		cn.setConnectTimeout(timeout);
-		//		cn.setReadTimeout(timeout);
+		
+		// wait for connection and data
+		final int timeout = 60000;// 60sec
+		cn.setConnectTimeout(timeout);
+		cn.setReadTimeout(timeout);
 
-		BufferedReader reader = new BufferedReader(new InputStreamReader(cn.getInputStream()));
+		// build a reader waiting for stream ready
+		BufferedReader reader = null;
+		int nwisTriesCount = 0;
+		while (null == reader && nwisTriesCount++ < conf.getRetries() ) {
+			try {
+				reader = new BufferedReader(new InputStreamReader(cn.getInputStream()));
+			} catch (IOException e) {
+				// if we cannot access the stream then wait a second
+				if (nwisTriesCount > conf.getRetries() ) {
+					throw e;
+				}
+				Thread.sleep(10000);
+			}
+			nwisTriesCount++;
+		}
+
 		return reader;
 	}
 

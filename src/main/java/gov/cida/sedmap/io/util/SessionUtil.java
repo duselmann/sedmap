@@ -6,11 +6,23 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
+import org.geotools.jdbc.JDBCJNDIDataStoreFactory;
 
 public class SessionUtil {
 
 	private static final Logger logger = Logger.getLogger(SessionUtil.class);
 
+	public static final String JNDI_PREFIX = JDBCJNDIDataStoreFactory.J2EERootContext;
+	
+	
+	static {
+		try {
+			ctx = new InitialContext();
+		} catch (NamingException e) {
+			logger.warn("Initial attempt to create a JNDI context failed.",e);
+		}
+	}
+	
 	protected static Context ctx;
 	
 	public static void setContext(Context context) {

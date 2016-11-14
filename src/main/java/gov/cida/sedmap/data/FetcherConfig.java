@@ -36,11 +36,25 @@ public class FetcherConfig {
 	List<String>              DATA_TYPES;
 	List<String>              DATA_VALUES;
 
-	protected static final String NWIS_URL_ENV     = "sedmap/NWIS_URL";
-	protected static final String NWIS_URL_DEFAULT = "http://waterservices.usgs.gov/nwis/dv/?format=_format_&sites=_sites_&startDT=_startDate_&endDT=_endDate_&statCd=00003&parameterCd=00060,80154,80155";
-	protected static String nwisUrl;
+	public static final String NWIS_BATCH_SIZE_PARAM = "sedmap/nwis.batch.size";
+	public static final String NWIS_RETRY_SIZE_PARAM = "sedmap/nwis.tries.size";
+	
+	public static final String NWIS_URL_ENV     = "sedmap/NWIS_URL";
+	public static final String NWIS_URL_DEFAULT = "http://waterservices.usgs.gov/nwis/dv/?format=_format_&sites=_sites_&startDT=_startDate_&endDT=_endDate_&statCd=00003&parameterCd=00060,80154,80155";
 
-	protected String jndiDS = "java:comp/env/jdbc/sedmapDS";
+	public static final int NUM_NWIS_TRIES  = 3;
+	public static final int NWIS_BATCH_SIZE = 25;
+	
+	
+	public static final String SEDMAP_DS        = "jdbc/sedmapDS";
+	
+	protected String nwisUrl;
+
+	protected String jndiDS = SEDMAP_DS;
+
+	private int batchSize;
+
+	private int retries;
 
 
 	public FetcherConfig() {
@@ -58,6 +72,8 @@ public class FetcherConfig {
 	public FetcherConfig init() {
 		logger.info("Static Fetcher initialization.");
 		nwisUrl = SessionUtil.lookup(NWIS_URL_ENV, NWIS_URL_DEFAULT);
+		batchSize = SessionUtil.lookup(NWIS_BATCH_SIZE_PARAM, NWIS_BATCH_SIZE);
+		retries = SessionUtil.lookup(NWIS_RETRY_SIZE_PARAM, NUM_NWIS_TRIES);
 
 		FIELD_TRANSLATIONS = configFieldTranslaions();
 		FILE_FORMATS       = configFormats();
@@ -218,4 +234,18 @@ public class FetcherConfig {
 
 		return meta;
 	}
+
+	public int getBatchSize() {
+		return this.batchSize;
+	}
+
+	public int getRetries() {
+		return this.retries;
+	}
+	
+	public String getNwisUrl() {
+		return this.nwisUrl;
+	}
+	
+	
 }

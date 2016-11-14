@@ -8,8 +8,8 @@
   <classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar" sourcepath="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4/mail-1.4.jar" sourcepath="M2_REPO/javax/mail/mail/1.4/mail-1.4-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar" sourcepath="M2_REPO/javax/activation/activation/1.1/activation-1.1-sources.jar"/>
-  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-  <classpathentry kind="var" path="M2_REPO/org/slf4j/log4j-over-slf4j/1.7.5/log4j-over-slf4j-1.7.5.jar" sourcepath="M2_REPO/org/slf4j/log4j-over-slf4j/1.7.5/log4j-over-slf4j-1.7.5-sources.jar"/>
+    <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+<classpathentry kind="var" path="M2_REPO/org/slf4j/log4j-over-slf4j/1.7.5/log4j-over-slf4j-1.7.5.jar" sourcepath="M2_REPO/org/slf4j/log4j-over-slf4j/1.7.5/log4j-over-slf4j-1.7.5-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5.jar" sourcepath="M2_REPO/org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-simple/1.7.5/slf4j-simple-1.7.5.jar" sourcepath="M2_REPO/org/slf4j/slf4j-simple/1.7.5/slf4j-simple-1.7.5-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1.jar" sourcepath="M2_REPO/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1-sources.jar"/>
