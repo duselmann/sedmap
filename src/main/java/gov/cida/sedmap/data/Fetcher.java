@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -19,6 +20,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.WriterOutputStream;
 import org.apache.log4j.Logger;
 import org.geotools.filter.AbstractFilter;
 import org.opengis.filter.PropertyIsGreaterThan;
@@ -29,6 +32,7 @@ import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 import gov.cida.sedmap.io.FileDownloadHandler;
 import gov.cida.sedmap.io.InputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.ReaderWithFile;
 import gov.cida.sedmap.io.WriterWithFile;
 import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.io.util.StringValueIterator;
@@ -331,7 +335,7 @@ public abstract class Fetcher {
 
 				int batchAttempts = 0; // keep track of batch attempts
 				WriterWithFile batchTmp = null;
-				BufferedReader nwis = null;
+				ReaderWithFile nwis = null;
 				while (batchAttempts++ <= nwisRetryMax) { // try again a limited number of times
 					logger.debug("NWIS WEB attempt starting number " +batchAttempts);
 
@@ -382,6 +386,9 @@ public abstract class Fetcher {
 							// clean up and try again
 							IoUtils.quiteClose(nwis, batchTmp);
 							batchTmp.deleteFile();
+							if (nwis != null) {
+								nwis.deleteFile();
+							}
 							continue;
 						} else {
 							logger.error("Possible EOF Issue.", ioe);
@@ -389,6 +396,9 @@ public abstract class Fetcher {
 						}
 					} finally {
 						IoUtils.quiteClose(nwis, batchTmp);
+						if (nwis != null) {
+							nwis.deleteFile();
+						}
 					}
 					try {
 						IoUtils.copy(batchTmp.getFile(), nwisTmp);
@@ -434,7 +444,7 @@ public abstract class Fetcher {
 
 
 
-	protected BufferedReader fetchNwisData(String urlStr) throws Exception {
+	protected ReaderWithFile fetchNwisData(String urlStr) throws Exception {
 		logger.debug("fetching NWIS data");
 		URL url = new URL(urlStr);
 		URLConnection cn = url.openConnection();
@@ -445,17 +455,25 @@ public abstract class Fetcher {
 		cn.setReadTimeout(timeout);
 
 		// build a reader waiting for stream ready
-		BufferedReader reader = null;
+		ReaderWithFile reader = null;
 		int nwisTriesCount = 0;
 		while (null == reader && nwisTriesCount++ < conf.getRetries() ) {
-			try {
-				reader = new BufferedReader(new InputStreamReader(cn.getInputStream()));
+			try (InputStream input = cn.getInputStream()) {
+				
+				WriterWithFile writer = IoUtils.createTmpZipWriter(NWIS_FILENAME, new RdbFormatter().getFileType());
+				WriterOutputStream out = new WriterOutputStream(writer);
+				IOUtils.copy(input, out);
+				IoUtils.quiteClose(input, out);
+				
+				InputStream fileIn = IoUtils.createTmpZipStream(writer.getFile());
+				reader = new ReaderWithFile(fileIn, writer.getFile());
+				
 			} catch (IOException e) {
 				// if we cannot access the stream then wait a second
 				if (nwisTriesCount > conf.getRetries() ) {
 					throw e;
 				}
-				Thread.sleep(10000);
+				Thread.sleep(1000);
 			}
 			nwisTriesCount++;
 		}
