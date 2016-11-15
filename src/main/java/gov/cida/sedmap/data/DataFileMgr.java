@@ -25,7 +25,8 @@ public class DataFileMgr {
 	public static final String BATCH_FILENAME    = "daily_batch";
 	public static final String DISCRETE_FILENAME = "discrete_data";
 	public static final String DATA_FILENAME     = "data";
-
+	public static final String NWIS_FILENAME     = "nwis_data";
+	
 
 	static {
 		DATA_PATH   = SessionUtil.lookup(PATH_ENV_KEY,  PATH_DEFAULT);
