@@ -72,7 +72,7 @@ public class ErrUtils {
 		SedmapDataMail mailer = new SedmapDataMail();
 		mailer.notifyAdminOfError("Sediment Portal Error - ID [" + errorid + "]", adminMessage);
 		
-		IoUtils.quiteClose(pw,sw);
+		IoUtils.quietClose(pw,sw);
 		
 		return errorid;
 	}

@@ -23,7 +23,7 @@ public class ReaderWithFile extends BufferedReader {
 	}
 
 	public void deleteFile() {
-		IoUtils.quiteClose(this);
+		IoUtils.quietClose(this);
 		IoUtils.deleteFile(file);
 	}
 }

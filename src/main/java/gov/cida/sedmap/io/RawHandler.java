@@ -48,7 +48,7 @@ public class RawHandler extends BaseHandler {
 
 	@Override
 	public void close() throws IOException {
-		IoUtils.quiteClose(source);
+		IoUtils.quietClose(source);
 		super.close();
 	}
 }

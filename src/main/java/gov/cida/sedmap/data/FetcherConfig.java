@@ -181,7 +181,7 @@ public class FetcherConfig {
 		} catch (Exception e) {
 			handleMetadataException(e);
 		} finally {
-			IoUtils.quiteClose(st,cn);
+			IoUtils.quietClose(st,cn);
 		}
 		return null;
 	}

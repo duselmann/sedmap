@@ -24,7 +24,7 @@ public class WriterWithFile extends BufferedWriter {
 	}
 
 	public void deleteFile() {
-		IoUtils.quiteClose(this);
+		IoUtils.quietClose(this);
 		IoUtils.deleteFile(file);
 	}
 }

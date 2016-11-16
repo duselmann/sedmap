@@ -83,7 +83,7 @@ public class SedmapDataMail {
 			
 			adminText += sw.toString();
 			
-			IoUtils.quiteClose(pw, sw);
+			IoUtils.quietClose(pw, sw);
 		}
 
 		notifyAdminOfError("Sediment Portal Error - [" + SUBJECT + "]", adminText);

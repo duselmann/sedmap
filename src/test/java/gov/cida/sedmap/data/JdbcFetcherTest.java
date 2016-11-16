@@ -256,7 +256,7 @@ public class JdbcFetcherTest {
 		FileDownloadHandler handler = new MultiPartHandler(res, out, "Test2NoNwisJDBC");
 
 		fetcher.doFetch(req, handler);
-		IoUtils.quiteClose(out);
+		IoUtils.quietClose(out);
 
 		String actual = out.toString();
 		System.out.println(actual);
@@ -290,7 +290,7 @@ public class JdbcFetcherTest {
 		FileDownloadHandler handler = new MultiPartHandler(res, out, "Test2NwisJDBC");
 
 		fetcher.doFetch(req, handler);
-		IoUtils.quiteClose(out);
+		IoUtils.quietClose(out);
 
 		String actual = out.toString();
 		System.out.println(actual);

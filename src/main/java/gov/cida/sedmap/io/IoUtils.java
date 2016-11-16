@@ -27,7 +27,7 @@ public class IoUtils {
 
 	public static final String LINE_SEPARATOR  = System.getProperty("line.separator");
 
-	public static void quiteClose(Object ... open) {
+	public static void quietClose(Object ... open) {
 
 		if (open == null) return;
 
