@@ -34,7 +34,7 @@ public class InputStreamWithFile extends InputStream {
 	}
 
 	public void deleteFile() {
-		IoUtils.quiteClose(this);
+		IoUtils.quietClose(this);
 		IoUtils.deleteFile(file);
 	}
 

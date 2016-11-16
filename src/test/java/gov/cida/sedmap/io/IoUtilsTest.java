@@ -46,7 +46,7 @@ public class IoUtilsTest {
 
 		handler.writeFile("text/csv", "foo.csv", fileData);
 		res.getWriter().flush();
-		IoUtils.quiteClose(out);
+		IoUtils.quietClose(out);
 		String actual = out.toString();
 
 		assertEquals("Expect contentType", 1, StrUtils.occurrences("Content-type: text/csv", actual));
@@ -78,7 +78,7 @@ public class IoUtilsTest {
 		handler.writeFile("text/csv", "foo2.csv", fileData2);
 		handler.writeFile("text/csv", "foo3.csv", fileData3);
 		res.getWriter().flush();
-		IoUtils.quiteClose(out);
+		IoUtils.quietClose(out);
 		String actual = out.toString();
 		System.out.println(actual);
 
@@ -114,20 +114,20 @@ public class IoUtilsTest {
 
 	@Test(expected=UnsupportedOperationException.class)
 	public void quiteClose_noCloseMethod() throws Exception {
-		IoUtils.quiteClose(this);
+		IoUtils.quietClose(this);
 	}
 	@Test
 	public void quiteClose_sqlConnection() throws Exception {
 		Connection test = new MockConnection();
 		assertFalse("Expect open", test.isClosed());
-		IoUtils.quiteClose(test);
+		IoUtils.quietClose(test);
 		assertTrue("Expect closed", test.isClosed());
 	}
 	@Test
 	public void quiteClose_sqlStatement() throws Exception {
 		Statement test = new MockStatement();
 		assertFalse("Expect open", test.isClosed());
-		IoUtils.quiteClose(test);
+		IoUtils.quietClose(test);
 		assertTrue("Expect closed", test.isClosed());
 	}
 	@Test
@@ -136,14 +136,14 @@ public class IoUtilsTest {
 		test.open();
 
 		assertFalse("Expect open", test.isClosed());
-		IoUtils.quiteClose(test);
+		IoUtils.quietClose(test);
 		assertTrue("Expect closed", test.isClosed());
 	}
 	@Test
 	public void quiteClose_sqlResultSet_notOpen() throws Exception {
 		ResultSet test = new MockResultSet();
 		test.close();
-		IoUtils.quiteClose(test);
+		IoUtils.quietClose(test);
 		// If throws exception then it is not working
 	}
 	@Test
@@ -157,7 +157,7 @@ public class IoUtilsTest {
 		};
 		// tisk tisk - closeable does not have isClosed
 		assertFalse("Expect open", closed[0]);
-		IoUtils.quiteClose(test);
+		IoUtils.quietClose(test);
 		assertTrue("Expect closed", closed[0]);
 	}
 	@Test
@@ -180,7 +180,7 @@ public class IoUtilsTest {
 		assertFalse("Expect open", st.isClosed());
 		assertFalse("Expect open", rs.isClosed());
 
-		IoUtils.quiteClose(closeable, rs, st, cn);
+		IoUtils.quietClose(closeable, rs, st, cn);
 
 		assertTrue("Expect closed", closed[0]);
 		assertTrue("Expect closed", cn.isClosed());

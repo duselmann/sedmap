@@ -25,7 +25,7 @@ public class Results implements AutoCloseable {
 	
 	@Override
 	public void close() throws Exception {
-		IoUtils.quiteClose(rs,ps,cn);
+		IoUtils.quietClose(rs,ps,cn);
 	}
 	
 	

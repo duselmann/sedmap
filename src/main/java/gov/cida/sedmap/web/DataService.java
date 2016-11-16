@@ -191,7 +191,7 @@ public class DataService extends HttpServlet {
 				logger.error(t);
 			}
 		} finally {
-			IoUtils.quiteClose(handler);
+			IoUtils.quietClose(handler);
 			long totalTime = System.currentTimeMillis() - startTime;
 			logger.info("Processing time (ms) " + totalTime );
 		}

@@ -280,7 +280,7 @@ public class GeoToolsFetcherTest {
 		FileDownloadHandler handler = new MultiPartHandler(res, out, "Test2NoNWIS");
 
 		fetcher.doFetch(req, handler);
-		IoUtils.quiteClose(out);
+		IoUtils.quietClose(out);
 
 		String actual = out.toString();
 		System.out.println(actual);
@@ -314,7 +314,7 @@ public class GeoToolsFetcherTest {
 		FileDownloadHandler handler = new MultiPartHandler(res, out, "Test2NWIS");
 
 		fetcher.doFetch(req, handler);
-		IoUtils.quiteClose(out);
+		IoUtils.quietClose(out);
 
 		String actual = out.toString();
 		System.out.println(actual);

@@ -384,7 +384,7 @@ public abstract class Fetcher {
 						if (batchAttempts < nwisRetryMax) {
 							logger.warn("NWIS WEB attempt number " +batchAttempts+ " failed, trying again.", ioe);
 							// clean up and try again
-							IoUtils.quiteClose(nwis, batchTmp);
+							IoUtils.quietClose(nwis, batchTmp);
 							batchTmp.deleteFile();
 							if (nwis != null) {
 								nwis.deleteFile();
@@ -395,7 +395,7 @@ public abstract class Fetcher {
 							throw ioe; // too many tries
 						}
 					} finally {
-						IoUtils.quiteClose(nwis, batchTmp);
+						IoUtils.quietClose(nwis, batchTmp);
 						if (nwis != null) {
 							nwis.deleteFile();
 						}
@@ -436,7 +436,7 @@ public abstract class Fetcher {
 			}
 			throw e;
 		} finally {
-			IoUtils.quiteClose(nwisTmp);
+			IoUtils.quietClose(nwisTmp);
 		}
 
 		return nwisTmp.getFile();
@@ -463,7 +463,7 @@ public abstract class Fetcher {
 				WriterWithFile writer = IoUtils.createTmpZipWriter(NWIS_FILENAME, new RdbFormatter().getFileType());
 				WriterOutputStream out = new WriterOutputStream(writer);
 				IOUtils.copy(input, out);
-				IoUtils.quiteClose(input, out);
+				IoUtils.quietClose(input, out);
 				
 				InputStream fileIn = IoUtils.createTmpZipStream(writer.getFile());
 				reader = new ReaderWithFile(fileIn, writer.getFile());

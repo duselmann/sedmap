@@ -65,7 +65,7 @@ public class DownloadService extends HttpServlet {
 		} catch (Exception e) {
 			ErrUtils.handleExceptionResponse(req,res,e);
 		} finally {
-			IoUtils.quiteClose(handler);
+			IoUtils.quietClose(handler);
 		}
 	}
 

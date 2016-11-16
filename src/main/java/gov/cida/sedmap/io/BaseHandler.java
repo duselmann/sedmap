@@ -36,7 +36,7 @@ public class BaseHandler implements FileDownloadHandler {
 
 	@Override
 	public void close() throws IOException {
-		IoUtils.quiteClose(out);
+		IoUtils.quietClose(out);
 	}
 
 	@Override
@@ -117,7 +117,7 @@ public class BaseHandler implements FileDownloadHandler {
 			logger.error(msg,e);
 			throw new SedmapException(msg, e);
 		} finally {
-			IoUtils.quiteClose(fileData);
+			IoUtils.quietClose(fileData);
 		}
 		return this; //chain
 	}
@@ -137,7 +137,7 @@ public class BaseHandler implements FileDownloadHandler {
 		
 		try {
 			out.flush();
-			IoUtils.quiteClose(out);
+			IoUtils.quietClose(out);
 			out = null;
 		} catch (IOException e) {
 			String msg = "Error flushing final file in basic handler - likely a zip related issue.";

@@ -26,7 +26,7 @@ public class MultiPartFileTest {
 		assertEquals(MultiPartHandler.MULTI_PART_CONTENT_TYPE, res.getContentType());
 
 		res.getWriter().flush();
-		IoUtils.quiteClose(out);
+		IoUtils.quietClose(out);
 		String actual = out.toString();
 
 		assertEquals("Expect only content type to be set", 0, actual.length());
@@ -42,7 +42,7 @@ public class MultiPartFileTest {
 
 		handler.startNewFile("text/csv", "foo.csv");
 		res.getWriter().flush();
-		IoUtils.quiteClose(out);
+		IoUtils.quietClose(out);
 
 		String actual = out.toString();
 
@@ -64,7 +64,7 @@ public class MultiPartFileTest {
 
 		handler.endNewFile();
 		res.getWriter().flush();
-		IoUtils.quiteClose(out);
+		IoUtils.quietClose(out);
 		String actual = out.toString();
 
 		assertEquals("Expect only content type to be set", 0, actual.length());
@@ -79,7 +79,7 @@ public class MultiPartFileTest {
 		FileDownloadHandler handler = new MultiPartHandler(res, out, "TestFinishWritingFiles");
 
 		handler.finishWritingFiles();
-		IoUtils.quiteClose(out);
+		IoUtils.quietClose(out);
 		String actual = out.toString();
 		assertEquals("The last boundary terminator should be present",
 				1, StrUtils.occurrences(MultiPartHandler.BOUNDARY_TAG+"--", actual));

@@ -140,7 +140,7 @@ public class GeoserverProxy extends ProxyServlet {
 				handleErrorStream(targetConn, responseOutputStream);
 			}
 		} finally {
-			IoUtils.quiteClose(targetConnWriter, targetIs);
+			IoUtils.quietClose(targetConnWriter, targetIs);
 		}
 	}
 
