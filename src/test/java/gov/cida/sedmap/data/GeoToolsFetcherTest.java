@@ -27,7 +27,6 @@ import gov.cida.sedmap.io.FileDownloadHandler;
 import gov.cida.sedmap.io.InputStreamWithFile;
 import gov.cida.sedmap.io.IoUtils;
 import gov.cida.sedmap.io.MultiPartHandler;
-import gov.cida.sedmap.io.util.SessionUtil;
 import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.mock.MockContext;
 import gov.cida.sedmap.mock.MockDataSource;

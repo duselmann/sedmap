@@ -30,7 +30,6 @@ import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.PropertyName;
 
-import gov.cida.sedmap.io.util.SessionUtil;
 import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.io.util.exceptions.SedmapException;
 import gov.cida.sedmap.io.util.exceptions.SedmapException.OGCExceptionCode;

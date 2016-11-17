@@ -29,10 +29,8 @@ import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 
-import gov.cida.sedmap.data.Fetcher;
 import gov.cida.sedmap.data.FetcherConfig;
 import gov.cida.sedmap.io.IoUtils;
-import gov.cida.sedmap.io.util.SessionUtil;
 import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.io.util.exceptions.SedmapException;
 import gov.cida.sedmap.mock.MockContext;
