@@ -53,11 +53,11 @@ public class GeoserverProxy extends ProxyServlet {
 
 		String params = request.getQueryString();
 		if (uri.contains("flow")) {
-			uri = NHD_SERVER; //"http://cida-wiwsc-wsdev.er.usgs.gov:8080/geoserver/NHDPlusFlowlines/wms";
+			uri = NHD_SERVER;
 			logger.error(uri+"?"+params);
 		} else {
 			uri = uri.replace("sediment/map", "geoserver/sedmap");
-			uri = GEO_SERVER + uri; //"http://cida-wiwsc-sedmapdev.er.usgs.gov:8080" + uri;
+			uri = GEO_SERVER + uri;
 		}
 		return new URL(uri +"?" +params);
 	}
