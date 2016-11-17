@@ -82,6 +82,7 @@
             </snapshotRepository>
     </distributionManagement>
         
+        
     <repositories>
         <repository>
 	        <id>maven2</id>
@@ -91,6 +92,15 @@
             <id>nexus</id>
             <name>CIDA Nexus</name>
             <url>${cida.maven.url}/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>cida-public-releases</id>
+            <layout>default</layout>
+            <name>Cida Releases - Release Shared Libraries</name>
+            <url>${cida.maven.url}/service/local/repositories/cida-public-releases/content</url>
+            <!--
+             http://internal.cida.usgs.gov/maven/service/local/repositories/cida-public-releases/content/gov/usgs/cida/jslibs/usgs-template/2.4/usgs-template-2.4.war
+             -->
         </repository>
         <repository>
             <id>cida-releases</id>
@@ -136,14 +146,14 @@
             <url>${cida.maven.url}/content/groups/public/</url>
         </pluginRepository>
     </pluginRepositories>
-    
+        
     <dependencies>
-        <dependency>
-            <groupId>gov.usgs.cida.jslibs</groupId>
-            <artifactId>usgs-template</artifactId>
-            <version>2.1</version>
-            <type>war</type>
-        </dependency>
+		<dependency>
+		  <groupId>gov.usgs.cida.jslibs</groupId>
+		  <artifactId>usgs-template</artifactId>
+		  <version>2.4</version>
+		  <type>war</type>
+		</dependency>
         <dependency>
             <groupId>gov.usgs.cida.jslibs</groupId>
             <artifactId>openlayers</artifactId>
