@@ -921,7 +921,7 @@ var UI = function() {
                 if (query) {
                     $.ajax({
                         type: 'GET',
-                        url: 'http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find',
+                        url: 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find',
                         data: {
                             text: query,
                             maxLocations: '20',

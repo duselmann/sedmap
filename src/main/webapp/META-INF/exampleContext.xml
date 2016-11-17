@@ -24,7 +24,7 @@
     <!-- disable session persistence across Tomcat restarts -->
     <Manager pathname="" />
     
-	<Environment name="sedmap/email/link" value="http://supply.your.own:8080/sediment/download?file=" type="java.lang.String"/>
+	<Environment name="sedmap/email/link" value="https://supply.your.own:8080/sediment/download?file=" type="java.lang.String"/>
     <Environment name="sedmap/data/path" value="/opt/tomcat/instance/default/temp/"      type="java.lang.String" override="true"/>
 
 
@@ -40,9 +40,9 @@
               driverClassName="oracle.jdbc.driver.OracleDriver"
               url="jdbc:oracle:thin:@supply.your.ip:supply.your.port:supply.your.schema.name"/>
 
-        <Environment name="sedmap/nhdServer" value="http://supply.your.own:8081"      type="java.lang.String" override="true"/>
+        <Environment name="sedmap/nhdServer" value="https://supply.your.own:8081"      type="java.lang.String" override="true"/>
         <Environment name="sedmap/nhdPath"   value="/geoserver/NHDPlusFlowlines/wms"  type="java.lang.String" override="true"/>
-        <Environment name="sedmap/sedServer" value="http://supply.your.own:8080" type="java.lang.String" override="true"/>
+        <Environment name="sedmap/sedServer" value="https://supply.your.own:8080" type="java.lang.String" override="true"/>
         <Environment name="sedmap/development" value="true" type="java.lang.String" />
         <Environment name="sedmap/googleAnalyticsAccountCode" value="supply.your.own" type="java.lang.String" />
 	

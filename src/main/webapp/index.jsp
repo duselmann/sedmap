@@ -19,7 +19,6 @@
         <link type="text/css" rel="stylesheet" href="css/app.css" />
         <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
-        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
         <jsp:include page="template/USGSHead.jsp">
             <jsp:param name="relPath" value="" />
@@ -39,8 +38,7 @@
         <script type="text/javascript" src="js/openlayers/OpenLayers.js"></script>
         <script type="text/javascript" src="js/utils.js"></script>
         <!-- Google Analytics Setup -->
-	<script type="text/javascript" async="" src="http://www.google-analytics.com/ga.js"></script>
-	<script type="text/javascript" async="" src="http://www.google-analytics.com/ga.js"></script>
+	<script type="text/javascript" async="" src="https://www.google-analytics.com/ga.js"></script>
 	<script type="text/javascript">
 		   var _gaq = _gaq || [];
 		   _gaq.push(['_setAccount', 'UA-46483138-2']);
