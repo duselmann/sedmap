@@ -186,6 +186,12 @@ public class IoUtils {
 		}
 	}
 	
+	public static void deleteFile(InputStreamWithFile instream) {
+		if (instream != null) {
+			deleteFile(instream.getFile());
+		}
+	}
+	
 	public static void deleteFile(File file) {
 		if (file == null) {
 			return;
