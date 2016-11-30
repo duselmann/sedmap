@@ -27,6 +27,7 @@ public class TimeOutHandler extends EmailLinkHandler {
 	
 	public TimeOutHandler(HttpServletResponse res, String email) throws IOException {
 		super(res, email);
+		isSendEmail = false;
 	}
 	
 	@Override
