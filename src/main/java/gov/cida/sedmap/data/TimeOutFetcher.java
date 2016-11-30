@@ -80,7 +80,7 @@ public class TimeOutFetcher extends Fetcher {
 		 */
 		timeoutAgent.start();
 		long  startTime = System.currentTimeMillis();
-		long currentTime = startTime;		
+		long currentTime = startTime;
 		waitForThreadToFinish(timeoutAgent, startTime, currentTime, TIMEOUT);
 				
 		/**

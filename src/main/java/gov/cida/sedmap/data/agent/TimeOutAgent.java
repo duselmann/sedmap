@@ -25,7 +25,7 @@ public class TimeOutAgent extends Thread {
 		this.timeoutHandler = timeoutHandler;
 		this.request = request;
 		
-		this.isRunning = false;
+		isRunning = false;
 		isStarted = false;
 		this.exception = null;
 	}
@@ -35,19 +35,24 @@ public class TimeOutAgent extends Thread {
 			isStarted = true;
 			isRunning = true;
 			jdbcFetcher.doFetch(this.request, this.timeoutHandler);
+			isRunning = false;
 		} catch (InterruptedException e) {
 			logger.info("TimeOutAgent has received a stop interrupt.  Exiting agent...");
-			exception = e;
+			isRunning = false;
+			this.exception = e;
 		} catch (Exception e) {
 			logger.info("TimeOutAgent has received an exception.  [" + e.getMessage() + "]");
-			exception = e;
-		} finally {
-			isRunning = false; // this used to be set in all blocks above
+			isRunning = false;
+			this.exception = e;
 		}
 	}
 
 	public boolean isRunning() {
-		return isStarted & isRunning;
+		if ( ! isStarted ) {
+			return true;
+		} else {
+			return isRunning;
+		}
 	}
 
 	public boolean isError() {

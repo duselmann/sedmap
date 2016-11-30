@@ -22,6 +22,8 @@ public class EmailLinkHandler extends ZipHandler {
 	protected String errorId;
 	protected Exception exceptionThrown;
 
+	protected boolean isSendEmail = true;
+	
 
 	public EmailLinkHandler(HttpServletResponse res, String email) throws IOException {
 		super(res);
@@ -50,7 +52,14 @@ public class EmailLinkHandler extends ZipHandler {
 	@Override
 	public FileDownloadHandler finishWritingFiles() throws SedmapException {
 		super.finishWritingFiles();
+		if (isSendEmail) {
+			sendEmail();
+		}
+		return this; //chain
+	}
 
+	public void sendEmail() {
+		logger.info("Sending email to " + emailAddr);
 		SedmapDataMail mailer = new SedmapDataMail();
 		// TODO handle false on send message
 		if ( StrUtils.isEmpty(getErrorId()) ) {
@@ -62,9 +71,8 @@ public class EmailLinkHandler extends ZipHandler {
 		} else {
 			mailer.sendErrorMessage(emailAddr, getErrorId(), getExceptionThrown());
 		}
-		return this; //chain
 	}
-
+	
 
 	public String getErrorId() {
 		return errorId;

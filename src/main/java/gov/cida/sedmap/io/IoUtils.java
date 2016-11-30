@@ -35,7 +35,22 @@ public class IoUtils {
 			if (o == null) continue;
 
 			try {
-				logger.debug("Closing resource. " + o.getClass().getName());
+				if (logger.isDebugEnabled()) {
+					StringBuilder msg = new StringBuilder();
+					msg.append("Closing resource");
+					
+					StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+					if (stackTraceElements != null && stackTraceElements.length>2) {
+						StackTraceElement caller = stackTraceElements[2];
+						msg.append(", called from ").append(caller.getClassName())
+							.append("(").append(caller.getMethodName()).append("):")
+							.append(caller.getLineNumber()).append(",");
+					}
+					
+					msg.append(" ").append(o.getClass().getName());
+					logger.debug(msg.toString());
+				}
+				
 				if        (o instanceof Connection) {
 					if ( !((Connection)o).isClosed() ) {
 						((Connection)o).close();
@@ -168,6 +183,12 @@ public class IoUtils {
 		try (InputStreamWithFile source = createTmpZipStream(sourceFile)) {
 			Reader reader = new InputStreamReader(source);
 			IOUtils.copy(reader, writer);
+		}
+	}
+	
+	public static void deleteFile(InputStreamWithFile instream) {
+		if (instream != null) {
+			deleteFile(instream.getFile());
 		}
 	}
 	

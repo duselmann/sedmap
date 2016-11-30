@@ -7,28 +7,27 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import gov.cida.sedmap.io.util.SessionUtil;
-import gov.cida.sedmap.io.util.StrUtils;
 import gov.cida.sedmap.io.util.exceptions.SedmapException;
-import gov.cida.sedmap.mail.SedmapDataMail;
 
-
+//
 public class TimeOutHandler extends EmailLinkHandler {
 	private static final Logger logger = Logger.getLogger(TimeOutHandler.class);
 	
 	protected static final String LINK_PATH_ENV_KEY        = "sedmap/timeouthandler/linkpath";
-	protected static final String LINK_PATH_LINK_DEFAULT        = "/sediment/download?file=";
-	public static final String LINK_PATH;
+	protected static final String LINK_PATH_LINK_DEFAULT   = "/sediment/download?file=";
+	public    static final String LINK_PATH;
 	
 	static {
 		LINK_PATH = SessionUtil.lookup(LINK_PATH_ENV_KEY, LINK_PATH_LINK_DEFAULT);
 	}
 	
 	private volatile Boolean finishedWriting = false;
-	private volatile boolean sendEmail = false;
 	private volatile boolean pastEmailLogic = false;
 
+	
 	public TimeOutHandler(HttpServletResponse res, String email) throws IOException {
 		super(res, email);
+		isSendEmail = false;
 	}
 	
 	@Override
@@ -52,18 +51,14 @@ public class TimeOutHandler extends EmailLinkHandler {
 		 * it has the least chance of happening.
 		 */
 		synchronized (finishedWriting) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("finishing writing files for timeout send email is " + isSendEmail);
+			}
+			
 			finishedWriting = true;
+			pastEmailLogic = isSendEmail;
 			
 			super.finishWritingFiles();
-			
-			/**
-			 * Lets see if this job timeout out at all.  If it did then we need to
-			 * send an email.  If not, we just exit out.
-			 */
-			if (sendEmail) {			
-				sendEmail();				
-				pastEmailLogic = true;
-			}
 		}
 		
 		return this; //chain
@@ -75,7 +70,7 @@ public class TimeOutHandler extends EmailLinkHandler {
 	 */
 	public String getFileUrl() {
 		String fileName = getFileName();
-		String fileId = fileName.substring(5,fileName.length()-4);
+		String fileId   = fileName.substring(5,fileName.length()-4);
 		
 		return LINK_PATH + fileId;
 	}
@@ -95,11 +90,11 @@ public class TimeOutHandler extends EmailLinkHandler {
 	}
 
 	public boolean sendingEmail() {
-		return sendEmail;
+		return isSendEmail;
 	}
 
 	public void setSendEmail(boolean send) {
-		this.sendEmail = send;
+		isSendEmail = send;
 	}
 	
 	public boolean finishedWriting() {
@@ -109,19 +104,4 @@ public class TimeOutHandler extends EmailLinkHandler {
 	public boolean isPastEmailLogic() {
 		return pastEmailLogic;
 	}
-	
-	public void sendEmail() {
-		logger.info("Sending email to " + emailAddr);
-		SedmapDataMail mailer = new SedmapDataMail();
-		// TODO handle false on send message
-		if ( StrUtils.isEmpty(getErrorId()) ) {
-			String fileId = getFileName();
-			fileId = fileId.substring(5,fileId.length()-4);
-
-			mailer.sendFileMessage(emailAddr, fileId);
-		} else {
-			mailer.sendErrorMessage(emailAddr, getErrorId(), getExceptionThrown());
-		}
-	}
-
 }
