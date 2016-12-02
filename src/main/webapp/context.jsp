@@ -15,7 +15,7 @@
             googleAnalyticsAccountNumber = (String) ctx.lookup("java:comp/env/sedmap/googleAnalyticsAccountCode");
         }
         catch (NamingException e) {
-            LoggerFactory.getLogger("index.jsp").error("Error reading environment variables.");
+            LoggerFactory.getLogger("index.jsp").error("Error reading environment variables. error in sedmap/development or sedmap/googleAnalyticsAccountCode");
         }
     }
 %>
