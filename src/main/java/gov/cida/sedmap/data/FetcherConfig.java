@@ -40,7 +40,7 @@ public class FetcherConfig {
 	public static final String NWIS_RETRY_SIZE_PARAM = "sedmap/nwis.tries.size";
 	
 	public static final String NWIS_URL_ENV     = "sedmap/NWIS_URL";
-	public static final String NWIS_URL_DEFAULT = "http://waterservices.usgs.gov/nwis/dv/?format=_format_&sites=_sites_&startDT=_startDate_&endDT=_endDate_&statCd=00003&parameterCd=00060,80154,80155";
+	public static final String NWIS_URL_DEFAULT = "https://waterservices.usgs.gov/nwis/dv/?format=_format_&sites=_sites_&startDT=_startDate_&endDT=_endDate_&statCd=00003&parameterCd=00060,80154,80155";
 
 	public static final int NUM_NWIS_TRIES  = 3;
 	public static final int NWIS_BATCH_SIZE = 25;
