@@ -17,5 +17,5 @@ grant select on site_basin to seduser;
 insert into site_basin
 select site_no,
 basin_ids
-from SRC_SEDMAP_SITE_BASIN_7222016;
+from SRC_SEDMAP_SITE_BASIN_11152017;
 -- rollback truncate table site_basin;

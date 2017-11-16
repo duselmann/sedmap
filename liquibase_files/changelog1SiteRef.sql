@@ -39,7 +39,8 @@ CREATE TABLE SEDMAP.SITE_REF
   NID_STOR            number(13,4),
   CLAY                number( 6,4),
   SAND                number( 6,4),
-  SILT                number( 6,4)
+  SILT                number( 6,4),
+  GAGE                VARCHAR2(1 BYTE)
 );
 
 ALTER TABLE SEDMAP.SITE_REF ADD (
@@ -144,8 +145,9 @@ select site_no,
   to_number(NID_STOR) ,
   to_number(CLAY)  ,
   to_number(SAND) ,
-  to_number(SILT)
-   from SRC_SSC_SITE_INFO_7252016;
+  to_number(SILT),
+  GAGE
+   from SRC_SSC_SITE_INFO_11152017;
 
 update site_ref set GEOM_LL = mdsys.sdo_geometry(2001,8307,mdsys.sdo_point_type
 (longitude,latitude,null),null,null); 
