@@ -81,9 +81,7 @@ Drop table benchmark_sites;
 Drop table flow_exceedance;
 
 Drop table discrete_sample_fact;
-
 Drop table discrete_sites;
-
 Drop table daily_years;  
 
 Drop table daily_sites;
@@ -97,6 +95,7 @@ Drop table SITE_REF;
 drop table DATABASECHANGELOG;
 
 drop table DATABASECHANGELOGLOCK;
+
 ---------------------------------------------------------------------------------------
 
 Updating the new basin layer shapefile:
@@ -112,11 +111,17 @@ We usually get shapefiles from Casey Lee (cjlee@usgs.gov) in a zip file that ave
 *.shx
 
 These 5 files must be renamed to the correct layer name used in Geoserver.  The end result must be:
+
 Allbasinsupdate.desc.dbf
+
 Allbasinsupdate.desc.prj
+
 Allbasinsupdate.desc.shp
+
 Allbasinsupdate.desc.shp.xml
+
 Allbasinsupdate.desc.shx
+
 Once renamed they need to be copied to the sedmap servers:
 cida-eros-sedmapdev.er.usgs.gov
 cida-eros-sedmapqa.er.usgs.gov
@@ -130,9 +135,11 @@ Checking Data Dot Size in UI:
 As mentioned in JIRA ticket NSM-260 (https://internal.cida.usgs.gov/jira/browse/NSM-260) the Data Dot Sizes need to me manually manipulated based on the amount of data in the database.  There is no algorithmic way to do this with Geoserver so the SQL for the _discrete layer needs to be updated based on the visual representation of the Dot Size.
 To change the SQL for this layer:
 Log into Geoserver as admin
+
 http://cida-eros-sedmapdev.er.usgs.gov:8080/geoserver
 http://cida-eros-sedmapqa.er.usgs.gov:8080/geoserver
 http://cida-eros-sedmapprod.er.usgs.gov:8080/geoserver
+
 On the left side, click "Layers".
 In the "Layer Name" column, click the "_discrete" link.
 Scroll to the bottom of this page and under the "Property" fields click the "Edit sql view" link
