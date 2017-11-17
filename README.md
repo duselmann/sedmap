@@ -104,34 +104,30 @@ drop table DATABASECHANGELOGLOCK;
 Updating the new basin layer shapefile:
 ======
 We usually get shapefiles from Casey Lee (cjlee@usgs.gov) in a zip file that averages 180MB+.  Regardless of the names (they differ year by year while this year they looked like "Basins.2015.updatedesc"), we are only interested in 5 files:
-*.dbf
-
-*.prj
-
-*.shp
-
-*.shp.xml
-
-*.shx
+ - *.dbf
+ - *.prj
+ - *.shp
+ - *.shp.xml
+ - *.shx
 
 These 5 files must be renamed to the correct layer name used in Geoserver.  The end result must be:
 
-Allbasinsupdate.desc.dbf
-
-Allbasinsupdate.desc.prj
-
-Allbasinsupdate.desc.shp
-
-Allbasinsupdate.desc.shp.xml
-
-Allbasinsupdate.desc.shx
+ - Allbasinsupdate.desc.dbf
+ - Allbasinsupdate.desc.prj
+ - Allbasinsupdate.desc.shp
+ - Allbasinsupdate.desc.shp.xml
+ - Allbasinsupdate.desc.shx
 
 Once renamed they need to be copied to the sedmap servers:
-cida-eros-sedmapdev.er.usgs.gov
-cida-eros-sedmapqa.er.usgs.gov
-cida-eros-sedmapprod.er.usgs.gov
+
+ - cida-eros-sedmapdev.er.usgs.gov
+ - cida-eros-sedmapqa.er.usgs.gov
+ - cida-eros-sedmapprod.er.usgs.gov
+ 
 Place the files in /opt/tomcat/geoserver/data/Allbasinsupdate.desc/ overwriting any files in the directory.
+
 Since we are replacing files of the same name we need to remove a Geoserver generated file called Allbasinsupdate.desc.qix located in that same directory (/opt/tomcat/geoserver/data/Allbasinsupdate.desc/).  Once Geoserver is restarted, this file is regenerated for the new shapefiles.
+
 Restart Geoserver via restarting tomcat:
 > tomcat restart default
 
@@ -140,16 +136,16 @@ Checking Data Dot Size in UI:
 As mentioned in JIRA ticket NSM-260 (https://internal.cida.usgs.gov/jira/browse/NSM-260) the Data Dot Sizes need to me manually manipulated based on the amount of data in the database.  There is no algorithmic way to do this with Geoserver so the SQL for the _discrete layer needs to be updated based on the visual representation of the Dot Size.
 
 To change the SQL for this layer:
- a.Log into Geoserver as admin
+  a.Log into Geoserver as admin
 
-  i.http://cida-eros-sedmapdev.er.usgs.gov:8080/geoserver
-  ii.http://cida-eros-sedmapqa.er.usgs.gov:8080/geoserver
-  iii.http://cida-eros-sedmapprod.er.usgs.gov:8080/geoserver
+    i.http://cida-eros-sedmapdev.er.usgs.gov:8080/geoserver
+    ii.http://cida-eros-sedmapqa.er.usgs.gov:8080/geoserver
+    iii.http://cida-eros-sedmapprod.er.usgs.gov:8080/geoserver
 
- b.On the left side, click "Layers".
- c. In the "Layer Name" column, click the "_discrete" link.
- d.Scroll to the bottom of this page and under the "Property" fields click the "Edit sql view" link
- e.Modify the "SQL Statement" to reflect the changes
+  b.On the left side, click "Layers".
+  c. In the "Layer Name" column, click the "_discrete" link.
+  d.Scroll to the bottom of this page and under the "Property" fields click the "Edit sql view" link
+  e.Modify the "SQL Statement" to reflect the changes
  
 Simple tests after the upload to make sure the update worked:
 ======
