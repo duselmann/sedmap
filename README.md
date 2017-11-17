@@ -3,12 +3,14 @@ sedmap
 
 
 Dev URL:  http://cida-eros-sedmapdev.er.usgs.gov:8080/sediment/
+
 Updating tables, views, indexes for new datasets using Liquibase:
+======
 So far, for data refreshes we have received a whole new dataset - rather than a set of data to add to existing data.  I delete all tables, views, indexes, and changelog tables (scripts in the notes below) and then re-run all of the liquibase scripts.  I found this useful for these reasons:
-*The tables need to be truncated and reloaded anyway.
-*After the site table is loaded the records need to be updated with the GEOM_LL data anyway (seechangelog1SiteRef.sql).
-*All of the site_ref updates need to be rerun anyway (see changelog2_DataFixes.sql).
-*Even indirect tables need to be truncated and reloaded.  For example, the daily_year table is created by pivoting a column in daily_years (see changelog2_DailyYear.sql)
+ - The tables need to be truncated and reloaded anyway.
+ - After the site table is loaded the records need to be updated with the GEOM_LL data anyway (seechangelog1SiteRef.sql).
+ - All of the site_ref updates need to be rerun anyway (see changelog2_DataFixes.sql).
+ - Even indirect tables need to be truncated and reloaded.  For example, the daily_year table is created by pivoting a column in daily_years (see changelog2_DailyYear.sql)
 
 If you decide to take this approach,
 1) First bring in the new datasets as SRC_ (source) tables and name them appropriately (in the DEV schema). I use Toad 'Create Table' and 'Import Table Data'
@@ -129,7 +131,8 @@ Place the files in /opt/tomcat/geoserver/data/Allbasinsupdate.desc/ overwriting 
 Since we are replacing files of the same name we need to remove a Geoserver generated file called Allbasinsupdate.desc.qix located in that same directory (/opt/tomcat/geoserver/data/Allbasinsupdate.desc/).  Once Geoserver is restarted, this file is regenerated for the new shapefiles.
 
 Restart Geoserver via restarting tomcat:
-    > tomcat restart default
+   
+   > tomcat restart default
 
 Checking Data Dot Size in UI:
 ======
