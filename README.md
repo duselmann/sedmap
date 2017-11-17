@@ -1,8 +1,6 @@
 sedmap
 ======
 
-Sediment Mapper
-
 
 Dev URL:  http://cida-eros-sedmapdev.er.usgs.gov:8080/sediment/
 Updating tables, views, indexes for new datasets using Liquibase:
