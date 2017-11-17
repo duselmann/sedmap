@@ -129,14 +129,14 @@ Place the files in /opt/tomcat/geoserver/data/Allbasinsupdate.desc/ overwriting 
 Since we are replacing files of the same name we need to remove a Geoserver generated file called Allbasinsupdate.desc.qix located in that same directory (/opt/tomcat/geoserver/data/Allbasinsupdate.desc/).  Once Geoserver is restarted, this file is regenerated for the new shapefiles.
 
 Restart Geoserver via restarting tomcat:
-> tomcat restart default
+    > tomcat restart default
 
 Checking Data Dot Size in UI:
 ======
 As mentioned in JIRA ticket NSM-260 (https://internal.cida.usgs.gov/jira/browse/NSM-260) the Data Dot Sizes need to me manually manipulated based on the amount of data in the database.  There is no algorithmic way to do this with Geoserver so the SQL for the _discrete layer needs to be updated based on the visual representation of the Dot Size.
 
 To change the SQL for this layer:
-  a.Log into Geoserver as admin
+   a.Log into Geoserver as admin
 
     i.http://cida-eros-sedmapdev.er.usgs.gov:8080/geoserver
     ii.http://cida-eros-sedmapqa.er.usgs.gov:8080/geoserver
