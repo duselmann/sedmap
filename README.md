@@ -35,7 +35,9 @@ Drop index SITE_REF_HUC_IDX;
 Drop index SITE_REF_ECO3_IDX;
 
 Drop index SITE_REF_ECO2_IDX;
+
 Drop index SITE_REF_URBAN_IDX;
+
 Drop index SITE_REF_AGRIC_IDX;
 
 Drop index SITE_REF_FOREST_IDX;
@@ -53,37 +55,62 @@ Drop index SITE_REF_SILT_IDX;
 Drop index DISCRETE_SAMPLE_YEAR_IDX;
 
 drop view SITE_REF_BASIN;
+
 drop view DISCRETE_STATIONS;
+
 drop view daily_stations;
+
 drop view SITE_INFO;
+
 drop view ECO1NAMES;
+
 drop view ECO2NAMES;
+
 drop view ECO3NAMES;
+
 drop view DISCRETE_STATIONS_DL;
+
 drop view DAILY_STATIONS_DL;
 
 drop table site_basin;
+
 drop table daily_year;
-Drop table benchmark_sites;    
+
+Drop table benchmark_sites;  
+
 Drop table flow_exceedance;
+
 Drop table discrete_sample_fact;
+
 Drop table discrete_sites;
+
 Drop table daily_years;  
+
 Drop table daily_sites;
+
 DROP INDEX SM_SITE_GEOM_LL_SP_IDX;
+
 delete from mdsys.user_sdo_geom_metadata where table_name='SITE_REF';
+
 Drop table SITE_REF;
+
 drop table DATABASECHANGELOG;
+
 drop table DATABASECHANGELOGLOCK;
 ---------------------------------------------------------------------------------------
 
 Updating the new basin layer shapefile:
 We usually get shapefiles from Casey Lee (cjlee@usgs.gov) in a zip file that averages 180MB+.  Regardless of the names (they differ year by year while this year they looked like "Basins.2015.updatedesc"), we are only interested in 5 files:
 *.dbf
+
 *.prj
+
 *.shp
+
 *.shp.xml
+
 *.shx
+
 These 5 files must be renamed to the correct layer name used in Geoserver.  The end result must be:
 Allbasinsupdate.desc.dbf
 Allbasinsupdate.desc.prj
