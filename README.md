@@ -27,9 +27,13 @@ Deleting from schema:
 To delete all of the tables, views, indexes and chagelog tables run these scripts:
 -------------------------------------------------------------------------------
 Drop index SITE_REF_DA_IDX;
+
 Drop index SITE_REF_STATE_IDX;
+
 Drop index SITE_REF_HUC_IDX;
+
 Drop index SITE_REF_ECO3_IDX;
+
 Drop index SITE_REF_ECO2_IDX;
 Drop index SITE_REF_URBAN_IDX;
 Drop index SITE_REF_AGRIC_IDX;
