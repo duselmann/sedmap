@@ -136,16 +136,15 @@ Checking Data Dot Size in UI:
 As mentioned in JIRA ticket NSM-260 (https://internal.cida.usgs.gov/jira/browse/NSM-260) the Data Dot Sizes need to me manually manipulated based on the amount of data in the database.  There is no algorithmic way to do this with Geoserver so the SQL for the _discrete layer needs to be updated based on the visual representation of the Dot Size.
 
 To change the SQL for this layer:
-   a.Log into Geoserver as admin
 
-    i.http://cida-eros-sedmapdev.er.usgs.gov:8080/geoserver
-    ii.http://cida-eros-sedmapqa.er.usgs.gov:8080/geoserver
-    iii.http://cida-eros-sedmapprod.er.usgs.gov:8080/geoserver
-
-  b.On the left side, click "Layers".
-  c. In the "Layer Name" column, click the "_discrete" link.
-  d.Scroll to the bottom of this page and under the "Property" fields click the "Edit sql view" link
-  e.Modify the "SQL Statement" to reflect the changes
+    a.Log into Geoserver as admin
+        i.http://cida-eros-sedmapdev.er.usgs.gov:8080/geoserver
+        ii.http://cida-eros-sedmapqa.er.usgs.gov:8080/geoserver
+        iii.http://cida-eros-sedmapprod.er.usgs.gov:8080/geoserver
+    b.On the left side, click "Layers".
+    c. In the "Layer Name" column, click the "_discrete" link.
+    d.Scroll to the bottom of this page and under the "Property" fields click the "Edit sql view" link
+    e.Modify the "SQL Statement" to reflect the changes
  
 Simple tests after the upload to make sure the update worked:
 ======
