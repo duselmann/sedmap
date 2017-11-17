@@ -102,6 +102,7 @@ drop table DATABASECHANGELOGLOCK;
 ---------------------------------------------------------------------------------------
 
 Updating the new basin layer shapefile:
+======
 We usually get shapefiles from Casey Lee (cjlee@usgs.gov) in a zip file that averages 180MB+.  Regardless of the names (they differ year by year while this year they looked like "Basins.2015.updatedesc"), we are only interested in 5 files:
 *.dbf
 
@@ -153,20 +154,24 @@ To change the SQL for this layer:
 Simple tests after the upload to make sure the update worked:
 ======
 Visual inspection:
-Are the discrete and daily points layers loading?
-Are the point sizes the same as production?
-Are all spatial layers loading?
-Is the NLCD legend loading?
+ - Are the discrete and daily points layers loading?
+ - Are the point sizes the same as production?
+ - Are all spatial layers loading?
+ - Is the NLCD legend loading?
+
 Data filtering
-Apply a state filter, are point filtering by that state?
-Apply a Basin boundary files (06130500, 07263620). Are sites filtered to just those in the basin?
-Apply a year range filter
-Apply a couple site characteristic filters, make sure they work.
-Pick a daily data site, click on it and record the number of years of daily data available. Use that value as the min years of daily data filter. Make sure this site is on the map when the filter is applied. 
+
+ - Apply a state filter, are point filtering by that state?
+ - Apply a Basin boundary files (06130500, 07263620). Are sites filtered to just those in the basin?
+ - Apply a year range filter
+ - Apply a couple site characteristic filters, make sure they work.
+ - Pick a daily data site, click on it and record the number of years of daily data available. Use that value as the min years of daily data filter. Make sure this site is on the map when the filter is applied. 
+ 
 Data download
-Apply a few filters, download the discrete data only. Compare to what is in production. They may not be exact due to data refresh, but are they close?
-Apply a few filters, download daily data only. Compare to what is in production. They should be the same or very close.
-Apply a few filters, download site attribute info only. Compare to production. They should be the same or very close. 
-Try to download data in both .tsv and .cvs format.
-Apply filers and select the option to include daily flow with the discrete data. Do you get the daily flow data? How does it compare to production?
+
+ - Apply a few filters, download the discrete data only. Compare to what is in production. They may not be exact due to data refresh, but are they close?
+ - Apply a few filters, download daily data only. Compare to what is in production. They should be the same or very close.
+ - Apply a few filters, download site attribute info only. Compare to production. They should be the same or very close. 
+ - Try to download data in both .tsv and .cvs format.
+ - Apply filers and select the option to include daily flow with the discrete data. Do you get the daily flow data? How does it compare to production?
 
