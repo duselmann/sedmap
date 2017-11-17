@@ -37,12 +37,19 @@ Drop index SITE_REF_ECO3_IDX;
 Drop index SITE_REF_ECO2_IDX;
 Drop index SITE_REF_URBAN_IDX;
 Drop index SITE_REF_AGRIC_IDX;
+
 Drop index SITE_REF_FOREST_IDX;
+
 Drop index SITE_REF_KFACT_IDX;
+
 Drop index SITE_REF_RFACT_IDX;
+
 Drop index SITE_REF_CLAY_IDX;
+
 Drop index SITE_REF_SAND_IDX;
+
 Drop index SITE_REF_SILT_IDX;
+
 Drop index DISCRETE_SAMPLE_YEAR_IDX;
 
 drop view SITE_REF_BASIN;
